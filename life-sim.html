@@ -672,6 +672,162 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   .loc-bar { padding:6px 12px; }
   .room-wrap { padding:4px; }
 }
+
+/* ── DUMBBELL ── */
+.dumbbell{position:absolute;top:142px;right:36px;display:flex;align-items:center;
+  z-index:4;cursor:pointer;opacity:.6;transition:opacity .2s;}
+.dumbbell:hover{opacity:1;}
+.db-w{width:8px;height:15px;background:#282830;border:1px solid #363640;border-radius:2px;flex-shrink:0;}
+.db-b{width:18px;height:5px;background:#1e1e26;border-top:1px solid #2c2c38;border-bottom:1px solid #2c2c38;}
+
+/* ── JOURNAL (on desk) ── */
+.journal{position:absolute;top:24px;left:22px;width:18px;height:26px;z-index:7;
+  background:linear-gradient(135deg,#3d2a18,#2a1c10);
+  border:1px solid #604028;border-radius:2px;cursor:pointer;
+  box-shadow:1px 2px 5px rgba(0,0,0,.6);transition:border-color .2s;}
+.journal:hover{border-color:#a06840;}
+.journal::after{content:'';position:absolute;right:2px;top:2px;bottom:2px;width:1px;
+  background:rgba(255,240,200,.15);}
+
+/* ── JOURNAL MODAL ── */
+.journal-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;
+  display:flex;align-items:center;justify-content:center;padding:16px;}
+.journal-inner{width:min(340px,92vw);max-height:82vh;background:#0d0d1a;
+  border:1px solid #2a2840;border-radius:14px;display:flex;flex-direction:column;overflow:hidden;}
+.j-hdr{padding:14px 18px 10px;border-bottom:1px solid #1e1e30;
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.j-title{font-size:14px;font-weight:800;color:#e8e0d0;letter-spacing:.5px;}
+.j-x{background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:22px;line-height:1;}
+.j-body{overflow-y:auto;flex:1;padding:10px 16px;}
+.todo-row{display:flex;align-items:center;gap:10px;padding:7px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);}
+.todo-row input[type=checkbox]{width:16px;height:16px;flex-shrink:0;accent-color:#a855f7;cursor:pointer;}
+.todo-row .t-txt{flex:1;font-size:13px;color:rgba(255,255,255,.82);line-height:1.4;}
+.todo-row.t-done .t-txt{text-decoration:line-through;opacity:.36;}
+.todo-row .t-del{background:none;border:none;color:rgba(255,255,255,.18);cursor:pointer;
+  font-size:17px;padding:0 2px;line-height:1;}
+.todo-row .t-del:hover{color:#ef4444;}
+.j-add{display:flex;gap:8px;padding:10px 16px;border-top:1px solid #1e1e30;flex-shrink:0;}
+.j-add input{flex:1;background:#141420;border:1px solid #2a2840;color:rgba(255,255,255,.88);
+  padding:8px 12px;border-radius:8px;font-size:13px;outline:none;font-family:inherit;}
+.j-add input:focus{border-color:#a855f7;}
+.j-add input::placeholder{color:rgba(255,255,255,.22);}
+.j-add-btn{background:#a855f7;border:none;color:white;padding:8px 14px;
+  border-radius:8px;cursor:pointer;font-size:17px;font-weight:700;transition:background .15s;}
+.j-add-btn:hover{background:#9333ea;}
+.j-foot{display:flex;gap:8px;padding:8px 16px 12px;border-top:1px solid #1e1e30;flex-shrink:0;}
+.j-foot button{flex:1;background:transparent;border:1px solid #2a2840;color:rgba(255,255,255,.42);
+  padding:7px;border-radius:8px;cursor:pointer;font-size:11px;letter-spacing:.5px;
+  transition:all .18s;font-family:inherit;}
+.j-foot button:hover{border-color:#a855f7;color:#c084fc;}
+.tmpl-list{padding:6px 0;}
+.tmpl-row{display:flex;align-items:center;gap:8px;padding:7px 8px;
+  background:#141420;border:1px solid #1e1e30;border-radius:6px;margin-bottom:6px;}
+.tmpl-row .tmpl-nm{flex:1;font-size:12px;color:rgba(255,255,255,.65);}
+.tmpl-load{background:rgba(168,85,247,.14);border:1px solid rgba(168,85,247,.4);
+  color:#c084fc;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .15s;}
+.tmpl-load:hover{background:rgba(168,85,247,.28);}
+.tmpl-del{background:transparent;border:1px solid #2a2840;color:rgba(255,255,255,.2);
+  padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px;}
+.tmpl-del:hover{border-color:#ef4444;color:#ef4444;}
+.j-empty{font-size:12px;color:rgba(255,255,255,.22);padding:10px 2px;}
+
+/* ── KITCHEN VIEW ── */
+.kitchen-wrap{flex:1;display:none;align-items:center;justify-content:center;
+  overflow:hidden;padding:16px;}
+.kitchen-wrap.show{display:flex;}
+.kitch{position:absolute;inset:0;
+  background:linear-gradient(180deg,#0d0f16 0%,#0f1218 55%,#111420 100%);overflow:hidden;}
+/* upper cabinet strip */
+.k-ucab{position:absolute;top:0;left:0;width:352px;height:16px;background:#16140f;
+  border-bottom:1px solid #2e2a22;}
+.k-ucab::after{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent,transparent 58px,#242018 58px,#242018 60px);}
+/* top counter */
+.k-ct{position:absolute;top:16px;left:0;width:352px;height:74px;
+  background:linear-gradient(180deg,#1c1a16,#161410);
+  border-right:2px solid #38342e;border-bottom:2px solid #38342e;}
+.k-ct::after{content:'';position:absolute;bottom:-3px;left:0;width:100%;height:10px;
+  background:linear-gradient(90deg,#9a8c6a,#c4b080,#9a8c6a);}
+/* lower cabinet fronts below top counter */
+.k-lcab{position:absolute;top:92px;left:0;width:352px;height:22px;
+  background:#131008;border-bottom:1px solid #28241c;}
+.k-lcab::after{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent,transparent 54px,#201e16 54px,#201e16 56px);}
+/* right counter */
+.k-cr{position:absolute;top:16px;right:0;width:72px;height:278px;
+  background:linear-gradient(180deg,#1c1a16,#161410);
+  border-left:2px solid #38342e;border-bottom:2px solid #38342e;}
+.k-cr::before{content:'';position:absolute;top:-2px;left:-2px;right:0;height:10px;
+  background:linear-gradient(90deg,#c4b080,#9a8c6a);}
+.k-cr::after{content:'';position:absolute;top:12px;left:4px;right:0;bottom:0;
+  background:repeating-linear-gradient(180deg,transparent,transparent 52px,#28241c 52px,#28241c 54px);}
+/* island — right edge touches right counter */
+.k-island{position:absolute;top:258px;left:143px;width:216px;height:72px;
+  background:linear-gradient(180deg,#201e18,#1a1814);
+  border-top:2px solid #38342e;border-left:2px solid #38342e;border-bottom:2px solid #38342e;
+  border-radius:4px 0 0 4px;}
+.k-island::after{content:'';position:absolute;top:-3px;left:0;right:0;height:10px;
+  background:linear-gradient(90deg,#9a8c6a,#c4b080,#9a8c6a);border-radius:4px 0 0 0;}
+/* sink */
+.k-sink{position:absolute;top:26px;left:66px;width:66px;height:48px;
+  background:#0c1018;border:2px solid #182030;border-radius:3px;
+  box-shadow:inset 0 3px 8px rgba(0,0,0,.6);}
+/* tap */
+.k-tap{position:absolute;top:18px;left:93px;width:4px;height:14px;
+  background:#2a3040;border-radius:2px;}
+.k-tap::after{content:'';position:absolute;top:0;left:-5px;width:14px;height:3px;
+  background:#2a3040;border-radius:2px;}
+/* stove hob */
+.k-stove{position:absolute;top:22px;left:182px;width:72px;height:62px;
+  background:#141418;border:1px solid #222228;border-radius:2px;}
+/* burner */
+.k-br{position:absolute;width:16px;height:16px;border-radius:50%;
+  border:2px solid #303038;background:#1a1a20;}
+/* oven front */
+.k-oven{position:absolute;top:93px;left:182px;width:72px;height:22px;
+  background:#141418;border:1px solid #222228;}
+.k-oven::after{content:'';position:absolute;top:4px;left:8px;right:8px;bottom:4px;
+  background:#0e0e12;border:1px solid #1e1e24;border-radius:1px;}
+/* microwave above stove */
+.k-micro{position:absolute;top:2px;left:180px;width:74px;height:14px;
+  background:#141418;border:1px solid #202028;border-radius:2px;}
+/* window above sink */
+.k-win{position:absolute;top:0;left:50px;width:78px;height:16px;
+  background:rgba(80,120,200,.06);border:1px solid #1a2030;border-radius:0 0 2px 2px;}
+/* fridge — top-right corner */
+.k-fridge{position:absolute;top:18px;right:4px;width:60px;height:88px;
+  background:linear-gradient(90deg,#1e2230,#252c3c);
+  border:1px solid #303848;border-radius:3px;z-index:2;}
+.k-fridge::after{content:'';position:absolute;top:44px;left:0;right:0;height:1px;background:#2c3448;}
+.k-fridge-h{position:absolute;top:14px;right:7px;width:3px;height:18px;
+  background:#404858;border-radius:2px;}
+/* knife block */
+.k-knives{position:absolute;top:26px;left:296px;width:24px;height:40px;
+  background:#1c1a16;border:1px solid #2e2a22;border-radius:2px;}
+.k-knives::after{content:'';position:absolute;top:5px;left:50%;transform:translateX(-50%);
+  width:1px;height:26px;background:#303028;
+  box-shadow:-5px 0 0 #2e2c26,5px 0 0 #2e2c26,-10px 0 0 #2c2a24;}
+/* plant on counter */
+.k-plant{position:absolute;top:10px;left:324px;font-size:14px;opacity:.7;}
+/* island stools */
+.k-stool{position:absolute;width:22px;height:15px;
+  background:#181620;border:1px solid #2a2838;border-radius:2px 2px 0 0;}
+.k-stool::after{content:'';position:absolute;bottom:-13px;left:50%;
+  transform:translateX(-50%);width:2px;height:13px;background:#1c1a24;}
+/* floor tile hint */
+.k-floor{position:absolute;bottom:0;left:0;right:0;height:185px;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.007),rgba(255,255,255,.007) 1px,transparent 1px,transparent 60px),
+  repeating-linear-gradient(0deg,rgba(255,255,255,.007),rgba(255,255,255,.007) 1px,transparent 1px,transparent 60px);}
+/* back button */
+.k-back{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.45);padding:9px 28px;border-radius:22px;
+  cursor:pointer;font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  transition:all .2s;font-family:inherit;white-space:nowrap;}
+.k-back:hover{border-color:rgba(255,255,255,.28);color:rgba(255,255,255,.65);}
+/* kitchen loc btn color */
+.loc-btn.kitchen.active{color:#f97316;border-color:#f97316;}
 </style>
 </head>
 <body>
@@ -692,6 +848,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <div class="loc-bar">
   <button class="loc-btn active" id="btn-room" onclick="goLoc('room')">🏠 Your Room</button>
   <button class="loc-btn" id="btn-out" onclick="goLoc('outside')">🌍 Outside</button>
+  <button class="loc-btn kitchen" id="btn-kitchen" onclick="goLoc('kitchen')">🍳 Kitchen</button>
 </div>
 
 <!-- BODY -->
@@ -730,6 +887,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
         <div class="d-kbd"></div>
         <div class="d-kbd d-kbd2"></div>
         <div class="d-mouse"></div>
+        <!-- Journal — left side of desk -->
+        <div class="journal" onclick="showJournal(event)" title="To-do list"></div>
       </div>
 
       <!-- PC tower -->
@@ -748,11 +907,16 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <div class="futon" onclick="showFutonMenu(event)" title="Rest on futon"></div>
       <div class="pillow"></div>
 
+      <!-- Dumbbell — between door and fan -->
+      <div class="dumbbell" onclick="showDumbbellMenu(event)" title="Train">
+        <div class="db-w"></div><div class="db-b"></div><div class="db-w"></div>
+      </div>
+
       <!-- Fan -->
       <div class="fan" id="fan"><div class="fan-blade" id="fan-blade"></div></div>
 
       <!-- Door -->
-      <div class="door" onclick="goLoc('outside')" title="Go outside">
+      <div class="door" onclick="showDoorMenu(event)" title="Leave room">
         <div class="door-icon">🚪</div>
         <div class="door-txt">Out</div>
         <div class="door-knob"></div>
@@ -772,6 +936,40 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
     <!-- Glow is a sibling of .room so room filter never dims it -->
     <div class="room-glow" id="room-glow"></div>
     </div><!-- /room-container -->
+  </div>
+
+  <!-- KITCHEN VIEW -->
+  <div class="kitchen-wrap" id="view-kitchen">
+    <div class="room-container">
+    <div class="kitch" id="the-kitchen">
+      <div class="k-floor"></div>
+      <div class="k-ucab"></div>
+      <div class="k-win"></div>
+      <div class="k-micro"></div>
+      <div class="k-ct"></div>
+      <div class="k-lcab"></div>
+      <div class="k-cr"></div>
+      <div class="k-island"></div>
+      <div class="k-sink"></div>
+      <div class="k-tap"></div>
+      <div class="k-stove">
+        <div class="k-br" style="top:8px;left:8px"></div>
+        <div class="k-br" style="top:8px;right:8px"></div>
+        <div class="k-br" style="bottom:8px;left:8px"></div>
+        <div class="k-br" style="bottom:8px;right:8px"></div>
+      </div>
+      <div class="k-oven"></div>
+      <div class="k-fridge"><div class="k-fridge-h"></div></div>
+      <div class="k-knives"></div>
+      <div class="k-plant">🌿</div>
+      <!-- Stools at island -->
+      <div class="k-stool" style="top:342px;left:162px"></div>
+      <div class="k-stool" style="top:342px;left:194px"></div>
+      <div class="k-stool" style="top:342px;left:226px"></div>
+      <div class="k-stool" style="top:342px;left:258px"></div>
+      <button class="k-back" onclick="goLoc('room')">← Back to Room</button>
+    </div>
+    </div>
   </div>
 
   <!-- OUTSIDE VIEW -->
@@ -1103,16 +1301,31 @@ function editTarget() {
 function goLoc(loc) {
   const rv = document.getElementById('view-room');
   const ov = document.getElementById('view-outside');
+  const kv = document.getElementById('view-kitchen');
   const br = document.getElementById('btn-room');
   const bo = document.getElementById('btn-out');
+  const bk = document.getElementById('btn-kitchen');
+  // hide all
+  rv.classList.add('hidden');
+  ov.classList.remove('show');
+  kv?.classList.remove('show');
+  [br, bo, bk].forEach(b => b?.classList.remove('active'));
   if (loc === 'room') {
-    rv.classList.remove('hidden'); ov.classList.remove('show');
-    br.classList.add('active');    bo.classList.remove('active');
-  } else {
-    rv.classList.add('hidden');    ov.classList.add('show');
-    bo.classList.add('active');    br.classList.remove('active');
-    closeZone();
+    rv.classList.remove('hidden'); br.classList.add('active');
+  } else if (loc === 'outside') {
+    ov.classList.add('show'); bo.classList.add('active'); closeZone();
+  } else if (loc === 'kitchen') {
+    kv?.classList.add('show'); bk?.classList.add('active');
   }
+}
+
+function showDoorMenu(e) {
+  e.stopPropagation();
+  moveChar('door');
+  showActivityMenu([
+    { icon:'🌍', label:'Go outside', action: () => goLoc('outside') },
+    { icon:'🍳', label:'Kitchen',    action: () => goLoc('kitchen') },
+  ], { top: 130, left: 195 }, 'down');
 }
 
 // ─────────────────────────────────────────────
@@ -1332,22 +1545,26 @@ function showFutonMenu(e) {
 
 function showDeskMenu(e) {
   e.stopPropagation();
-  // Second click on desk while already there → back to center
-  if (_currentZone === 'desk') {
-    closeActivityMenu();
-    clearActivityTimer();
-    moveChar('center');
-    _manualStatus = null;
-    render();
-    return;
-  }
-  moveChar('desk');
-  showActivityMenu([
+  const opts = [
     { icon:'💰', label:'Online hustle',       status:'💰 On the grind'    },
     { icon:'🎬', label:'Recording content',   status:'🎬 Recording'       },
     { icon:'🎮', label:'Gaming / doom scroll',status:'🎮 Wasting time...' },
     { icon:'⚡', label:'Productive work',     status:'⚡ Locked in'       },
-  ], { top: 116, left: 234 }, 'down');
+  ];
+  // If already seated in chair — stay in chair, just glow desk too
+  if (_sittingOnChair) {
+    document.querySelector('.desk')?.classList.add('active-zone');
+    showActivityMenu(opts, { top: 116, left: 234 }, 'down');
+    return;
+  }
+  // Second click on desk while standing → go back to center
+  if (_currentZone === 'desk') {
+    closeActivityMenu(); clearActivityTimer();
+    moveChar('center'); _manualStatus = null; render();
+    return;
+  }
+  moveChar('desk');
+  showActivityMenu(opts, { top: 116, left: 234 }, 'down');
 }
 
 function showActivityMenu(options, pos, dir) {
@@ -1367,7 +1584,7 @@ function showActivityMenu(options, pos, dir) {
     b.className = 'act-bubble';
     b.style.animationDelay = (i * 0.07) + 's';
     b.innerHTML = opt.icon + ' ' + opt.label;
-    b.onclick = ev => { ev.stopPropagation(); selectActivity(opt); };
+    b.onclick = ev => { ev.stopPropagation(); if (opt.action) { closeActivityMenu(); opt.action(); } else { selectActivity(opt); } };
     menu.appendChild(b);
   });
 
@@ -1489,6 +1706,7 @@ function toggleChair(e) {
     _manualStatus     = '🪑 Sitting';
     _manualStatusTime = Date.now();
   } else {
+    document.querySelector('.desk')?.classList.remove('active-zone');
     moveChar('center');
     if (chairEl) chairEl.classList.remove('seated');
     _manualStatus = null;
@@ -1623,6 +1841,109 @@ function _navPoster(dir) {
 }
 
 // ─────────────────────────────────────────────
+//  DUMBBELL MENU
+// ─────────────────────────────────────────────
+function showDumbbellMenu(e) {
+  e.stopPropagation();
+  showActivityMenu([
+    { icon:'😮', label:'Mewing',       status:'😮 Mewing'        },
+    { icon:'💪', label:'Face curls',   status:'💪 Face curls'    },
+    { icon:'🤸', label:'Face pulls',   status:'🤸 Face pulls'    },
+    { icon:'🧘', label:'Chin tucks',   status:'🧘 Chin tucks'    },
+    { icon:'🙆', label:'Stretching',   status:'🙆 Stretching'    },
+  ], { top: 250, left: 270 });
+}
+
+// ─────────────────────────────────────────────
+//  JOURNAL / TO-DO LIST
+// ─────────────────────────────────────────────
+function showJournal(e) {
+  e.stopPropagation();
+  const existing = document.getElementById('journal-modal');
+  if (existing) { existing.remove(); return; }
+  const modal = document.createElement('div');
+  modal.className = 'journal-modal';
+  modal.id = 'journal-modal';
+  modal.onclick = ev => { if (ev.target === modal) modal.remove(); };
+  _renderJournal(modal, false);
+  document.body.appendChild(modal);
+}
+
+function _jTodos()     { return JSON.parse(localStorage.getItem('life_sim_todos')     || '[]'); }
+function _jSaveTodos(t){ localStorage.setItem('life_sim_todos', JSON.stringify(t)); }
+function _jTmpls()     { return JSON.parse(localStorage.getItem('life_sim_todo_tmpls')|| '[]'); }
+function _jSaveTmpls(t){ localStorage.setItem('life_sim_todo_tmpls', JSON.stringify(t)); }
+
+function _renderJournal(modal, showTmpls) {
+  const todos = _jTodos(), tmpls = _jTmpls();
+  const rows = todos.map((t, i) => `
+    <div class="todo-row${t.done?' t-done':''}">
+      <input type="checkbox"${t.done?' checked':''} onchange="_jToggle(${i})">
+      <span class="t-txt">${t.text.replace(/</g,'&lt;')}</span>
+      <button class="t-del" onclick="_jDel(${i})">×</button>
+    </div>`).join('');
+  const tmplSection = showTmpls ? `
+    <div class="tmpl-list">
+      <div style="font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.28);text-transform:uppercase;margin-bottom:8px;padding:0 2px">Saved Templates</div>
+      ${tmpls.length ? tmpls.map((t,i)=>`
+        <div class="tmpl-row">
+          <span class="tmpl-nm">${t.name.replace(/</g,'&lt;')}</span>
+          <button class="tmpl-load" onclick="_jLoadTmpl(${i})">Load</button>
+          <button class="tmpl-del"  onclick="_jDelTmpl(${i})">×</button>
+        </div>`).join('') : '<div class="j-empty">No templates saved yet.</div>'}
+    </div>` : '';
+  modal.innerHTML = `
+    <div class="journal-inner" onclick="event.stopPropagation()">
+      <div class="j-hdr">
+        <div class="j-title">📓 Today's Tasks</div>
+        <button class="j-x" onclick="document.getElementById('journal-modal').remove()">×</button>
+      </div>
+      <div class="j-body">
+        ${todos.length ? rows : '<div class="j-empty">Nothing here yet — add a task below.</div>'}
+        ${tmplSection}
+      </div>
+      <div class="j-add">
+        <input id="j-inp" type="text" placeholder="Add a task…" onkeydown="if(event.key==='Enter')_jAdd()">
+        <button class="j-add-btn" onclick="_jAdd()">+</button>
+      </div>
+      <div class="j-foot">
+        <button onclick="_jSaveTmpl()">💾 Save as Template</button>
+        <button onclick="_jToggleTmpls()">${showTmpls?'📋 Hide':'📋 Templates'}</button>
+      </div>
+    </div>`;
+  // Re-focus input if it existed
+  setTimeout(()=>{ const inp=document.getElementById('j-inp'); if(inp)inp.focus(); },50);
+}
+
+function _jToggle(i){ const t=_jTodos(); t[i].done=!t[i].done; _jSaveTodos(t); const m=document.getElementById('journal-modal'); if(m)_renderJournal(m,!!m.querySelector('.tmpl-list')); }
+function _jDel(i)   { const t=_jTodos(); t.splice(i,1); _jSaveTodos(t); const m=document.getElementById('journal-modal'); if(m)_renderJournal(m,!!m.querySelector('.tmpl-list')); }
+function _jAdd()    {
+  const inp=document.getElementById('j-inp'); if(!inp)return;
+  const txt=inp.value.trim(); if(!txt)return;
+  const t=_jTodos(); t.push({text:txt,done:false}); _jSaveTodos(t);
+  const m=document.getElementById('journal-modal'); if(m)_renderJournal(m,false);
+}
+function _jSaveTmpl(){
+  const todos=_jTodos(); if(!todos.length){alert('Add some tasks first!');return;}
+  const name=prompt('Template name:'); if(!name)return;
+  const tmpls=_jTmpls(); tmpls.push({name,items:todos.filter(t=>!t.done).map(t=>t.text)});
+  _jSaveTmpls(tmpls); const m=document.getElementById('journal-modal'); if(m)_renderJournal(m,true);
+}
+function _jToggleTmpls(){
+  const m=document.getElementById('journal-modal'); if(!m)return;
+  _renderJournal(m,!m.querySelector('.tmpl-list'));
+}
+function _jLoadTmpl(i){
+  const tmpls=_jTmpls(); const t=tmpls[i]; if(!t)return;
+  _jSaveTodos(t.items.map(text=>({text,done:false})));
+  const m=document.getElementById('journal-modal'); if(m)_renderJournal(m,false);
+}
+function _jDelTmpl(i){
+  const tmpls=_jTmpls(); tmpls.splice(i,1); _jSaveTmpls(tmpls);
+  const m=document.getElementById('journal-modal'); if(m)_renderJournal(m,true);
+}
+
+// ─────────────────────────────────────────────
 //  MOTIVATIONAL PHRASES — cycle every 15 secs
 // ─────────────────────────────────────────────
 const MOTIV = [
@@ -1670,7 +1991,9 @@ setInterval(flashMotiv, 15 * 1000);
 //  (which can return 0 before layout is painted).
 // ─────────────────────────────────────────────
 function scaleRoom() {
-  const container = document.querySelector('.room-container');
+  document.querySelectorAll('.room-container').forEach(container => _scaleContainer(container));
+}
+function _scaleContainer(container) {
   if (!container) return;
 
   const DESIGN_W = 430, DESIGN_H = 510;
