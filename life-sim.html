@@ -1683,6 +1683,7 @@ function toggleCurtains() {
     win.className = 'window' + (_curtainsDrawn ? ' curtains' : isNight ? ' night' : '');
   }
   updateRoom();
+  saveState();
 }
 
 function toggleLight() {
@@ -1690,6 +1691,7 @@ function toggleLight() {
   const sw = document.getElementById('light-switch');
   if (sw) sw.className = 'light-switch' + (_lightOn ? ' on' : '');
   updateRoom();
+  saveState();
 }
 
 function updateDevices() {
@@ -1732,6 +1734,7 @@ function togglePC(e) {
   _pcOn = !_pcOn;
   if (_pcOn) _lastDevice = 'pc';
   updateDevices();
+  saveState();
 }
 
 function toggleMini(e) {
@@ -1739,6 +1742,7 @@ function toggleMini(e) {
   _miniOn = !_miniOn;
   if (_miniOn) _lastDevice = 'mac';
   updateDevices();
+  saveState();
 }
 
 // ─────────────────────────────────────────────
@@ -2455,6 +2459,12 @@ function saveState() {
       status:        _manualStatus,
       activityName:  _activityName,
       activityStart: _activityStart || null,
+      // Room / device state
+      pcOn:          _pcOn,
+      miniOn:        _miniOn,
+      lastDevice:    _lastDevice,
+      curtains:      _curtainsDrawn,
+      lightOn:       _lightOn,
     }));
   } catch(e) {}
 }
@@ -2463,6 +2473,17 @@ function loadState() {
   try {
     const s = JSON.parse(localStorage.getItem('life_sim_runtime') || 'null');
     if (!s) return;
+    // Restore room / device state
+    if (s.pcOn   !== undefined) _pcOn         = s.pcOn;
+    if (s.miniOn !== undefined) _miniOn       = s.miniOn;
+    if (s.lastDevice)           _lastDevice   = s.lastDevice;
+    if (s.curtains !== undefined) _curtainsDrawn = s.curtains;
+    if (s.lightOn !== undefined)  _lightOn      = s.lightOn;
+    updateDevices();
+    updateRoom();
+    // Sync light-switch visual
+    const sw = document.getElementById('light-switch');
+    if (sw) sw.className = 'light-switch' + (_lightOn ? ' on' : '');
     // Restore zone position
     if (s.zone && POS[s.zone]) {
       _currentZone = s.zone;
