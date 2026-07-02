@@ -681,7 +681,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .db-b{width:18px;height:5px;background:#1e1e26;border-top:1px solid #2c2c38;border-bottom:1px solid #2c2c38;}
 
 /* ── JOURNAL (on desk) ── */
-.journal{position:absolute;top:24px;left:22px;width:18px;height:26px;z-index:7;
+.journal{position:absolute;top:38px;left:40px;width:18px;height:26px;z-index:7;
   background:linear-gradient(135deg,#3d2a18,#2a1c10);
   border:1px solid #604028;border-radius:2px;cursor:pointer;
   box-shadow:1px 2px 5px rgba(0,0,0,.6);transition:border-color .2s;}
@@ -917,7 +917,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   <!-- ROOM VIEW -->
   <div class="room-wrap" id="view-room">
     <div class="room-container">
-    <div class="room dim" id="the-room">
+    <div class="room dim" id="the-room" onclick="roomClick()">
 
       <div class="win-light" id="win-light"></div>
 
@@ -947,9 +947,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
         <div class="d-kbd"></div>
         <div class="d-kbd d-kbd2"></div>
         <div class="d-mouse"></div>
-        <!-- Journal — left side of desk -->
-        <div class="journal" onclick="showJournal(event)" title="To-do list"></div>
       </div>
+      <!-- Journal — sibling of desk, own z-index above it -->
+      <div class="journal" onclick="showJournal(event)" title="To-do list"></div>
 
       <!-- PC tower -->
       <div class="tower" id="pc-tower" onclick="togglePC(event)" title="Click to turn PC on/off" style="cursor:pointer">
@@ -1427,6 +1427,18 @@ function showDoorMenu(e) {
     { icon:'🌍', label:'Go outside', action: () => goLoc('outside') },
     { icon:'🍳', label:'Kitchen',    action: () => goLoc('kitchen') },
   ], { top: 130, left: 195 }, 'down');
+}
+
+function roomClick() {
+  // Clicking empty room floor → dismiss activity menu and walk back to center
+  if (_sittingOnChair) return; // stay seated if in chair
+  if (_currentZone === 'center') return; // already there
+  closeActivityMenu();
+  clearActivityTimer();
+  resetCharVisual();
+  moveChar('center');
+  _manualStatus = null;
+  render();
 }
 
 // ─────────────────────────────────────────────
