@@ -624,14 +624,14 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   background:#0a0a14;border:1px solid #2a2830;border-radius:14px;text-align:center;
 }
 
-/* mobile */
-@media(max-width:640px){
-  .stats-panel{display:none;}
-  .room{width:340px;height:420px;}
-  .desk{width:190px;}
-  .futon{width:165px;}
-  .hdr{padding:8px 12px;gap:10px;}
-  .pot-badge{display:none;}
+/* ── MOBILE — scale the whole room as one unit ── */
+@media(max-width:700px){
+  .stats-panel { display:none; }
+  .hdr { padding:7px 10px; gap:8px; }
+  .hdr-title { font-size:14px; }
+  .pot-badge { display:none; }
+  .loc-bar { padding:6px 12px; }
+  .room-wrap { padding:4px; }
 }
 </style>
 </head>
@@ -1499,8 +1499,53 @@ function showPoster() {
 }
 
 // ─────────────────────────────────────────────
+//  ROOM SCALING — fit entire 430×510 room into
+//  whatever space is available on the device.
+//  Uses CSS transform so ALL interior positions,
+//  character coords, menus etc. stay correct.
+// ─────────────────────────────────────────────
+function scaleRoom() {
+  const wrap      = document.querySelector('.room-wrap');
+  const container = document.querySelector('.room-container');
+  if (!wrap || !container) return;
+
+  const DESIGN_W = 430, DESIGN_H = 510;
+  const PAD = 8;  // breathing room around scaled room
+
+  // Space available inside the wrap
+  const availW = wrap.clientWidth  - PAD * 2;
+  const availH = wrap.clientHeight - PAD * 2;
+
+  // How much do we need to shrink? Never upscale beyond 1.
+  const scale = Math.min(availW / DESIGN_W, availH / DESIGN_H, 1.0);
+
+  container.style.transformOrigin = 'center center';
+
+  if (scale >= 0.99) {
+    // No scaling needed — clear any previous override
+    container.style.transform = '';
+    container.style.marginTop = '';
+    container.style.marginBottom = '';
+    container.style.marginLeft = '';
+    container.style.marginRight = '';
+  } else {
+    container.style.transform = `scale(${scale})`;
+    // Negative margins collapse the layout footprint to the visual size
+    // so the room-wrap centres it correctly and doesn't overflow.
+    const shrinkH = Math.round(DESIGN_H * (1 - scale) / 2);
+    const shrinkW = Math.round(DESIGN_W * (1 - scale) / 2);
+    container.style.marginTop    = `-${shrinkH}px`;
+    container.style.marginBottom = `-${shrinkH}px`;
+    container.style.marginLeft   = `-${shrinkW}px`;
+    container.style.marginRight  = `-${shrinkW}px`;
+  }
+}
+
+// ─────────────────────────────────────────────
 //  INIT
 // ─────────────────────────────────────────────
+scaleRoom();
+window.addEventListener('resize', scaleRoom);
 render();
 setInterval(render, 30000);
 window.addEventListener('focus', render);

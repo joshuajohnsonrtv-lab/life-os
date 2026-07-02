@@ -23,7 +23,12 @@
     flex-shrink: 0;
     z-index: 9999;
     user-select: none;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
+  #tab-bar::-webkit-scrollbar { display: none; }
 
   .bar-logo {
     padding: 0 14px 0 16px;
