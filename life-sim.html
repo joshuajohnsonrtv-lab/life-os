@@ -355,9 +355,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   border:1px dashed rgba(100,140,255,.12);border-radius:4px;
 }
 .pillow{
-  position:absolute;top:380px;left:28px;width:22px;height:38px;z-index:5;
-  background:linear-gradient(135deg,#304070,#202e58);
-  border:1px solid #405080;border-radius:4px;
+  position:absolute;top:381px;left:19px;width:20px;height:44px;z-index:6;
+  background:linear-gradient(180deg,#304070,#202e58);
+  border:1px solid #405080;border-radius:5px;
   box-shadow:0 2px 6px rgba(0,0,0,.5);
 }
 
@@ -1347,7 +1347,7 @@ function showDeskMenu(e) {
     { icon:'🎬', label:'Recording content',   status:'🎬 Recording'       },
     { icon:'🎮', label:'Gaming / doom scroll',status:'🎮 Wasting time...' },
     { icon:'⚡', label:'Productive work',     status:'⚡ Locked in'       },
-  ], { top: 116, left: 50 }, 'down');
+  ], { top: 116, left: 234 }, 'down');
 }
 
 function showActivityMenu(options, pos, dir) {
@@ -1522,51 +1522,61 @@ const _GL = `<svg viewBox="0 0 300 440" xmlns="http://www.w3.org/2000/svg" style
   <line x1="222" y1="192" x2="234" y2="187" stroke="white" stroke-width="1.8" opacity=".44"/>
 </svg>`;
 
-// Fairy Tail background art — guild star + wings + sparkles
-const _FT = `<svg viewBox="0 0 300 440" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
-  <g fill="white" opacity=".32"><circle cx="58" cy="72" r="2.5"/><circle cx="242" cy="72" r="2.5"/><circle cx="32" cy="208" r="1.8"/><circle cx="268" cy="208" r="1.8"/><circle cx="78" cy="375" r="1.6"/><circle cx="222" cy="375" r="1.6"/><circle cx="150" cy="418" r="1.8"/><circle cx="105" cy="38" r="1.5"/><circle cx="195" cy="38" r="1.5"/></g>
-  <path d="M150,248 C118,208 64,193 17,216 C62,196 120,222 150,260Z" fill="white" opacity=".28"/>
-  <path d="M150,253 C107,197 46,174 5,206 C49,179 109,209 150,264Z" stroke="white" stroke-width="1.8" fill="none" opacity=".22"/>
-  <path d="M150,248 C182,208 236,193 283,216 C238,196 180,222 150,260Z" fill="white" opacity=".28"/>
-  <path d="M150,253 C193,197 254,174 295,206 C251,179 191,209 150,264Z" stroke="white" stroke-width="1.8" fill="none" opacity=".22"/>
-  <polygon points="150,70 161,104 196,104 168,124 179,158 150,138 121,158 132,124 104,104 139,104" fill="white" opacity=".6"/>
-  <ellipse cx="150" cy="256" rx="11" ry="15" fill="white" opacity=".25"/>
-  <path d="M147,270 Q144,298 147,324 M153,270 Q156,298 153,324" stroke="white" stroke-width="1.5" fill="none" opacity=".2"/>
+// Power / ki aura — energy rings + radial beams (DBZ, Bleach, AoT, etc.)
+const _PWR = `<svg viewBox="0 0 300 440" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+  <circle cx="150" cy="220" r="44" fill="none" stroke="white" stroke-width="2" opacity=".28"/>
+  <circle cx="150" cy="220" r="86" fill="none" stroke="white" stroke-width="1.4" opacity=".2"/>
+  <circle cx="150" cy="220" r="130" fill="none" stroke="white" stroke-width="1" opacity=".13"/>
+  <circle cx="150" cy="220" r="178" fill="none" stroke="white" stroke-width=".7" opacity=".08"/>
+  <g stroke="white" opacity=".17" stroke-width=".9">
+    <line x1="150" y1="220" x2="150" y2="0"/><line x1="150" y1="220" x2="286" y2="70"/>
+    <line x1="150" y1="220" x2="300" y2="220"/><line x1="150" y1="220" x2="286" y2="370"/>
+    <line x1="150" y1="220" x2="150" y2="440"/><line x1="150" y1="220" x2="14" y2="370"/>
+    <line x1="150" y1="220" x2="0" y2="220"/><line x1="150" y1="220" x2="14" y2="70"/>
+  </g>
+  <g stroke="white" opacity=".1" stroke-width=".7">
+    <line x1="150" y1="220" x2="222" y2="8"/><line x1="150" y1="220" x2="293" y2="148"/>
+    <line x1="150" y1="220" x2="293" y2="292"/><line x1="150" y1="220" x2="222" y2="432"/>
+    <line x1="150" y1="220" x2="78" y2="432"/><line x1="150" y1="220" x2="7" y2="292"/>
+    <line x1="150" y1="220" x2="7" y2="148"/><line x1="150" y1="220" x2="78" y2="8"/>
+  </g>
+  <circle cx="150" cy="220" r="10" fill="white" opacity=".16"/>
+  <circle cx="150" cy="220" r="4" fill="white" opacity=".3"/>
 </svg>`;
 
 const POSTERS = [
   { bg:'#100828', ac:'#9b7fff', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'Don\'t believe in yourself. Believe in me — believe in the Kamina who believes in you!' },
-  { bg:'#0d1e3a', ac:'#4d9eff', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'Who the hell do you think I am?!' },
+    q:'Don\'t believe in yourself. Believe in me! Believe in the Kamina who believes in you!' },
   { bg:'#0e2008', ac:'#5dca5d', art:_GL, src:'Gurren Lagann', by:'Kamina',
     q:'Your drill is the drill that will pierce the heavens!' },
-  { bg:'#220c0c', ac:'#ff6b6b', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'Kick logic out and do the impossible! That\'s the way Team Gurren rolls!' },
-  { bg:'#0b1e1e', ac:'#3dc9c9', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'If there\'s a wall in our way, we smash it down! If there\'s no path, we carve one ourselves!' },
-  { bg:'#201a08', ac:'#ffd56b', art:_GL, src:'Gurren Lagann', by:'Simon',
-    q:'My bro is dead. He\'s gone. But he lives on in my back and in my heart. He\'ll keep living as a part of me.' },
-  { bg:'#200c18', ac:'#ff6bab', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'Don\'t stop moving until your heart stops pumping!' },
-  { bg:'#080820', ac:'#7070ff', art:_GL, src:'Gurren Lagann', by:'Simon',
-    q:'Mark my words — this drill will open a hole in the universe. And that hole will be a path for those behind us.' },
-  { bg:'#0c2018', ac:'#6bcca0', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'A real man never dies, even when he\'s killed!' },
-  { bg:'#1e0c00', ac:'#ff9b6b', art:_GL, src:'Gurren Lagann', by:'Team Gurren',
-    q:'Row row, fight the power!' },
-  { bg:'#001a18', ac:'#6bddcc', art:_GL, src:'Gurren Lagann', by:'Nia Teppelin',
-    q:'Even if tomorrow never comes, I\'ll keep believing in the tomorrow I\'ll spend with you.' },
-  { bg:'#12001a', ac:'#c06bff', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'Go beyond the impossible and kick reason to the curb!' },
-  { bg:'#001a08', ac:'#6bff9b', art:_GL, src:'Gurren Lagann', by:'Simon',
-    q:'I\'m not afraid anymore. I know my drill will pierce the heavens!' },
-  { bg:'#1e0008', ac:'#ff6b88', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'The lights in the sky are stars. We won\'t stop — ever — until we\'ve reached every last one of them.' },
-  { bg:'#0a1600', ac:'#aaff6b', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'Don\'t be distracted by the what-ifs and should-haves. It was the best possible choice at that moment.' },
-  { bg:'#00121e', ac:'#6bbbff', art:_FT, src:'Fairy Tail', by:'Makarov Dreyar',
-    q:'There is no shame in being weak. The shame is in staying weak.' },
+  { bg:'#0d1e3a', ac:'#4d9eff', art:_GL, src:'Gurren Lagann', by:'Simon',
+    q:'Who the hell do you think I am?!' },
+  { bg:'#1a0800', ac:'#ff7722', art:_PWR, src:'Dragon Ball Z', by:'Vegeta',
+    q:'I do not fear this new challenge. I will rise to meet it.' },
+  { bg:'#200808', ac:'#ff4444', art:_PWR, src:'Dragon Ball Z', by:'Vegeta',
+    q:'Every time I reach a new level of power, a greater one appears.' },
+  { bg:'#080f1a', ac:'#4488ff', art:_PWR, src:'Dragon Ball Z', by:'Goku',
+    q:'Power comes in response to a need, not a desire.' },
+  { bg:'#0a1010', ac:'#f5c542', art:_PWR, src:'Dragon Ball Z', by:'Goku',
+    q:'I am the hope of the universe.' },
+  { bg:'#0e0814', ac:'#cc88ff', art:_PWR, src:'Dragon Ball Super', by:'Jiren',
+    q:'Power comes from resolve. Not emotion.' },
+  { bg:'#140a00', ac:'#ff8c00', art:_PWR, src:'Bleach', by:'Kenpachi Zaraki',
+    q:'If you don\'t risk your life, you can\'t find a way forward.' },
+  { bg:'#001214', ac:'#00ddcc', art:_PWR, src:'Black Clover', by:'Asta',
+    q:'My magic is never giving up!' },
+  { bg:'#0e0808', ac:'#cc3333', art:_PWR, src:'Berserk', by:'Guts',
+    q:'You\'re going to die someday… so live while you can.' },
+  { bg:'#080e14', ac:'#4488cc', art:_PWR, src:'Attack on Titan', by:'Erwin Smith',
+    q:'If you regret your decisions, you weaken your future choices.' },
+  { bg:'#0e0e08', ac:'#ccaa44', art:_PWR, src:'Attack on Titan', by:'Eren Yeager',
+    q:'If you win, you live. If you lose, you die. If you don\'t fight, you can\'t win.' },
+  { bg:'#060e0e', ac:'#44cccc', art:_PWR, src:'Attack on Titan', by:'Levi Ackerman',
+    q:'The only thing we\'re allowed to do is believe we won\'t regret our choice.' },
+  { bg:'#00081e', ac:'#3366ff', art:_PWR, src:'Kuroko no Basket', by:'Aomine Daiki',
+    q:'The only one who can beat me… is me.' },
+  { bg:'#081408', ac:'#66cc44', art:_PWR, src:'Hunter x Hunter', by:'Netero',
+    q:'You should appreciate the challenges that push you to grow.' },
 ];
 
 let _posterIdx = parseInt(localStorage.getItem('life_sim_poster') || '0');
@@ -1611,6 +1621,39 @@ function _navPoster(dir) {
   updateRoomPoster();
   _renderPosterModal();
 }
+
+// ─────────────────────────────────────────────
+//  MOTIVATIONAL PHRASES — flash every 2 mins
+// ─────────────────────────────────────────────
+const MOTIV = [
+  '💪 I\'m never giving up',
+  '🔥 I can do this',
+  '🏆 I will win',
+  '⚡ I don\'t lose',
+  '🚀 Failure is nothing',
+  '💥 Built different',
+  '🎯 Stay locked in',
+  '👊 No days off',
+  '🌟 I\'m that guy',
+  '💎 Pressure makes diamonds',
+  '🦾 I keep going',
+  '⚔️ I don\'t back down',
+  '🔱 Outwork everyone',
+  '🧠 Discipline over mood',
+];
+let _motivIdx = Math.floor(Math.random() * MOTIV.length);
+
+function flashMotiv() {
+  if (_manualStatus) return; // never interrupt active activity tracking
+  const bubble = document.getElementById('char-bubble');
+  if (!bubble) return;
+  _motivIdx = (_motivIdx + 1) % MOTIV.length;
+  bubble.innerHTML = MOTIV[_motivIdx];
+  bubble.style.borderColor = '#a855f7';
+  // Restore normal status after 12 seconds
+  setTimeout(() => { if (!_manualStatus) render(); }, 12000);
+}
+setInterval(flashMotiv, 2 * 60 * 1000);
 
 // ─────────────────────────────────────────────
 //  ROOM SCALING
