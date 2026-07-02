@@ -1002,10 +1002,10 @@ function render() {
   // Fan
   document.getElementById('fan').className = 'fan' + (s.gymToday || s.gymSess7 >= 4 ? ' on' : '');
 
-  // Status bubble — respect manual activity for 20 mins
+  // Status bubble — respect manual activity for 20 mins, and motiv phrases while showing
   const bubble = document.getElementById('char-bubble');
   const manualActive = _manualStatus && (Date.now() - _manualStatusTime < 20 * 60 * 1000);
-  if (!manualActive) {
+  if (!manualActive && !_motivActive) {
     _manualStatus = null;
     bubble.innerHTML      = s.emoji + ' ' + s.text;
     bubble.style.borderColor = s.col;
@@ -1623,7 +1623,7 @@ function _navPoster(dir) {
 }
 
 // ─────────────────────────────────────────────
-//  MOTIVATIONAL PHRASES — flash every 2 mins
+//  MOTIVATIONAL PHRASES — cycle every 15 secs
 // ─────────────────────────────────────────────
 const MOTIV = [
   '💪 I\'m never giving up',
@@ -1642,6 +1642,7 @@ const MOTIV = [
   '🧠 Discipline over mood',
 ];
 let _motivIdx = Math.floor(Math.random() * MOTIV.length);
+let _motivActive = false;
 
 function flashMotiv() {
   if (_manualStatus) return; // never interrupt active activity tracking
@@ -1650,9 +1651,12 @@ function flashMotiv() {
   _motivIdx = (_motivIdx + 1) % MOTIV.length;
   bubble.innerHTML = MOTIV[_motivIdx];
   bubble.style.borderColor = '#a855f7';
-  // Restore normal status after 12 seconds
-  setTimeout(() => { if (!_manualStatus) render(); }, 12000);
+  _motivActive = true;
+  // Clear flag after 13s so render() can take back over between cycles
+  setTimeout(() => { _motivActive = false; }, 13000);
 }
+// Fire first one after 3 seconds so it's visible right away
+setTimeout(flashMotiv, 3000);
 setInterval(flashMotiv, 15 * 1000);
 
 // ─────────────────────────────────────────────
