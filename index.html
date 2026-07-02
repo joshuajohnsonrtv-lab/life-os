@@ -2,97 +2,224 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Life OS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Life OS — Joshua</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;}
-  :root{
-    --bg:#0a0a0e;--card:#111118;--border:#1e1e2e;
-    --gold:#f5c542;--text:#e8e6f0;--muted:#5a5870;
-    --green:#22c55e;--blue:#06b6d4;--purple:#a855f7;
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; background: #080a0f; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
   }
-  body{
-    background:var(--bg);color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-    min-height:100vh;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;padding:32px 16px;
+
+  /* ── TOP TAB BAR ── */
+  #tab-bar {
+    height: 48px;
+    background: #08090e;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: stretch;
+    flex-shrink: 0;
+    z-index: 9999;
+    user-select: none;
   }
-  .logo{
-    font-size:11px;letter-spacing:6px;text-transform:uppercase;
-    color:var(--muted);margin-bottom:12px;
+
+  .bar-logo {
+    padding: 0 14px 0 16px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    white-space: nowrap;
+    flex-shrink: 0;
   }
-  h1{
-    font-size:32px;font-weight:800;letter-spacing:-1px;
-    color:var(--text);margin-bottom:6px;
+
+  .tab {
+    padding: 0 22px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    color: rgba(255,255,255,0.35);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.2px;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
   }
-  .sub{
-    font-size:13px;color:var(--muted);margin-bottom:48px;
+  .tab:hover { color: rgba(255,255,255,0.65); }
+  .tab .tab-icon { font-size: 15px; }
+  .tab .tab-label { font-size: 12.5px; }
+
+  .tab.money.active   { color: #f5c542; border-bottom-color: #f5c542; }
+  .tab.wellness.active { color: #22c55e; border-bottom-color: #22c55e; }
+  .tab.sim.active     { color: #a855f7; border-bottom-color: #a855f7; }
+
+  /* small dot on inactive tabs to show they're loaded */
+  .tab .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0;
+    margin-left: 2px;
+    transition: opacity 0.3s;
+    flex-shrink: 0;
   }
-  .grid{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:16px;width:100%;max-width:740px;
+  .tab.ready .dot { opacity: 0.4; }
+
+  /* ── IFRAME PANELS ── */
+  .panel {
+    flex: 1;
+    overflow: hidden;
+    display: none;
+    position: relative;
   }
-  .card{
-    background:var(--card);border:1px solid var(--border);
-    border-radius:14px;padding:28px 24px;
-    text-decoration:none;color:inherit;
-    transition:border-color .2s,transform .2s,box-shadow .2s;
-    display:flex;flex-direction:column;gap:10px;
+  .panel.active { display: flex; }
+  .panel iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    background: #080a0f;
   }
-  .card:hover{
-    transform:translateY(-3px);
-    box-shadow:0 8px 32px rgba(0,0,0,.4);
+
+  /* ── LOADING OVERLAY ── */
+  .panel-loading {
+    position: absolute;
+    inset: 0;
+    background: #080a0f;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    pointer-events: none;
+    transition: opacity 0.4s;
   }
-  .card.money:hover{border-color:var(--gold);box-shadow:0 8px 32px rgba(245,197,66,.12);}
-  .card.wellness:hover{border-color:var(--green);box-shadow:0 8px 32px rgba(34,197,94,.12);}
-  .card.sim:hover{border-color:var(--purple);box-shadow:0 8px 32px rgba(168,85,247,.12);}
-  .card-icon{font-size:28px;}
-  .card-title{font-size:17px;font-weight:700;letter-spacing:-.3px;}
-  .card-desc{font-size:12px;color:var(--muted);line-height:1.6;}
-  .card-arrow{
-    margin-top:auto;padding-top:14px;
-    font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  .panel-loading.hidden { opacity: 0; }
+  .panel-loading .spin {
+    width: 28px; height: 28px;
+    border: 2px solid rgba(255,255,255,0.08);
+    border-top-color: rgba(255,255,255,0.4);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
   }
-  .money  .card-arrow{color:var(--gold);}
-  .wellness .card-arrow{color:var(--green);}
-  .sim    .card-arrow{color:var(--purple);}
-  .footer{
-    margin-top:48px;font-size:11px;color:var(--muted);
-    letter-spacing:1px;
+  .panel-loading .load-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 2px;
+    text-transform: uppercase;
   }
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
-<div class="logo">Joshua Johnson</div>
-<h1>Life OS</h1>
-<p class="sub">Everything in one place. One link. Same data everywhere.</p>
-
-<div class="grid">
-  <a class="card money" href="money.html">
-    <div class="card-icon">💰</div>
-    <div class="card-title">Money Dashboard</div>
-    <div class="card-desc">Income, hustles, goals, expenses, savings runway and net worth tracking.</div>
-    <div class="card-arrow">Open →</div>
-  </a>
-
-  <a class="card wellness" href="wellness.html">
-    <div class="card-icon">💪</div>
-    <div class="card-title">Wellness Dashboard</div>
-    <div class="card-desc">Gym sessions, sleep, hydration, diet and body stats — all in one log.</div>
-    <div class="card-arrow">Open →</div>
-  </a>
-
-  <a class="card sim" href="life-sim.html">
-    <div class="card-icon">🏠</div>
-    <div class="card-title">Life Simulator</div>
-    <div class="card-desc">Your room, your output bar, your character — live view of how you're moving.</div>
-    <div class="card-arrow">Open →</div>
-  </a>
+<!-- ── TOP TAB BAR ── -->
+<div id="tab-bar">
+  <div class="bar-logo">Life OS</div>
+  <button class="tab money active" id="tab-money" onclick="switchTab('money', this)">
+    <span class="tab-icon">💰</span>
+    <span class="tab-label">Money</span>
+    <span class="dot"></span>
+  </button>
+  <button class="tab wellness" id="tab-wellness" onclick="switchTab('wellness', this)">
+    <span class="tab-icon">💪</span>
+    <span class="tab-label">Wellness</span>
+    <span class="dot"></span>
+  </button>
+  <button class="tab sim" id="tab-sim" onclick="switchTab('sim', this)">
+    <span class="tab-icon">🏠</span>
+    <span class="tab-label">Life Sim</span>
+    <span class="dot"></span>
+  </button>
 </div>
 
-<div class="footer">All data shared · One origin · Always in sync</div>
+<!-- ── MONEY PANEL ── -->
+<div class="panel active" id="panel-money">
+  <div class="panel-loading" id="load-money">
+    <div class="spin"></div>
+    <div class="load-label">Loading Money</div>
+  </div>
+  <iframe id="frame-money" src="money.html" onload="onFrameLoad('money')"></iframe>
+</div>
 
+<!-- ── WELLNESS PANEL ── -->
+<div class="panel" id="panel-wellness">
+  <div class="panel-loading" id="load-wellness">
+    <div class="spin"></div>
+    <div class="load-label">Loading Wellness</div>
+  </div>
+  <iframe id="frame-wellness" data-src="wellness.html" onload="onFrameLoad('wellness')"></iframe>
+</div>
+
+<!-- ── LIFE SIM PANEL ── -->
+<div class="panel" id="panel-sim">
+  <div class="panel-loading" id="load-sim">
+    <div class="spin"></div>
+    <div class="load-label">Loading Sim</div>
+  </div>
+  <iframe id="frame-sim" data-src="life-sim.html" onload="onFrameLoad('sim')"></iframe>
+</div>
+
+<script>
+  const TABS = ['money', 'wellness', 'sim'];
+  let _active = 'money';
+
+  function switchTab(name, btn) {
+    if (name === _active) return;
+    _active = name;
+
+    // Deactivate all
+    TABS.forEach(t => {
+      document.getElementById('panel-' + t).classList.remove('active');
+      document.getElementById('tab-' + t).classList.remove('active');
+    });
+
+    // Activate selected
+    document.getElementById('panel-' + name).classList.add('active');
+    btn.classList.add('active');
+
+    // Lazy-load iframe if not yet started
+    const frame = document.getElementById('frame-' + name);
+    if (frame.dataset.src && !frame.src.endsWith(frame.dataset.src)) {
+      frame.src = frame.dataset.src;
+    }
+  }
+
+  function onFrameLoad(name) {
+    // Hide loading overlay
+    const overlay = document.getElementById('load-' + name);
+    if (overlay) {
+      overlay.classList.add('hidden');
+      setTimeout(() => overlay.remove(), 500);
+    }
+    // Mark tab as ready (shows subtle dot)
+    document.getElementById('tab-' + name).classList.add('ready');
+  }
+
+  // Restore last active tab from sessionStorage
+  const saved = sessionStorage.getItem('life_os_tab');
+  if (saved && TABS.includes(saved) && saved !== 'money') {
+    switchTab(saved, document.getElementById('tab-' + saved));
+  }
+
+  // Persist tab choice
+  TABS.forEach(t => {
+    document.getElementById('tab-' + t).addEventListener('click', () => {
+      sessionStorage.setItem('life_os_tab', t);
+    });
+  });
+</script>
 </body>
 </html>
-
