@@ -779,8 +779,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .k-fridge-l-lbl{position:absolute;bottom:5px;left:0;right:0;text-align:center;
   font-size:8px;color:rgba(255,255,255,.25);pointer-events:none;letter-spacing:.5px;}
 
-/* right counter */
-.k-cr{position:absolute;top:16px;right:0;width:72px;height:278px;
+/* right counter — extends to island bottom (y=330) */
+.k-cr{position:absolute;top:16px;right:0;width:72px;height:314px;
   background:linear-gradient(180deg,#1c1a16,#161410);
   border-left:2px solid #38342e;border-bottom:2px solid #38342e;}
 .k-cr::before{content:'';position:absolute;top:-2px;left:-2px;right:0;height:10px;
@@ -806,22 +806,29 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   background:#2a3040;border-radius:2px;}
 
 /* COOKER — middle of right counter, burners face left into kitchen */
-.k-cooker{position:absolute;top:145px;right:0;width:72px;height:72px;
+.k-cooker{position:absolute;top:160px;right:0;width:72px;height:72px;
   background:#141418;border:1px solid #222228;border-left:2px solid #38342e;
   cursor:pointer;transition:border-color .2s,box-shadow .2s;}
 .k-cooker:hover{border-color:#f97316;box-shadow:0 0 8px rgba(249,115,22,.3);}
 .k-cooker-br{position:absolute;width:16px;height:16px;border-radius:50%;
   border:2px solid #303038;background:#1a1a20;}
 
-/* oven below cooker */
-.k-oven{position:absolute;top:217px;right:0;width:72px;height:22px;
-  background:#141418;border:1px solid #222228;border-left:2px solid #38342e;}
-.k-oven::after{content:'';position:absolute;top:4px;left:8px;right:8px;bottom:4px;
-  background:#0e0e12;border:1px solid #1e1e24;border-radius:1px;}
+/* MICROWAVE — mounted on right counter, top area */
+.k-micro{position:absolute;top:16px;right:0;width:72px;height:38px;
+  background:linear-gradient(180deg,#262630,#1e1e28);
+  border:1px solid #323240;border-left:2px solid #38342e;z-index:4;}
+.k-micro-scr{position:absolute;top:7px;left:8px;width:28px;height:24px;
+  background:#040c04;border:1px solid #0e1a0e;border-radius:2px;}
+.k-micro-btn{position:absolute;top:11px;right:8px;width:11px;height:11px;
+  border-radius:50%;background:#141420;border:1px solid #2c2c3c;}
+.k-micro-btn2{position:absolute;top:26px;right:8px;width:11px;height:11px;
+  border-radius:50%;background:#141420;border:1px solid #2c2c3c;}
 
-/* MICROWAVE — top-right corner (above right counter) */
-.k-micro{position:absolute;top:0;right:0;width:72px;height:16px;
-  background:#141418;border:1px solid #202028;border-radius:2px 0 0 2px;}
+/* DRAINING BOARD — left of sink */
+.k-drain{position:absolute;top:28px;left:88px;width:58px;height:42px;
+  background:#141210;border:1px solid #222018;border-radius:2px;}
+.k-drain::after{content:'';position:absolute;inset:4px 3px;
+  background:repeating-linear-gradient(0deg,transparent,transparent 5px,rgba(255,255,255,.06) 5px,rgba(255,255,255,.06) 6px);}
 
 /* window above sink */
 .k-win{position:absolute;top:0;left:152px;width:54px;height:16px;
@@ -839,9 +846,16 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 /* island stools */
 .k-stool{position:absolute;width:22px;height:15px;
-  background:#181620;border:1px solid #2a2838;border-radius:2px 2px 0 0;}
+  background:#181620;border:1px solid #2a2838;border-radius:2px 2px 0 0;
+  cursor:pointer;transition:border-color .15s,background .15s;}
+.k-stool:hover{background:#221e2c;border-color:#4a3878;}
+.k-stool.occupied{background:#2a2040;border-color:#6644aa;}
 .k-stool::after{content:'';position:absolute;bottom:-13px;left:50%;
   transform:translateX(-50%);width:2px;height:13px;background:#1c1a24;}
+
+/* fridge delete button */
+.f-del{color:#ef4444 !important;border-color:rgba(239,68,68,.28) !important;}
+.f-del:hover{background:rgba(239,68,68,.18) !important;border-color:#ef4444 !important;}
 
 /* floor tile hint */
 .k-floor{position:absolute;bottom:0;left:0;right:0;height:185px;
@@ -1001,15 +1015,16 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   <!-- KITCHEN VIEW -->
   <div class="kitchen-wrap" id="view-kitchen">
     <div class="room-container">
-    <div class="kitch" id="the-kitchen">
+    <div class="kitch" id="the-kitchen" onclick="kitchenClick()">
       <div class="k-floor"></div>
-      <!-- Top wall -->
+      <!-- Top wall upper cabinets + window above sink -->
       <div class="k-ucab"></div>
-      <div class="k-micro"></div>
       <div class="k-win"></div>
       <!-- Top counter (horizontal) -->
       <div class="k-ct"></div>
       <div class="k-lcab"></div>
+      <!-- DRAINING BOARD — left of sink -->
+      <div class="k-drain"></div>
       <!-- Sink — center of top counter -->
       <div class="k-sink"></div>
       <div class="k-tap"></div>
@@ -1025,22 +1040,26 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       </div>
       <!-- Right counter -->
       <div class="k-cr"></div>
+      <!-- MICROWAVE — top of right counter -->
+      <div class="k-micro">
+        <div class="k-micro-scr"></div>
+        <div class="k-micro-btn"></div>
+        <div class="k-micro-btn2"></div>
+      </div>
       <!-- COOKER — middle of right counter, clickable -->
-      <div class="k-cooker" onclick="kGoToCooker(event)" title="Cooker — meal prep">
+      <div class="k-cooker" onclick="kGoToCooker(event)" title="Cooker">
         <div class="k-cooker-br" style="top:10px;left:8px"></div>
         <div class="k-cooker-br" style="top:10px;right:8px"></div>
         <div class="k-cooker-br" style="bottom:10px;left:8px"></div>
         <div class="k-cooker-br" style="bottom:10px;right:8px"></div>
       </div>
-      <!-- Oven below cooker -->
-      <div class="k-oven"></div>
       <!-- Island connects to right counter -->
       <div class="k-island"></div>
-      <!-- Stools at island -->
-      <div class="k-stool" style="top:342px;left:162px"></div>
-      <div class="k-stool" style="top:342px;left:194px"></div>
-      <div class="k-stool" style="top:342px;left:226px"></div>
-      <div class="k-stool" style="top:342px;left:258px"></div>
+      <!-- Stools at island — clickable -->
+      <div class="k-stool" id="kstool-0" style="top:342px;left:162px" onclick="kSitStool(0,event)"></div>
+      <div class="k-stool" id="kstool-1" style="top:342px;left:194px" onclick="kSitStool(1,event)"></div>
+      <div class="k-stool" id="kstool-2" style="top:342px;left:226px" onclick="kSitStool(2,event)"></div>
+      <div class="k-stool" id="kstool-3" style="top:342px;left:258px" onclick="kSitStool(3,event)"></div>
       <!-- Kitchen character (reuses room char styles) -->
       <div class="char" id="k-char" style="top:290px;left:165px;display:none">
         <div class="char-bubble" id="k-bubble">🍳 In the kitchen</div>
@@ -1253,6 +1272,7 @@ function moveChar(zone, instant) {
   el.style.top  = p.top  + 'px';
   el.style.left = p.left + 'px';
   if (instant) requestAnimationFrame(() => el.style.transition = '');
+  saveState();
 }
 
 // ─────────────────────────────────────────────
@@ -1414,7 +1434,7 @@ function goLoc(loc) {
       if (roomBody && kBody) kBody.style.background = roomBody.style.background;
       kChar.style.display = 'flex';
     }
-    kMoveChar('center');
+    kMoveChar('entry');
     const kb = document.getElementById('k-bubble');
     if (kb) kb.textContent = '🍳 In the kitchen';
   }
@@ -1724,6 +1744,7 @@ function selectActivity(opt) {
   applyActivityVisual(opt);
   updateActivityBubble();
   _activityInterval = setInterval(updateActivityBubble, 1000);
+  saveState();
 }
 
 function applyActivityVisual(opt) {
@@ -1789,6 +1810,7 @@ function stopActivity(e) {
   _activityStart    = null;
   _manualStatus     = null;
   _activityName     = null;
+  saveState();
   const bubble = document.getElementById('char-bubble');
   if (bubble) {
     bubble.innerHTML = '✅ Done · ' + dStr;
@@ -1818,11 +1840,13 @@ function toggleChair(e) {
     if (bubble) { bubble.innerHTML = '🪑 Sitting'; bubble.style.borderColor = 'var(--muted)'; }
     _manualStatus     = '🪑 Sitting';
     _manualStatusTime = Date.now();
+    saveState();
   } else {
     document.querySelector('.desk')?.classList.remove('active-zone');
     moveChar('center');
     if (chairEl) chairEl.classList.remove('seated');
     _manualStatus = null;
+    saveState();
     render();
   }
 }
@@ -2145,23 +2169,65 @@ function _scaleContainer(container) {
 //  KITCHEN CHARACTER + INTERACTIONS
 // ─────────────────────────────────────────────
 const K_POS = {
-  center: { top:290, left:165 },
+  entry:  { top:418, left:22  }, // bottom-left spawn / home base
   fridge: { top:140, left:76  }, // in front of left-wall fridge
-  cooker: { top:158, left:330 }, // in front of right-counter cooker
+  cooker: { top:172, left:330 }, // in front of right-counter cooker
+  stool0: { top:326, left:156 },
+  stool1: { top:326, left:188 },
+  stool2: { top:326, left:220 },
+  stool3: { top:326, left:252 },
 };
-let _kZone = 'center';
+let _kZone   = 'entry';
+let _kSitting = false;
 
 function kMoveChar(zone) {
   _kZone = zone;
-  const p = K_POS[zone] || K_POS.center;
+  const p = K_POS[zone] || K_POS.entry;
   const el = document.getElementById('k-char');
   if (!el) return;
   el.style.top  = p.top  + 'px';
   el.style.left = p.left + 'px';
 }
 
+function kitchenClick() {
+  // Clicking empty kitchen floor → return to bottom-left home base
+  if (_kSitting) {
+    _kSitting = false;
+    // clear stool highlights
+    document.querySelectorAll('.k-stool').forEach(s => s.classList.remove('occupied'));
+  }
+  if (_kZone !== 'entry') {
+    closeActivityMenu();
+    kMoveChar('entry');
+    const kb = document.getElementById('k-bubble');
+    if (kb) kb.textContent = '🍳 In the kitchen';
+  }
+}
+
+function kSitStool(i, e) {
+  e.stopPropagation();
+  const stoolEl = document.getElementById('kstool-' + i);
+  const wasHere = _kSitting && _kZone === ('stool' + i);
+  // clear all stool highlights
+  document.querySelectorAll('.k-stool').forEach(s => s.classList.remove('occupied'));
+  if (wasHere) {
+    _kSitting = false;
+    kMoveChar('entry');
+    const kb = document.getElementById('k-bubble');
+    if (kb) kb.textContent = '🍳 In the kitchen';
+  } else {
+    _kSitting = true;
+    kMoveChar('stool' + i);
+    if (stoolEl) stoolEl.classList.add('occupied');
+    const kb = document.getElementById('k-bubble');
+    if (kb) kb.textContent = '🪑 Sat at island';
+  }
+}
+
 function kGoToFridge(e) {
   e.stopPropagation();
+  _kSitting = false;
+  document.querySelectorAll('.k-stool').forEach(s => s.classList.remove('occupied'));
   kMoveChar('fridge');
   const kb = document.getElementById('k-bubble');
   if (kb) kb.textContent = '🧊 Checking fridge…';
@@ -2170,16 +2236,14 @@ function kGoToFridge(e) {
 
 function kGoToCooker(e) {
   e.stopPropagation();
+  _kSitting = false;
+  document.querySelectorAll('.k-stool').forEach(s => s.classList.remove('occupied'));
   kMoveChar('cooker');
   const kb = document.getElementById('k-bubble');
-  if (kb) kb.textContent = '🍳 What to make?';
+  if (kb) kb.textContent = '🍳 Cooking…';
   setTimeout(() => {
     showActivityMenu([
-      { icon:'🍗', label:'Prep chicken & rice',  status:'🍗 Meal prepping'     },
-      { icon:'🥦', label:'Steam veg',             status:'🥦 Steaming veg'      },
-      { icon:'🥚', label:'Boil eggs',             status:'🥚 Boiling eggs'      },
-      { icon:'🍝', label:'Cook pasta',            status:'🍝 Cooking pasta'     },
-      { icon:'🧹', label:'Clean kitchen',         status:'🧹 Cleaning kitchen'  },
+      { icon:'🍳', label:'Cooking', status:'🍳 Cooking' },
     ], { top:220, left:150 }, null, document.getElementById('the-kitchen'));
   }, 450);
 }
@@ -2224,6 +2288,7 @@ function _renderFridgeModal(modal) {
       <span class="f-qty">${f.qty}</span>
       <span class="f-unit">${f.unit}</span>
       <button class="f-btn" onclick="_foodAdj(${i},1)">+</button>
+      <button class="f-btn f-del" onclick="_foodDel(${i})" title="Remove">×</button>
     </div>`).join('');
   modal.innerHTML = `
     <div class="k-fridge-inner" onclick="event.stopPropagation()">
@@ -2231,7 +2296,7 @@ function _renderFridgeModal(modal) {
         <div class="kf-title">🧊 Food Stock</div>
         <button class="kf-x" onclick="document.getElementById('k-fridge-modal').remove()">×</button>
       </div>
-      <div class="kf-body">${rows.length ? rows : '<p style="color:rgba(255,255,255,.3);font-size:12px;padding:10px 0">Fridge is empty — add items below.</p>'}</div>
+      <div class="kf-body">${rows || '<p style="color:rgba(255,255,255,.3);font-size:12px;padding:10px 0">Fridge is empty — add items below.</p>'}</div>
       <div class="kf-add">
         <input id="f-inp-name" placeholder="Item name…" onkeydown="if(event.key==='Enter')_foodAdd()">
         <input id="f-inp-unit" placeholder="Unit" style="max-width:70px" onkeydown="if(event.key==='Enter')_foodAdd()">
@@ -2244,6 +2309,14 @@ function _foodAdj(i, d) {
   const f = _getFood();
   if (!f[i]) return;
   f[i].qty = Math.max(0, (f[i].qty || 0) + d);
+  _saveFood(f);
+  const m = document.getElementById('k-fridge-modal');
+  if (m) _renderFridgeModal(m);
+}
+
+function _foodDel(i) {
+  const f = _getFood();
+  f.splice(i, 1);
   _saveFood(f);
   const m = document.getElementById('k-fridge-modal');
   if (m) _renderFridgeModal(m);
@@ -2263,6 +2336,67 @@ function _foodAdd() {
 }
 
 // ─────────────────────────────────────────────
+//  STATE PERSISTENCE (survives tab close/reopen)
+// ─────────────────────────────────────────────
+function saveState() {
+  try {
+    localStorage.setItem('life_sim_runtime', JSON.stringify({
+      zone:          _currentZone,
+      sitting:       _sittingOnChair,
+      status:        _manualStatus,
+      activityName:  _activityName,
+      activityStart: _activityStart || null,
+    }));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('life_sim_runtime') || 'null');
+    if (!s) return;
+    // Restore zone position
+    if (s.zone && POS[s.zone]) {
+      _currentZone = s.zone;
+      const el = document.getElementById('char');
+      if (el) {
+        el.style.top  = (POS[s.zone].top)  + 'px';
+        el.style.left = (POS[s.zone].left) + 'px';
+      }
+      // Restore visual state for the zone
+      if (s.zone === 'desk') document.querySelector('.desk')?.classList.add('active-zone');
+      if (s.zone === 'futon' || s.zone === 'futon_sleep')
+        document.querySelector('.futon')?.classList.add('active-zone');
+    }
+    // Restore chair
+    if (s.sitting) {
+      _sittingOnChair = true;
+      document.getElementById('chair')?.classList.add('seated');
+      document.querySelector('.desk')?.classList.add('active-zone');
+    }
+    // Restore active activity (keep timer running)
+    if (s.activityStart && s.activityName && s.status) {
+      _activityStart    = s.activityStart; // raw ms timestamp
+      _activityName     = s.activityName;
+      _manualStatus     = s.status;
+      _manualStatusTime = Date.now();
+      // Restore sleeping/meditating visual
+      const head   = document.getElementById('char-head');
+      const figure = document.getElementById('char-figure');
+      if (s.status === '😴 Sleeping' || s.status === '💤 Napping') {
+        if (head)   head.className   = 'char-head sleeping';
+        if (figure) figure.className = 'char-figure laying';
+      }
+      clearActivityTimer();
+      updateActivityBubble();
+      _activityInterval = setInterval(updateActivityBubble, 1000);
+    } else if (s.status) {
+      _manualStatus     = s.status;
+      _manualStatusTime = Date.now();
+    }
+  } catch(e) {}
+}
+
+// ─────────────────────────────────────────────
 //  INIT
 // ─────────────────────────────────────────────
 // Call scaleRoom multiple times to survive iframe
@@ -2274,6 +2408,7 @@ setTimeout(scaleRoom, 250);
 window.addEventListener('resize', scaleRoom);
 render();
 updateRoomPoster();
+loadState(); // restore character position + active activity after tab reopen
 setInterval(render, 30000);
 window.addEventListener('focus', render);
 </script>
