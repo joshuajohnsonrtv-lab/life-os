@@ -225,6 +225,24 @@
       sessionStorage.setItem('life_os_tab', t);
     });
   });
+
+  // Cross-frame: life-sim cooker → wellness meals page
+  window.addEventListener('message', function(ev) {
+    if (!ev.data || ev.data.action !== 'openWellnessMeals') return;
+    // Only accept from the sim frame (ignore wellness or other sources)
+    const simFrame = document.getElementById('frame-sim');
+    if (ev.source !== simFrame?.contentWindow) return;
+    // Switch to wellness tab
+    switchTab('wellness', document.getElementById('tab-wellness'));
+    sessionStorage.setItem('life_os_tab', 'wellness');
+    // Give the wellness iframe a beat to load/settle, then navigate to mealideas
+    setTimeout(() => {
+      const wf = document.getElementById('frame-wellness');
+      if (wf && wf.contentWindow) {
+        wf.contentWindow.postMessage({ action: 'showWellnessPage', page: 'mealideas' }, '*');
+      }
+    }, 250);
+  });
 </script>
 </body>
 </html>

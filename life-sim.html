@@ -834,15 +834,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .k-win{position:absolute;top:0;left:152px;width:54px;height:16px;
   background:rgba(80,120,200,.06);border:1px solid #1a2030;border-radius:0 0 2px 2px;}
 
-/* knife block */
-.k-knives{position:absolute;top:26px;left:296px;width:24px;height:40px;
-  background:#1c1a16;border:1px solid #2e2a22;border-radius:2px;}
-.k-knives::after{content:'';position:absolute;top:5px;left:50%;transform:translateX(-50%);
-  width:1px;height:26px;background:#303028;
-  box-shadow:-5px 0 0 #2e2c26,5px 0 0 #2e2c26,-10px 0 0 #2c2a24;}
-
-/* plant on top counter */
-.k-plant{position:absolute;top:10px;left:324px;font-size:14px;opacity:.7;}
+/* (knife block and plant removed) */
 
 /* island stools */
 .k-stool{position:absolute;width:22px;height:15px;
@@ -1028,9 +1020,6 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <!-- Sink — center of top counter -->
       <div class="k-sink"></div>
       <div class="k-tap"></div>
-      <!-- Knives + plant on top counter right section -->
-      <div class="k-knives"></div>
-      <div class="k-plant">🌿</div>
       <!-- LEFT counter going down left wall -->
       <div class="k-lc"></div>
       <!-- Left FRIDGE — faces into kitchen, clickable -->
@@ -2241,11 +2230,8 @@ function kGoToCooker(e) {
   kMoveChar('cooker');
   const kb = document.getElementById('k-bubble');
   if (kb) kb.textContent = '🍳 Cooking…';
-  setTimeout(() => {
-    showActivityMenu([
-      { icon:'🍳', label:'Cooking', status:'🍳 Cooking' },
-    ], { top:220, left:150 }, null, document.getElementById('the-kitchen'));
-  }, 450);
+  // Open wellness meals page in parent hub
+  window.parent.postMessage({ action: 'openWellnessMeals' }, '*');
 }
 
 // ── FRIDGE INVENTORY ──

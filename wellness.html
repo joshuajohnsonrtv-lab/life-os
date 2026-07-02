@@ -6382,6 +6382,15 @@ function updateNavBadges() {
   // Reserved for future dynamic badges
 }
 updateNavBadges();
+
+// Cross-frame: hub tells wellness to jump to a page (e.g. mealideas from cooker click)
+// Only accepts messages from parent window — will NOT navigate away to life-sim.
+window.addEventListener('message', function(ev) {
+  if (ev.source !== window.parent) return; // ignore anything not from the hub
+  if (ev.data && ev.data.action === 'showWellnessPage' && ev.data.page) {
+    showPage(ev.data.page);
+  }
+});
 </script>
 
 <!-- ══ FIREBASE SETUP MODAL ══ -->
