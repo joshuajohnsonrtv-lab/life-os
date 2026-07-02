@@ -614,14 +614,53 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   border-color:rgba(210,185,130,.5);
   background:linear-gradient(90deg,rgba(210,190,150,.12),rgba(230,210,170,.28),rgba(210,190,150,.12));
 }
-/* poster modal */
+/* ── POSTER MODAL / GALLERY ── */
 .poster-modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;
-  display:flex;align-items:center;justify-content:center;
+  position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:2000;
+  display:flex;align-items:center;justify-content:center;gap:12px;padding:14px;
 }
-.poster-inner{
-  max-width:310px;padding:36px 32px;
-  background:#0a0a14;border:1px solid #2a2830;border-radius:14px;text-align:center;
+.poster-card{
+  width:min(278px,84vw);min-height:360px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;flex-shrink:0;
+}
+.poster-art{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.poster-body{
+  position:relative;z-index:1;flex:1;
+  display:flex;flex-direction:column;
+  padding:26px 20px 14px;text-align:center;
+}
+.p-counter{font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.28);
+  text-transform:uppercase;margin-bottom:8px;}
+.p-src{font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  font-weight:800;margin-bottom:20px;}
+.p-quote{font-size:14.5px;font-weight:700;color:rgba(255,255,255,.92);
+  line-height:1.68;letter-spacing:.15px;flex:1;
+  display:flex;align-items:center;justify-content:center;}
+.p-by{font-size:10px;font-weight:600;letter-spacing:1.5px;
+  text-transform:uppercase;margin-top:18px;opacity:.75;}
+.p-close{
+  position:relative;z-index:1;margin:12px 20px 18px;
+  background:transparent;border:1px solid rgba(255,255,255,.16);
+  color:rgba(255,255,255,.34);padding:7px 0;border-radius:20px;
+  cursor:pointer;font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  transition:all .2s;
+}
+.p-close:hover{border-color:rgba(255,255,255,.42);color:rgba(255,255,255,.6);}
+.p-nav{
+  width:42px;height:42px;border-radius:50%;flex-shrink:0;
+  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);
+  color:white;font-size:26px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s;line-height:1;padding:0 0 2px;
+}
+.p-nav:hover{background:rgba(255,255,255,.2);}
+@media(max-width:480px){
+  .poster-modal{gap:8px;padding:10px;}
+  .p-nav{width:34px;height:34px;font-size:20px;}
+  .poster-body{padding:20px 15px 10px;}
+  .p-quote{font-size:13px;}
 }
 
 /* ── MOBILE — scale the whole room as one unit ── */
@@ -1458,44 +1497,119 @@ function toggleChair(e) {
 }
 
 // ─────────────────────────────────────────────
-//  POSTER
+//  POSTER GALLERY
 // ─────────────────────────────────────────────
-function showPoster() {
-  if (document.getElementById('poster-modal')) return;
-  const modal = document.createElement('div');
-  modal.className = 'poster-modal';
-  modal.id = 'poster-modal';
-  modal.onclick = () => modal.remove();
-  modal.innerHTML = `
-    <div class="poster-inner" onclick="event.stopPropagation()">
-      <div style="font-size:9px;letter-spacing:4px;color:#4a4858;text-transform:uppercase;margin-bottom:20px">on your wall</div>
-      <div style="font-size:26px;font-weight:800;color:#ddd4b8;letter-spacing:3px;line-height:1.5;margin-bottom:28px">
-        EAT.<br>SLEEP.<br>WORK.<br>REPEAT.
+
+// Gurren Lagann background art — drill + sunburst + Kamina's shades
+const _GL = `<svg viewBox="0 0 300 440" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+  <g stroke="white" opacity=".28" stroke-width="1">
+    <line x1="150" y1="200" x2="0" y2="0"/><line x1="150" y1="200" x2="90" y2="0"/>
+    <line x1="150" y1="200" x2="150" y2="0" stroke-width="1.8"/>
+    <line x1="150" y1="200" x2="210" y2="0"/><line x1="150" y1="200" x2="300" y2="0"/>
+    <line x1="150" y1="200" x2="300" y2="200"/><line x1="150" y1="200" x2="300" y2="440"/>
+    <line x1="150" y1="200" x2="0" y2="440"/><line x1="150" y1="200" x2="0" y2="200"/>
+    <line x1="150" y1="200" x2="60" y2="440" opacity=".6"/><line x1="150" y1="200" x2="240" y2="440" opacity=".6"/>
+  </g>
+  <polygon points="150,12 170,308 130,308" fill="white" opacity=".42"/>
+  <polygon points="150,12 158,308 142,308" fill="white" opacity=".8"/>
+  <ellipse cx="150" cy="308" rx="82" ry="18" fill="none" stroke="white" stroke-width="2" opacity=".36"/>
+  <ellipse cx="150" cy="324" rx="64" ry="13" fill="none" stroke="white" stroke-width="1.5" opacity=".24"/>
+  <ellipse cx="150" cy="336" rx="47" ry="9" fill="none" stroke="white" stroke-width="1" opacity=".16"/>
+  <rect x="80" y="180" width="54" height="24" rx="5" fill="rgba(0,0,0,.45)" stroke="white" stroke-width="2.2" opacity=".65"/>
+  <rect x="168" y="180" width="54" height="24" rx="5" fill="rgba(0,0,0,.45)" stroke="white" stroke-width="2.2" opacity=".65"/>
+  <line x1="134" y1="192" x2="168" y2="192" stroke="white" stroke-width="2.6" opacity=".65"/>
+  <line x1="80" y1="192" x2="68" y2="187" stroke="white" stroke-width="1.8" opacity=".44"/>
+  <line x1="222" y1="192" x2="234" y2="187" stroke="white" stroke-width="1.8" opacity=".44"/>
+</svg>`;
+
+// Fairy Tail background art — guild star + wings + sparkles
+const _FT = `<svg viewBox="0 0 300 440" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+  <g fill="white" opacity=".32"><circle cx="58" cy="72" r="2.5"/><circle cx="242" cy="72" r="2.5"/><circle cx="32" cy="208" r="1.8"/><circle cx="268" cy="208" r="1.8"/><circle cx="78" cy="375" r="1.6"/><circle cx="222" cy="375" r="1.6"/><circle cx="150" cy="418" r="1.8"/><circle cx="105" cy="38" r="1.5"/><circle cx="195" cy="38" r="1.5"/></g>
+  <path d="M150,248 C118,208 64,193 17,216 C62,196 120,222 150,260Z" fill="white" opacity=".28"/>
+  <path d="M150,253 C107,197 46,174 5,206 C49,179 109,209 150,264Z" stroke="white" stroke-width="1.8" fill="none" opacity=".22"/>
+  <path d="M150,248 C182,208 236,193 283,216 C238,196 180,222 150,260Z" fill="white" opacity=".28"/>
+  <path d="M150,253 C193,197 254,174 295,206 C251,179 191,209 150,264Z" stroke="white" stroke-width="1.8" fill="none" opacity=".22"/>
+  <polygon points="150,70 161,104 196,104 168,124 179,158 150,138 121,158 132,124 104,104 139,104" fill="white" opacity=".6"/>
+  <ellipse cx="150" cy="256" rx="11" ry="15" fill="white" opacity=".25"/>
+  <path d="M147,270 Q144,298 147,324 M153,270 Q156,298 153,324" stroke="white" stroke-width="1.5" fill="none" opacity=".2"/>
+</svg>`;
+
+const POSTERS = [
+  { bg:'#100828', ac:'#9b7fff', art:_GL, src:'Gurren Lagann', by:'Kamina',
+    q:'Don\'t believe in yourself. Believe in me — believe in the Kamina who believes in you!' },
+  { bg:'#0d1e3a', ac:'#4d9eff', art:_GL, src:'Gurren Lagann', by:'Kamina',
+    q:'Who the hell do you think I am?!' },
+  { bg:'#0e2008', ac:'#5dca5d', art:_GL, src:'Gurren Lagann', by:'Kamina',
+    q:'Your drill is the drill that will pierce the heavens!' },
+  { bg:'#220c0c', ac:'#ff6b6b', art:_GL, src:'Gurren Lagann', by:'Kamina',
+    q:'Kick logic out and do the impossible! That\'s the way Team Gurren rolls!' },
+  { bg:'#0b1e1e', ac:'#3dc9c9', art:_GL, src:'Gurren Lagann', by:'Kamina',
+    q:'If there\'s a wall in our way, we smash it down! If there\'s no path, we carve one ourselves!' },
+  { bg:'#201a08', ac:'#ffd56b', art:_GL, src:'Gurren Lagann', by:'Simon',
+    q:'My bro is dead. He\'s gone. But he lives on in my back and in my heart. He\'ll keep living as a part of me.' },
+  { bg:'#200c18', ac:'#ff6bab', art:_GL, src:'Gurren Lagann', by:'Kamina',
+    q:'Don\'t stop moving until your heart stops pumping!' },
+  { bg:'#080820', ac:'#7070ff', art:_GL, src:'Gurren Lagann', by:'Simon',
+    q:'Mark my words — this drill will open a hole in the universe. And that hole will be a path for those behind us.' },
+  { bg:'#0c2018', ac:'#6bcca0', art:_GL, src:'Gurren Lagann', by:'Kamina',
+    q:'A real man never dies, even when he\'s killed!' },
+  { bg:'#1e0c00', ac:'#ff9b6b', art:_GL, src:'Gurren Lagann', by:'Team Gurren',
+    q:'Row row, fight the power!' },
+  { bg:'#001a18', ac:'#6bddcc', art:_GL, src:'Gurren Lagann', by:'Nia Teppelin',
+    q:'Even if tomorrow never comes, I\'ll keep believing in the tomorrow I\'ll spend with you.' },
+  { bg:'#12001a', ac:'#c06bff', art:_GL, src:'Gurren Lagann', by:'Kamina',
+    q:'Go beyond the impossible and kick reason to the curb!' },
+  { bg:'#001a08', ac:'#6bff9b', art:_GL, src:'Gurren Lagann', by:'Simon',
+    q:'I\'m not afraid anymore. I know my drill will pierce the heavens!' },
+  { bg:'#1e0008', ac:'#ff6b88', art:_GL, src:'Gurren Lagann', by:'Kamina',
+    q:'The lights in the sky are stars. We won\'t stop — ever — until we\'ve reached every last one of them.' },
+  { bg:'#0a1600', ac:'#aaff6b', art:_GL, src:'Gurren Lagann', by:'Kamina',
+    q:'Don\'t be distracted by the what-ifs and should-haves. It was the best possible choice at that moment.' },
+  { bg:'#00121e', ac:'#6bbbff', art:_FT, src:'Fairy Tail', by:'Makarov Dreyar',
+    q:'There is no shame in being weak. The shame is in staying weak.' },
+];
+
+let _posterIdx = parseInt(localStorage.getItem('life_sim_poster') || '0');
+
+function updateRoomPoster() {
+  const el = document.querySelector('.poster');
+  if (!el) return;
+  const p = POSTERS[_posterIdx % POSTERS.length];
+  el.style.background = `linear-gradient(90deg,${p.bg},${p.ac}55,${p.bg})`;
+  el.style.borderColor = p.ac + '55';
+}
+
+function showPoster() { _renderPosterModal(); }
+
+function _renderPosterModal() {
+  document.getElementById('poster-modal')?.remove();
+  const idx = _posterIdx % POSTERS.length;
+  const p = POSTERS[idx];
+  const m = document.createElement('div');
+  m.className = 'poster-modal';
+  m.id = 'poster-modal';
+  m.onclick = e => { if (e.target === m) m.remove(); };
+  m.innerHTML = `
+    <button class="p-nav" onclick="event.stopPropagation();_navPoster(-1)">&#8249;</button>
+    <div class="poster-card" style="background:${p.bg};border-color:${p.ac}44">
+      <div class="poster-art">${p.art}</div>
+      <div class="poster-body">
+        <div class="p-counter">${idx + 1} / ${POSTERS.length}</div>
+        <div class="p-src" style="color:${p.ac}">${p.src}</div>
+        <div class="p-quote">&ldquo;${p.q}&rdquo;</div>
+        <div class="p-by" style="color:${p.ac}">— ${p.by}</div>
       </div>
-      <div style="font-size:11.5px;color:#706880;line-height:1.9;margin-bottom:24px">
-        You're 20.<br>
-        That's the whole advantage right there.<br><br>
-        No mortgage. No dependants. No decisions locked in yet.<br>
-        Just time — and you've got more of it than you think.<br><br>
-        Most people your age are sleeping in,<br>
-        spending on nothing, drifting.<br>
-        You're in this room. Building.<br><br>
-        <span style="color:#a89870">Every desk session is a rep.<br>
-        Every nap is recovery, not laziness.<br>
-        Every hustle dollar is evidence.</span><br><br>
-        You don't need motivation. You need the next hour.<br>
-        That's it. Just the next hour.
-      </div>
-      <button onclick="document.getElementById('poster-modal').remove()"
-        style="background:transparent;border:1px solid #2a2838;color:#5a5868;
-        padding:8px 28px;border-radius:20px;cursor:pointer;font-size:10px;
-        letter-spacing:2px;text-transform:uppercase;transition:border-color .2s,color .2s"
-        onmouseover="this.style.borderColor='#a89870';this.style.color='#a89870'"
-        onmouseout="this.style.borderColor='#2a2838';this.style.color='#5a5868'">
-        close
-      </button>
-    </div>`;
-  document.body.appendChild(modal);
+      <button class="p-close" onclick="document.getElementById('poster-modal').remove()">close</button>
+    </div>
+    <button class="p-nav" onclick="event.stopPropagation();_navPoster(1)">&#8250;</button>`;
+  document.body.appendChild(m);
+}
+
+function _navPoster(dir) {
+  _posterIdx = (_posterIdx + dir + POSTERS.length) % POSTERS.length;
+  localStorage.setItem('life_sim_poster', _posterIdx);
+  updateRoomPoster();
+  _renderPosterModal();
 }
 
 // ─────────────────────────────────────────────
@@ -1555,6 +1669,7 @@ setTimeout(scaleRoom, 60);
 setTimeout(scaleRoom, 250);
 window.addEventListener('resize', scaleRoom);
 render();
+updateRoomPoster();
 setInterval(render, 30000);
 window.addEventListener('focus', render);
 </script>
