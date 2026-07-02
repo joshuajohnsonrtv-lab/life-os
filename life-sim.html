@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>The Sim — Joshua</title>
+<style>
+:root {
+  --bg:#0d0d0f; --bg2:#141416; --surface:#1a1a1e; --border:#2a2a30;
+  --text:#e8e8ec; --muted:#6b7280; --muted2:#9ca3af;
+  --gold:#f5c542; --green:#22c55e; --red:#ef4444;
+  --blue:#3b82f6; --purple:#a855f7; --orange:#f97316;
+  --floor:#2a1c0e; --wall-col:#13121e;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;flex-direction:column;}
+
+/* ── HEADER ── */
+.hdr{
+  display:flex;align-items:center;gap:16px;padding:10px 18px;
+  border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;
+}
+.hdr-title{font-size:16px;font-weight:900;letter-spacing:-0.5px;white-space:nowrap;}
+.out-wrap{display:flex;align-items:center;gap:10px;flex:1;min-width:160px;}
+.out-label{font-size:10px;color:var(--muted);white-space:nowrap;font-weight:700;text-transform:uppercase;}
+.out-track{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden;}
+.out-fill{height:100%;border-radius:4px;background:var(--gold);transition:width 1.2s ease,background 1s ease;}
+.out-pct{font-size:13px;font-weight:900;min-width:36px;text-align:right;transition:color 1s ease;}
+.pot-badge{font-size:10px;font-weight:700;white-space:nowrap;padding:3px 10px;
+  border-radius:20px;border:1px solid rgba(168,85,247,.35);background:rgba(168,85,247,.07);color:var(--purple);}
+.refresh-btn{padding:4px 10px;border-radius:8px;border:1px solid var(--border);background:transparent;
+  color:var(--muted);font-size:11px;cursor:pointer;flex-shrink:0;}
+.refresh-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ── LOC BAR ── */
+.loc-bar{display:flex;gap:0;padding:8px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.loc-btn{padding:7px 18px;border:1px solid var(--border);background:transparent;
+  color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
+.loc-btn:first-child{border-radius:8px 0 0 8px;}
+.loc-btn:last-child{border-radius:0 8px 8px 0;border-left:none;}
+.loc-btn.active{background:var(--gold);color:#000;border-color:var(--gold);}
+
+/* ── BODY ── */
+.sim-body{display:flex;flex:1;overflow:hidden;}
+
+/* ── ROOM ── */
+.room-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;overflow:hidden;}
+/* container holds .room + .room-glow as siblings so room filter never touches the glow */
+.room-container{position:relative;width:430px;height:510px;flex-shrink:0;}
+.room{
+  position:absolute;inset:0;
+  background:var(--floor);border:3px solid #2a2a1a;border-radius:4px;
+  overflow:hidden;transition:filter 1.5s ease;
+}
+.room.dim {filter:brightness(.35) saturate(.3) hue-rotate(22deg);}  /* curtains drawn */
+.room.mid {filter:brightness(.62) saturate(.95);}                   /* curtains open, no light (~60% of switch-on) */
+.room.lit {filter:brightness(1.04) saturate(1.18);}                 /* light switch on */
+
+/* floor — dark wood planks */
+.room::before{
+  content:'';position:absolute;inset:0;z-index:0;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px, transparent 38px,
+      rgba(0,0,0,.18) 38px, rgba(0,0,0,.18) 39px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px, transparent 27px,
+      rgba(255,255,255,.022) 27px, rgba(255,255,255,.022) 28px
+    );
+  background-size:39px 28px;
+}
+/*
+  Monitor glow — narrow vertical beam directly below the monitor.
+  Monitor centre in room coords ≈ x:147. Room-glow div is left:16→right:16, width≈398px.
+  Monitor centre in glow-div % = (147-16)/398 ≈ 33%.
+  Ellipse x-radius 90px keeps light off the door (x≈394). Y-radius 400px
+  means the faint tip barely kisses the futon at y≈366 (glow centre at y≈32).
+*/
+/*
+  Glow is a SIBLING of .room (inside .room-container) so the room's
+  filter:brightness() can never dim it. No counter-filter needed.
+  Position matches where it would sit inside the room:
+    top:34px = monitor face, left:16px/right:16px = room inner padding.
+  z-index:99 puts it above .room's stacking context.
+  Alpha values tuned for ~75% brightness at the core.
+*/
+.room-glow{
+  position:absolute;top:34px;left:16px;right:16px;height:400px;z-index:99;
+  pointer-events:none;opacity:0;
+  transition:opacity 1s ease, background .4s;
+}
+.room-glow.on-pc{
+  opacity:1;
+  background:
+    radial-gradient(ellipse 120px 400px at 33% 1%,
+      rgba(30,140,255,.92) 0%,
+      rgba(30,140,255,.60) 14%,
+      rgba(30,140,255,.28) 40%,
+      rgba(30,140,255,.08) 64%,
+      transparent 82%);
+}
+.room-glow.on-mac{
+  opacity:1;
+  background:
+    radial-gradient(ellipse 120px 400px at 33% 1%,
+      rgba(232,180,32,.88) 0%,
+      rgba(232,180,32,.56) 14%,
+      rgba(232,180,32,.26) 40%,
+      rgba(232,180,32,.08) 64%,
+      transparent 82%);
+}
+
+/* ── WALLS ── */
+.wt{position:absolute;top:0;left:0;right:0;height:16px;background:linear-gradient(180deg,#1a192c,#13121e);border-bottom:2px solid #2d2b40;z-index:2;}
+.wl{position:absolute;top:0;left:0;bottom:0;width:16px;background:linear-gradient(90deg,#1a192c,#13121e);border-right:2px solid #2d2b40;z-index:2;}
+.wr{position:absolute;top:0;right:0;bottom:0;width:16px;background:linear-gradient(270deg,#1a192c,#13121e);border-left:2px solid #2d2b40;z-index:2;}
+.wb{position:absolute;bottom:0;left:0;right:0;height:16px;background:linear-gradient(0deg,#1a192c,#13121e);border-top:2px solid #2d2b40;z-index:2;}
+
+/* ── WINDOW — always on during day, off at night ── */
+.window{
+  position:absolute;right:0;bottom:75px;width:16px;height:72px;z-index:3;
+  background:rgba(180,220,255,.55);
+  border-left:2px solid rgba(160,210,255,.9);
+  box-shadow:inset -1px 0 10px rgba(160,210,255,.35);
+  transition:background .8s,border-color .8s,box-shadow .8s;
+}
+.window::after{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(160,210,255,.6);}
+.window.night{
+  background:rgba(15,20,45,.45);
+  border-color:rgba(30,40,80,.5);
+  box-shadow:none;
+}
+.window.night::after{background:rgba(30,40,80,.4);}
+/* daylight spill from window — hidden when curtains drawn or night */
+/* window centre: right:8px, bottom:111px — gradient origin at 100% 50% of this div */
+.win-light{
+  position:absolute;right:8px;bottom:36px;width:150px;height:150px;z-index:1;
+  background:radial-gradient(ellipse at 100% 50%,
+    rgba(180,220,255,.22) 0%,
+    rgba(180,220,255,.10) 35%,
+    rgba(180,220,255,.03) 60%,
+    transparent 75%);
+  pointer-events:none;
+  transition:opacity .7s ease;
+}
+
+/* ── WARDROBES — bottom wall, left + right ── */
+.ward{
+  position:absolute;bottom:0;width:90px;height:56px;z-index:3;
+  background:linear-gradient(180deg,#20182e 0%,#16101e 100%);
+  border:2px solid #352848;border-radius:2px 2px 0 0;
+  box-shadow:inset 0 1px 0 rgba(180,140,255,.06),0 -2px 8px rgba(0,0,0,.4);
+}
+/* double-door centre line */
+.ward::before{
+  content:'';position:absolute;top:6px;bottom:0;left:50%;width:1px;
+  background:linear-gradient(180deg,#3a2a50,#241838);
+}
+/* two handles */
+.ward::after{
+  content:'';position:absolute;bottom:14px;left:calc(25% - 4px);
+  width:8px;height:8px;border-radius:2px;background:#3a2a50;border:1px solid #4a3860;
+  box-shadow:calc(50% + 4px) 0 0 #3a2a50, calc(50% + 4px) 0 0 1px #4a3860;
+}
+.ward-l{left:18px;}
+.ward-r{right:18px;}
+
+/* ── DESK ── */
+.desk{
+  position:absolute;top:20px;left:18px;width:258px;height:92px;z-index:3;
+  background:linear-gradient(180deg,#3e2810 0%,#2e1c08 100%);
+  border:2px solid #6b4520;border-radius:3px;
+  box-shadow:inset 0 1px 0 rgba(255,200,100,.07),0 2px 8px rgba(0,0,0,.5);
+  cursor:pointer;transition:border-color .2s,box-shadow .2s;
+}
+.desk:hover,.desk.active-zone{border-color:var(--gold);box-shadow:0 0 10px rgba(245,197,66,.15),inset 0 1px 0 rgba(255,200,100,.07);}
+.desk > *{pointer-events:none;}
+/* tower off state */
+.tower.off .tower-led{background:#1a1a1a;animation:none;box-shadow:none;}
+
+/* ── CHAIR — gray office chair below desk ── */
+.chair{
+  position:absolute;top:118px;left:128px;z-index:3;
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;
+  transition:opacity .15s;
+}
+.chair:hover{opacity:.8;}
+/* backrest */
+.chair-back{
+  width:36px;height:8px;
+  background:linear-gradient(180deg,#5a5a68,#42424e);
+  border:1.5px solid #6e6e7e;border-radius:3px 3px 0 0;
+}
+/* seat */
+.chair-seat{
+  width:36px;height:28px;
+  background:linear-gradient(180deg,#4c4c5a,#38383e);
+  border:1.5px solid #6a6a7a;border-bottom-width:2.5px;border-radius:0 0 4px 4px;
+  box-shadow:0 3px 8px rgba(0,0,0,.55);
+}
+/* subtle armrests on sides */
+.chair-seat::before,.chair-seat::after{
+  content:'';position:absolute;top:4px;width:5px;height:14px;
+  background:#484856;border:1px solid #6a6a7a;border-radius:2px;
+}
+.chair-seat::before{left:-5px;}
+.chair-seat::after{right:-5px;}
+.chair.seated .chair-back,.chair.seated .chair-seat{border-color:var(--gold);}
+
+/* ── LIGHT SWITCH — right wall, just past the door ── */
+.light-switch{
+  position:absolute;right:2px;top:70px;width:12px;height:20px;z-index:6;
+  background:#1e1e2a;border:1px solid #2e2e3e;border-radius:3px;
+  cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;
+}
+.light-switch::after{
+  content:'';width:5px;height:10px;border-radius:2px;
+  background:#2e2e3e;border:1px solid #3e3e50;transition:all .2s;
+}
+.light-switch.on{background:#2a2416;border-color:#7a6020;}
+.light-switch.on::after{background:#f0c840;border-color:#e0a820;box-shadow:0 0 6px rgba(240,200,64,.6);}
+
+/* ── WINDOW CURTAINS ── */
+.window.curtains{
+  background:rgba(40,22,30,.85);
+  border-color:rgba(70,38,50,.6);
+  box-shadow:none;
+}
+.window.curtains::after{background:rgba(70,38,50,.4);}
+/* desk strip at very back */
+.d-strip{
+  position:absolute;top:4px;left:6px;right:6px;height:5px;
+  background:linear-gradient(90deg,#1a1a20,#28282e,#1a1a20);
+  border:1px solid #303038;border-radius:2px;
+}
+/* big wide monitor — thin bar */
+.d-monitor{
+  position:absolute;top:15px;left:26px;right:26px;height:7px;
+  background:#06080e;border:1.5px solid #22223a;border-radius:2px;
+  transition:border-color .4s,box-shadow .4s;
+}
+/* PC on — blue */
+.d-monitor.on-pc{
+  border-color:#2090ff;
+  box-shadow:0 0 10px rgba(30,140,255,.65),0 0 30px rgba(30,140,255,.2),inset 0 0 5px rgba(30,140,255,.15);
+}
+.d-monitor.on-pc::before{
+  content:'';position:absolute;inset:-3px -6px;
+  background:rgba(30,140,255,.06);border-radius:4px;
+  box-shadow:0 0 22px rgba(30,140,255,.22);pointer-events:none;
+}
+.d-monitor.on-pc::after{
+  content:'';position:absolute;inset:1px;
+  background:linear-gradient(90deg,#00122a,#002448,#00122a);
+  animation:screenFlicker 4s ease-in-out infinite;border-radius:1px;
+}
+/* Mac Mini on — yellow/amber */
+.d-monitor.on-mac{
+  border-color:#e8b820;
+  box-shadow:0 0 10px rgba(232,184,32,.65),0 0 30px rgba(232,184,32,.2),inset 0 0 5px rgba(232,184,32,.15);
+}
+.d-monitor.on-mac::before{
+  content:'';position:absolute;inset:-3px -6px;
+  background:rgba(232,184,32,.06);border-radius:4px;
+  box-shadow:0 0 22px rgba(232,184,32,.22);pointer-events:none;
+}
+.d-monitor.on-mac::after{
+  content:'';position:absolute;inset:1px;
+  background:linear-gradient(90deg,#1c1000,#2e1c00,#1c1000);
+  animation:screenFlicker 4s ease-in-out infinite;border-radius:1px;
+}
+@keyframes screenFlicker{0%,100%{opacity:.5;}50%{opacity:1;}}
+/* corner speakers */
+.d-spkr{
+  position:absolute;top:12px;width:18px;height:20px;
+  background:linear-gradient(180deg,#1e1e1e,#141414);
+  border:1px solid #333;border-radius:2px;
+}
+.d-spkr-l{left:4px;}
+.d-spkr-r{right:4px;}
+/* mac mini — clickable independently */
+.d-mini{
+  position:absolute;top:34px;right:4px;width:14px;height:14px;
+  background:linear-gradient(135deg,#c4c4c4,#969696);
+  border:1px solid #787878;border-radius:3px;
+  box-shadow:0 1px 3px rgba(0,0,0,.6);
+  pointer-events:auto;cursor:pointer;transition:box-shadow .3s;
+}
+.d-mini::after{
+  content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
+  width:3px;height:3px;border-radius:50%;background:#555;
+}
+.d-mini.on{box-shadow:0 0 8px rgba(255,160,40,.5),0 1px 3px rgba(0,0,0,.6);}
+.d-mini.on::after{background:#f0a030;box-shadow:0 0 5px rgba(255,160,0,.9);}
+
+/* keyboards stacked in centre — narrow, centred under monitor */
+.d-kbd{
+  position:absolute;top:42px;left:100px;width:58px;height:14px;
+  background:#0e0e14;border:1px solid #252530;border-radius:2px;
+  background-image:repeating-linear-gradient(90deg,transparent,transparent 5px,rgba(255,255,255,.03) 5px,rgba(255,255,255,.03) 6px);
+}
+.d-kbd2{
+  top:60px;left:102px;width:54px;height:11px;
+}
+/* tiny mouse — right of keyboards */
+.d-mouse{
+  position:absolute;top:57px;right:20px;width:9px;height:13px;
+  background:linear-gradient(170deg,#1a1a26,#111118);
+  border:1px solid #2a2a3a;border-radius:50% 50% 42% 42% / 55% 55% 45% 45%;
+}
+.d-mouse::before{
+  content:'';position:absolute;top:4px;left:50%;transform:translateX(-50%);
+  width:1px;height:5px;background:#242432;border-radius:1px;
+}
+.d-mouse::after{
+  content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);
+  width:3px;height:3px;border-radius:50%;
+  background:#dc2626;box-shadow:0 0 4px rgba(220,38,38,.9);
+  animation:mouseLed 2.8s ease-in-out infinite;
+}
+@keyframes mouseLed{0%,88%,100%{opacity:1;}44%{opacity:.1;}}
+
+/* ── PC TOWER ── */
+.tower{
+  position:absolute;top:118px;left:18px;width:26px;height:52px;z-index:3;
+  background:#131318;border:2px solid #222228;border-radius:2px;
+  display:flex;flex-direction:column;align-items:center;padding-top:6px;gap:4px;
+}
+.tower-led{
+  width:6px;height:6px;border-radius:50%;background:#22c55e;
+  animation:ledBlink 2.2s ease-in-out infinite;
+}
+@keyframes ledBlink{0%,85%,100%{opacity:1;}42%{opacity:.15;}}
+
+/* ── FUTON ── */
+.futon{
+  position:absolute;bottom:72px;left:18px;width:210px;height:72px;z-index:3;
+  background:linear-gradient(160deg,#243060 0%,#1a2448 50%,#141c38 100%);
+  border:2px solid #38508a;border-radius:6px;
+  cursor:pointer;transition:border-color .2s,box-shadow .2s;
+  box-shadow:0 3px 12px rgba(0,0,0,.6),inset 0 1px 0 rgba(100,140,255,.1);
+}
+.futon:hover,.futon.active-zone{border-color:#6090e0;box-shadow:0 0 12px rgba(80,120,220,.25),inset 0 1px 0 rgba(100,140,255,.1);}
+.futon::before{
+  content:'FUTON';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-size:8px;letter-spacing:3px;color:rgba(160,180,255,.25);
+  text-transform:uppercase;pointer-events:none;
+}
+.futon::after{
+  content:'';position:absolute;top:5px;left:5px;right:5px;bottom:5px;
+  border:1px dashed rgba(100,140,255,.12);border-radius:4px;
+}
+.pillow{
+  position:absolute;top:382px;left:23px;width:22px;height:40px;z-index:5;
+  background:linear-gradient(135deg,#304070,#202e58);
+  border:1px solid #405080;border-radius:5px;
+  box-shadow:0 2px 6px rgba(0,0,0,.5);
+}
+
+/* ── FAN — mid-right, clear of window ── */
+.fan{
+  position:absolute;bottom:210px;right:35px;width:38px;height:38px;z-index:3;
+  border-radius:50%;border:2px solid #383838;background:radial-gradient(circle,#1a1a1a,#0a0a0a);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.6);
+  transition:box-shadow .4s;
+}
+.fan.on{box-shadow:0 0 14px rgba(180,220,255,.3),0 2px 8px rgba(0,0,0,.6);}
+.fan-blade{
+  width:24px;height:24px;border-radius:50%;
+  background:conic-gradient(from 0deg,#181818 0deg,#2e2e2e 60deg,#141414 120deg,#2e2e2e 180deg,#141414 240deg,#2e2e2e 300deg,#181818 360deg);
+  border:1.5px solid #2e2e2e;transition:border-color .4s;
+}
+.fan.on .fan-blade{
+  animation:spinBlade .65s linear infinite;
+  border-color:#3a3a3a;
+  box-shadow:0 0 6px rgba(180,220,255,.18);
+}
+@keyframes spinBlade{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+/* ── DOOR — top wall, right ── */
+.door{
+  position:absolute;top:0;right:36px;width:50px;height:60px;z-index:5;
+  background:rgba(255,255,255,.03);border:2px solid #2a2a2a;border-top:none;
+  border-radius:0 0 3px 3px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;transition:all .2s;
+}
+.door:hover{background:rgba(245,197,66,.06);border-color:var(--gold);}
+.door-knob{
+  position:absolute;left:6px;bottom:14px;
+  width:5px;height:5px;border-radius:50%;background:#555;
+}
+.door-icon{font-size:18px;}
+.door-txt{font-size:8px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+
+/* ── CHARACTER ── */
+.char{
+  position:absolute;z-index:10;width:24px;
+  transition:top .65s cubic-bezier(.4,0,.2,1),left .65s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;align-items:center;
+}
+.char-bubble{
+  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:rgba(10,10,14,.92);border:1px solid var(--border);
+  border-radius:10px;padding:4px 8px;white-space:nowrap;
+  font-size:10px;font-weight:700;pointer-events:none;backdrop-filter:blur(4px);
+  min-width:120px;text-align:center;transition:border-color .5s;
+}
+.char-bubble::after{
+  content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:var(--border);
+}
+.char-head{
+  width:16px;height:16px;border-radius:50%;
+  background:#9B6240;
+  border:1.5px solid #7A4A28;
+  position:relative;
+}
+/* Brown eyes */
+.char-head::before,.char-head::after{
+  content:'';position:absolute;width:2px;height:2px;border-radius:50%;
+  background:#3D1C06;
+  top:6px;
+}
+.char-head::before{left:3px;}
+.char-head::after{right:3px;}
+
+/* sleeping — Zs stacked vertically (top+bottom of head), each rotated on its side */
+.char-head.sleeping::before,.char-head.sleeping::after{
+  content:'Z';width:auto;height:auto;border-radius:0;background:transparent;
+  font-size:6px;font-weight:800;color:#3a2010;line-height:1;
+  left:50%;right:auto;transform:translateX(-50%) rotate(90deg);transform-origin:center;
+}
+.char-head.sleeping::before{top:1px;}
+.char-head.sleeping::after {top:auto;bottom:1px;}
+/* meditation — flat-line eyes */
+.char-head.meditating::before,.char-head.meditating::after{
+  content:'—';width:auto;height:auto;border-radius:0;background:transparent;
+  font-size:6px;color:#3a2010;line-height:1;top:5px;letter-spacing:-1px;
+}
+.char-head.meditating::before{left:0px;}
+.char-head.meditating::after{right:-1px;left:auto;}
+
+/* char-figure wrapper — row layout when laying */
+.char-figure{display:flex;flex-direction:column;align-items:center;gap:0;}
+.char-figure.laying{flex-direction:row;gap:2px;align-items:center;}
+
+/* Neck — standing */
+.char-neck{
+  width:5px;height:2px;
+  background:#9B6240;
+  border-left:1px solid #7A4A28;
+  border-right:1px solid #7A4A28;
+  flex-shrink:0;
+}
+/* Neck — laying: becomes a horizontal bridge with top/bottom borders */
+.char-figure.laying .char-neck{
+  width:3px;height:8px;
+  border-left:none;border-right:none;
+  border-top:1px solid #7A4A28;border-bottom:1px solid #7A4A28;
+}
+
+/* Body — laying: rotate -90° so shoulders face the head (left) and legs face right */
+.char-figure.laying .char-body{
+  transform:rotate(-90deg);
+  /* visual becomes 18px wide × 22px tall; layout is still 22×18 → pull in phantom 2px each side */
+  margin:0 -2px;
+}
+/* hide standing-only decorations when rotated */
+.char-figure.laying .char-body::before,
+.char-figure.laying .char-body::after{content:none;}
+
+/*
+  Body — black V-taper shirt + grey baggy joggers.
+  clip-path polygon:
+    Shirt (top 52%): full-width shoulders taper to ~60% waist.
+    Waist notch at 52%: drops back out to full width → baggy jogger silhouette.
+    Joggers (bottom 48%): full width, grey.
+
+  At 22px wide:
+    shoulders = 0–22px
+    waist     = ~4px–18px  (18% → 82%)
+    joggers   = 0–22px
+*/
+.char-body{
+  width:22px;height:18px;
+  position:relative;
+  clip-path:polygon(
+    0%   0%,
+    100% 0%,
+    82%  52%,
+    82%  100%,
+    18%  100%,
+    18%  52%
+  );
+  background:linear-gradient(180deg,
+    #0a0a0a 0%,
+    #0f0f0f 50%,   /* black shirt */
+    #d8d8d8 52%,
+    #cccccc 100%); /* light grey joggers */
+}
+/* subtle collar V on shirt */
+.char-body::before{
+  content:'';position:absolute;
+  top:1px;left:50%;transform:translateX(-50%);
+  width:0;height:0;
+  border-left:2px solid transparent;
+  border-right:2px solid transparent;
+  border-top:3px solid #222;
+}
+/* leg split line down the centre of the jogger section */
+.char-body::after{
+  content:'';position:absolute;
+  top:52%;bottom:0;
+  left:50%;transform:translateX(-50%);
+  width:1px;
+  background:#2a2a2a;
+}
+
+
+
+/* ── OUTSIDE ── */
+.outside-wrap{flex:1;padding:20px;overflow-y:auto;display:none;}
+.outside-wrap.show{display:block;}
+.room-wrap.hidden{display:none;}
+.out-intro{font-size:12px;color:var(--muted);margin-bottom:16px;max-width:480px;margin:0 auto 16px;}
+.zone-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:480px;margin:0 auto;}
+.zone-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:18px 14px;cursor:pointer;transition:all .2s;text-align:center;
+}
+.zone-card:hover,.zone-card.active{border-color:var(--gold);background:rgba(245,197,66,.04);transform:translateY(-2px);}
+.z-icon{font-size:32px;margin-bottom:6px;}
+.z-name{font-size:13px;font-weight:700;margin-bottom:3px;}
+.z-stat{font-size:10px;color:var(--muted);}
+.zone-detail{
+  max-width:480px;margin:14px auto 0;
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:16px;display:none;
+}
+.zone-detail.show{display:block;}
+.zd-title{font-size:13px;font-weight:700;margin-bottom:12px;}
+.back-btn{
+  display:block;margin:14px auto 0;max-width:480px;
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:8px 20px;border-radius:8px;cursor:pointer;font-size:12px;
+}
+.back-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ── STATS PANEL ── */
+.stats-panel{
+  width:230px;border-left:1px solid var(--border);padding:14px;
+  overflow-y:auto;display:flex;flex-direction:column;gap:10px;flex-shrink:0;
+}
+.sblock{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;}
+.sblock-title{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:11px;border-bottom:1px solid var(--border);}
+.srow:last-child{border-bottom:none;}
+.sval{font-weight:800;font-size:12px;}
+.mood-pill{
+  display:block;padding:5px 10px;border-radius:20px;
+  font-size:10px;font-weight:700;text-align:center;margin-bottom:8px;
+}
+.gap-block{font-size:10px;color:var(--muted);line-height:1.8;}
+.gap-now{font-size:20px;font-weight:900;display:block;}
+.gap-pot{font-size:12px;font-weight:700;color:var(--purple);display:block;}
+.gap-diff{font-size:10px;font-weight:700;color:var(--red);display:block;}
+.hustle-row{padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;}
+.hustle-row:last-child{border-bottom:none;}
+.hustle-n{font-weight:600;}
+.hustle-r{font-size:10px;color:var(--green);}
+.dot-track{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px;}
+.dot{width:13px;height:13px;border-radius:3px;border:1px solid #222;}
+
+/* ── ACTIVITY MENU ── */
+.act-menu{
+  position:absolute;z-index:30;
+  display:flex;flex-direction:column;align-items:flex-start;gap:5px;
+  pointer-events:none;
+}
+.act-bubble{
+  background:rgba(8,8,16,.93);border:1px solid #3a3a50;border-radius:20px;
+  padding:5px 13px;font-size:11px;font-weight:700;cursor:pointer;
+  white-space:nowrap;backdrop-filter:blur(6px);color:var(--text);
+  pointer-events:all;
+  opacity:0;transform:translateY(6px) scale(.92);
+  animation:bubblePop .22s ease forwards;
+  transition:border-color .15s,background .15s;
+  box-shadow:0 2px 10px rgba(0,0,0,.5);
+}
+.act-bubble:hover{background:rgba(245,197,66,.1);border-color:var(--gold);color:var(--gold);}
+@keyframes bubblePop{to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* PC tower tooltip */
+.tower-tip{
+  position:absolute;top:118px;left:48px;font-size:8px;color:#383838;
+  text-transform:uppercase;letter-spacing:.5px;pointer-events:none;z-index:3;
+  white-space:nowrap;
+}
+
+/* ── POSTER — bottom wall, between wardrobes ── */
+.poster{
+  position:absolute;bottom:1px;left:111px;width:208px;height:13px;z-index:6;
+  background:linear-gradient(90deg,rgba(210,190,150,.08),rgba(230,210,170,.18),rgba(210,190,150,.08));
+  border:1px solid rgba(210,185,130,.22);border-radius:1px;
+  cursor:pointer;transition:border-color .2s,background .2s;
+}
+.poster:hover{
+  border-color:rgba(210,185,130,.5);
+  background:linear-gradient(90deg,rgba(210,190,150,.12),rgba(230,210,170,.28),rgba(210,190,150,.12));
+}
+/* poster modal */
+.poster-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;
+  display:flex;align-items:center;justify-content:center;
+}
+.poster-inner{
+  max-width:310px;padding:36px 32px;
+  background:#0a0a14;border:1px solid #2a2830;border-radius:14px;text-align:center;
+}
+
+/* mobile */
+@media(max-width:640px){
+  .stats-panel{display:none;}
+  .room{width:340px;height:420px;}
+  .desk{width:190px;}
+  .futon{width:165px;}
+  .hdr{padding:8px 12px;gap:10px;}
+  .pot-badge{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-title">🎮 The Sim</div>
+  <div class="out-wrap">
+    <span class="out-label">Output</span>
+    <div class="out-track"><div class="out-fill" id="out-fill" style="width:0%"></div></div>
+    <span class="out-pct" id="out-pct">0%</span>
+  </div>
+  <div class="pot-badge" id="pot-badge">🎯 £100M+ potential</div>
+  <button class="refresh-btn" onclick="render()">↻ Refresh</button>
+</div>
+
+<!-- LOCATION BAR -->
+<div class="loc-bar">
+  <button class="loc-btn active" id="btn-room" onclick="goLoc('room')">🏠 Your Room</button>
+  <button class="loc-btn" id="btn-out" onclick="goLoc('outside')">🌍 Outside</button>
+</div>
+
+<!-- BODY -->
+<div class="sim-body">
+
+  <!-- ROOM VIEW -->
+  <div class="room-wrap" id="view-room">
+    <div class="room-container">
+    <div class="room dim" id="the-room">
+
+      <div class="win-light" id="win-light"></div>
+
+      <!-- Walls -->
+      <div class="wt"></div><div class="wl"></div><div class="wr"></div><div class="wb"></div>
+
+      <!-- Window (click to draw/open curtains) -->
+      <div class="window" id="room-window" onclick="toggleCurtains()" title="Draw / open curtains"></div>
+
+      <!-- Light switch — right wall past door -->
+      <div class="light-switch" id="light-switch" onclick="toggleLight()" title="Light switch"></div>
+
+      <!-- Built-in wardrobes — bottom wall, left + right -->
+      <div class="ward ward-l"></div>
+      <div class="ward ward-r"></div>
+
+      <!-- Poster — bottom wall between wardrobes -->
+      <div class="poster" onclick="showPoster()" title="Read the poster"></div>
+
+      <!-- Desk -->
+      <div class="desk" onclick="showDeskMenu(event)" title="Click — what are you doing?">
+        <div class="d-strip"></div>
+        <div class="d-spkr d-spkr-l"></div>
+        <div class="d-monitor" id="monitor"></div>
+        <div class="d-spkr d-spkr-r"></div>
+        <div class="d-mini" id="d-mini" onclick="toggleMini(event)" title="Mac Mini — click to turn on/off"></div>
+        <div class="d-kbd"></div>
+        <div class="d-kbd d-kbd2"></div>
+        <div class="d-mouse"></div>
+      </div>
+
+      <!-- PC tower -->
+      <div class="tower" id="pc-tower" onclick="togglePC(event)" title="Click to turn PC on/off" style="cursor:pointer">
+        <div class="tower-led"></div>
+      </div>
+      <div class="tower-tip">PC</div>
+
+      <!-- Chair — below desk, independent sit toggle -->
+      <div class="chair" id="chair" onclick="toggleChair(event)" title="Sit down">
+        <div class="chair-back"></div>
+        <div class="chair-seat"></div>
+      </div>
+
+      <!-- Futon -->
+      <div class="futon" onclick="showFutonMenu(event)" title="Rest on futon"></div>
+      <div class="pillow"></div>
+
+      <!-- Fan -->
+      <div class="fan" id="fan"><div class="fan-blade" id="fan-blade"></div></div>
+
+      <!-- Door -->
+      <div class="door" onclick="goLoc('outside')" title="Go outside">
+        <div class="door-icon">🚪</div>
+        <div class="door-txt">Out</div>
+        <div class="door-knob"></div>
+      </div>
+
+      <!-- Character -->
+      <div class="char" id="char" style="top:270px;left:175px">
+        <div class="char-bubble" id="char-bubble">😮‍💨 Loading…</div>
+        <div class="char-figure" id="char-figure">
+          <div class="char-head" id="char-head"></div>
+          <div class="char-neck"></div>
+          <div class="char-body" id="char-body"></div>
+        </div>
+      </div>
+
+    </div>
+    <!-- Glow is a sibling of .room so room filter never dims it -->
+    <div class="room-glow" id="room-glow"></div>
+    </div><!-- /room-container -->
+  </div>
+
+  <!-- OUTSIDE VIEW -->
+  <div class="outside-wrap" id="view-outside">
+    <p class="out-intro">Your character steps outside. Choose a zone.</p>
+    <div class="zone-grid">
+      <div class="zone-card" id="zc-gym" onclick="openZone('gym')">
+        <div class="z-icon">🏋️</div>
+        <div class="z-name">Gym</div>
+        <div class="z-stat" id="zs-gym">—</div>
+      </div>
+      <div class="zone-card" id="zc-hustle" onclick="openZone('hustle')">
+        <div class="z-icon">💼</div>
+        <div class="z-name">Side Hustle</div>
+        <div class="z-stat" id="zs-hustle">—</div>
+      </div>
+      <div class="zone-card" id="zc-walk" onclick="openZone('walk')">
+        <div class="z-icon">🚶</div>
+        <div class="z-name">Walk</div>
+        <div class="z-stat">Clear your head</div>
+      </div>
+      <div class="zone-card" id="zc-kitchen" onclick="openZone('kitchen')">
+        <div class="z-icon">🍳</div>
+        <div class="z-name">Kitchen</div>
+        <div class="z-stat" id="zs-kitchen">—</div>
+      </div>
+    </div>
+    <div class="zone-detail" id="zone-detail">
+      <div class="zd-title" id="zd-title"></div>
+      <div id="zd-body"></div>
+    </div>
+    <button class="back-btn" onclick="goLoc('room')">← Back to your room</button>
+  </div>
+
+  <!-- STATS PANEL -->
+  <div class="stats-panel" id="stats-panel"></div>
+
+</div><!-- /sim-body -->
+
+<script>
+// ─────────────────────────────────────────────
+//  DATA
+// ─────────────────────────────────────────────
+function getMoney() {
+  try { return JSON.parse(localStorage.getItem('money_os_data')) || {}; } catch(e) { return {}; }
+}
+function getWellness() {
+  try { return JSON.parse(localStorage.getItem('wellness_data')) || {}; } catch(e) { return {}; }
+}
+
+// ─────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────
+function toDate(d) { return new Date(d).toISOString().slice(0,10); }
+function today() { return new Date().toISOString().slice(0,10); }
+function daysAgo(n) { const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); }
+function fmt(n) {
+  if (!n || isNaN(n)) return '£0';
+  if (n >= 1e6) return '£' + (n/1e6).toFixed(1) + 'M';
+  if (n >= 1000) return '£' + (n/1000).toFixed(1) + 'k';
+  return '£' + Math.round(n);
+}
+function clamp(v,mn,mx){return Math.min(mx,Math.max(mn,v));}
+
+// ─────────────────────────────────────────────
+//  CALCULATE
+// ─────────────────────────────────────────────
+function calc() {
+  const M = getMoney();
+  const W = getWellness();
+  const tod = today();
+
+  // ── Money ──────────────────────────────────
+  const incEntries = M.income?.entries || [];
+  const now = new Date();
+  const msStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0,10);
+  const yr1 = new Date(now); yr1.setFullYear(yr1.getFullYear()-1);
+
+  let monthIncome = 0, yearIncome = 0;
+  incEntries.forEach(e => {
+    const amt = parseFloat(e.amount)||0;
+    if (e.date >= msStart)        monthIncome += amt;
+    if (new Date(e.date) >= yr1)  yearIncome  += amt;
+  });
+
+  const allHustles  = M.hustles?.items || [];
+  const actHustles  = allHustles.filter(h => h.status === 'active' || parseFloat(h.revenue||0) > 0);
+  // revenue field = user's target/goal, not necessarily earned — label accordingly
+  const hustleRev   = actHustles.reduce((s,h) => s + (parseFloat(h.revenue)||0), 0);
+  // monthTarget: stored in sim's own localStorage, editable in-sim. Default £50k/month.
+  const monthTarget = parseFloat(localStorage.getItem('life_sim_month_target')) || 50000;
+  const dreamAge    = parseInt(M.delusion?.targetAge) || null;
+  const curAge      = parseInt(M.delusion?.currentAge) || null;
+
+  // ── Wellness ──────────────────────────────
+  const gymLog   = W.gym?.log  || {};
+  const sleepLog = W.sleep?.log || {};
+  const hydLog   = W.hydration?.log || {};
+  const dietLog  = W.diet?.log  || {};
+  const hydGoal  = W.hydration?.goal || 8;
+
+  let gymSess7=0, sleepTotal=0, sleepDays=0, hydDays=0;
+  for (let i=0;i<7;i++) {
+    const d = daysAgo(i);
+    if (gymLog[d]) gymSess7++;
+    const sl = sleepLog[d];
+    if (sl !== undefined && sl !== null) {
+      const hrs = typeof sl === 'object' ? (parseFloat(sl.hours||sl.value||0)) : parseFloat(sl)||0;
+      if (hrs > 0) { sleepTotal += hrs; sleepDays++; }
+    }
+    const hy = hydLog[d];
+    if (hy !== undefined) {
+      const cups = typeof hy === 'object' ? (hy.cups||hy.count||hy.value||0) : (hy||0);
+      if (parseFloat(cups) >= hydGoal) hydDays++;
+    }
+  }
+  const sleepAvg   = sleepDays > 0 ? sleepTotal/sleepDays : 0;
+  const gymToday   = !!gymLog[tod];
+  const todayDiet  = dietLog[tod];
+  const mealCount  = todayDiet
+    ? (Array.isArray(todayDiet) ? todayDiet.length : (typeof todayDiet === 'object' ? Object.keys(todayDiet).length : 1))
+    : 0;
+
+  // ── Score (0–100) ─────────────────────────
+  let score = 0;
+  // Income (max 35)
+  if (monthIncome > 0)    score += 10;
+  if (monthIncome >= 500) score += 10;
+  if (monthIncome >= 1500)score += 10;
+  if (monthIncome >= 3000)score +=  5;
+  // Hustles (max 25)
+  score += clamp(actHustles.length * 12, 0, 25);
+  // Gym (max 22)
+  score += clamp(gymSess7 * 4, 0, 22);
+  // Sleep (max 10)
+  if (sleepAvg >= 7 && sleepAvg <= 9) score += 10;
+  else if (sleepAvg >= 6)              score +=  5;
+  // Hydration (max 8)
+  score += Math.round((hydDays/7)*8);
+
+  const outputPct = clamp(Math.round(score), 0, 100);
+
+  // ── Status ────────────────────────────────
+  let emoji, text, col;
+  if      (outputPct <=  8) { emoji='😮‍💨'; text='Idle. Nothing being built.';  col='#ef4444'; }
+  else if (outputPct <= 20) { emoji='😐';  text='Baseline. Not enough.';        col='#f97316'; }
+  else if (outputPct <= 35) { emoji='🔄';  text='Moving. Keep pushing.';        col='#f59e0b'; }
+  else if (outputPct <= 55) { emoji='💪';  text='Locked in. Don\'t stop.';      col='#a3e635'; }
+  else if (outputPct <= 75) { emoji='🔥';  text='In the zone.';                 col='#22c55e'; }
+  else                       { emoji='⚡';  text='Maximum output.';              col='#06b6d4'; }
+
+  return {
+    outputPct, emoji, text, col,
+    monthIncome, yearIncome, hustleRev,
+    actHustles, allHustles,
+    monthTarget,
+    dreamAge, curAge,
+    gymSess7, gymToday, sleepAvg, hydDays, mealCount,
+    gymLog, dietLog, M, W
+  };
+}
+
+// ─────────────────────────────────────────────
+//  CHARACTER POSITIONS (px within .room)
+// ─────────────────────────────────────────────
+const POS = {
+  desk:        { top: 122, left: 105 },
+  chair:       { top: 126, left: 134 },  // seated — character centred on seat
+  futon:       { top: 392, left: 113 },
+  futon_sleep: { top: 395, left: 30  },
+  door:        { top: 72,  left: 340 },
+  center:      { top: 232, left: 160 }
+};
+
+let _currentZone = 'center';
+
+function moveChar(zone, instant) {
+  _currentZone = zone;
+
+  // ── always clear all zone highlights first ──
+  if (zone !== 'chair') {
+    _sittingOnChair = false;
+    document.getElementById('chair')?.classList.remove('seated');
+  }
+  document.querySelector('.desk')?.classList.remove('active-zone');
+  document.querySelector('.futon')?.classList.remove('active-zone');
+
+  // ── apply highlight for the destination zone ──
+  if (zone === 'desk') {
+    document.querySelector('.desk')?.classList.add('active-zone');
+  } else if (zone === 'futon' || zone === 'futon_sleep') {
+    document.querySelector('.futon')?.classList.add('active-zone');
+  }
+
+  const p   = POS[zone] || POS.center;
+  const el  = document.getElementById('char');
+  if (instant) el.style.transition = 'none';
+  el.style.top  = p.top  + 'px';
+  el.style.left = p.left + 'px';
+  if (instant) requestAnimationFrame(() => el.style.transition = '');
+}
+
+// ─────────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────────
+let _firstRender = true;
+
+function render() {
+  const s = calc();
+
+  // Output bar
+  const fill = document.getElementById('out-fill');
+  fill.style.width      = s.outputPct + '%';
+  fill.style.background = s.col;
+  const pctEl = document.getElementById('out-pct');
+  pctEl.textContent = s.outputPct + '%';
+  pctEl.style.color = s.col;
+
+  // Potential badge
+  document.getElementById('pot-badge').textContent = '🎯 ' + fmt(s.dreamNW) + ' potential';
+
+  // Room brightness — driven by curtains + light switch only
+  updateRoom();
+
+  // Monitor / window / glow — driven by PC toggle
+  updateDevices();
+
+  // Fan
+  document.getElementById('fan').className = 'fan' + (s.gymToday || s.gymSess7 >= 4 ? ' on' : '');
+
+  // Status bubble — respect manual activity for 20 mins
+  const bubble = document.getElementById('char-bubble');
+  const manualActive = _manualStatus && (Date.now() - _manualStatusTime < 20 * 60 * 1000);
+  if (!manualActive) {
+    _manualStatus = null;
+    bubble.innerHTML      = s.emoji + ' ' + s.text;
+    bubble.style.borderColor = s.col;
+  }
+
+  // Character body colour = mood colour
+  // char-body uses fixed CSS gradient (black shirt + joggers) — no override
+
+  // Only set position on first spawn — after that the user controls it
+  if (_firstRender) { moveChar('center', true); _firstRender = false; }
+
+  // Outside zone stats
+  const gs = document.getElementById('zs-gym');
+  if (gs) gs.textContent = s.gymSess7 + ' session' + (s.gymSess7!==1?'s':'') + ' this week';
+  const hs = document.getElementById('zs-hustle');
+  if (hs) hs.textContent = s.actHustles.length + ' active hustle' + (s.actHustles.length!==1?'s':'');
+  const ks = document.getElementById('zs-kitchen');
+  if (ks) ks.textContent = s.mealCount + ' meal' + (s.mealCount!==1?'s':'') + ' logged today';
+
+  // Stats panel
+  renderStats(s);
+}
+
+function renderStats(s) {
+  // How far this month's income is toward the monthly target
+  const monthGap  = Math.max(0, s.monthTarget - s.monthIncome);
+  const monthProg = s.monthTarget > 0 ? Math.min(100, Math.round((s.monthIncome / s.monthTarget) * 100)) : 0;
+
+  const hustleHTML = s.actHustles.length > 0
+    ? s.actHustles.map(h => `
+        <div class="hustle-row">
+          <div class="hustle-n">${h.name || 'Unnamed hustle'}</div>
+          <div class="hustle-r">${h.revenue ? fmt(h.revenue)+' target' : 'No target set'}</div>
+        </div>`).join('')
+    : `<div style="font-size:10px;color:var(--muted)">None active. Add one in the Money Dashboard → Hustles.</div>`;
+
+  document.getElementById('stats-panel').innerHTML = `
+    <div class="sblock">
+      <div class="sblock-title">Character</div>
+      <div class="mood-pill" style="background:${s.col}1a;color:${s.col}">${s.emoji} ${s.text}</div>
+      <div class="gap-block">
+        <span style="color:var(--muted);font-size:9px">THIS MONTH</span>
+        <span class="gap-now" style="color:${s.monthIncome>0?'var(--green)':'var(--red)'}">${fmt(s.monthIncome)}</span>
+        <span style="color:var(--muted);font-size:9px">MONTHLY TARGET</span>
+        <span class="gap-pot" style="cursor:pointer" onclick="editTarget()" title="Click to change">
+          ${fmt(s.monthTarget)} <span style="font-size:9px;opacity:.6">✏️</span>
+        </span>
+        <span class="gap-diff" style="color:${monthGap===0?'var(--green)':'var(--red)'}">
+          ${monthGap===0 ? '✅ TARGET HIT' : fmt(monthGap)+' to go this month'}
+        </span>
+        <div style="margin-top:6px;height:5px;background:var(--border);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${monthProg}%;background:var(--green);border-radius:3px;transition:width 1s ease"></div>
+        </div>
+        <span style="color:var(--muted);font-size:9px;margin-top:2px;display:block">
+          <span style="cursor:pointer;text-decoration:underline;color:var(--muted)" onclick="editTarget()">change monthly target</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="sblock">
+      <div class="sblock-title">💰 Money</div>
+      <div class="srow"><span>This month</span><span class="sval" style="color:var(--gold)">${fmt(s.monthIncome)}</span></div>
+      <div class="srow"><span>This year</span><span class="sval" style="color:var(--gold)">${fmt(s.yearIncome)}</span></div>
+      <div class="srow"><span>Active hustles</span><span class="sval">${s.actHustles.length}</span></div>
+    </div>
+
+    <div class="sblock">
+      <div class="sblock-title">🚀 Hustles</div>
+      ${hustleHTML}
+    </div>
+
+    <div class="sblock">
+      <div class="sblock-title">😴 Rest & Body</div>
+      <div class="srow"><span>Gym this week</span><span class="sval" style="color:${s.gymSess7>=3?'var(--green)':s.gymSess7>0?'var(--gold)':'var(--muted)'}">${s.gymSess7}/7</span></div>
+      <div class="srow"><span>Avg sleep</span><span class="sval" style="color:${s.sleepAvg>=7?'var(--green)':s.sleepAvg>0?'var(--orange)':'var(--muted)'}">${s.sleepAvg>0?s.sleepAvg.toFixed(1)+'h':'—'}</span></div>
+      <div class="srow"><span>Water days</span><span class="sval">${s.hydDays}/7</span></div>
+      <div class="srow"><span>Meals today</span><span class="sval">${s.mealCount}</span></div>
+    </div>`;
+}
+
+function editTarget() {
+  const current = parseFloat(localStorage.getItem('life_sim_month_target')) || 50000;
+  const val = prompt('Set your monthly income target (£):', current);
+  if (val === null) return;
+  const n = parseFloat(val.replace(/[^0-9.]/g,''));
+  if (!isNaN(n) && n > 0) {
+    localStorage.setItem('life_sim_month_target', n);
+    render();
+  }
+}
+
+// ─────────────────────────────────────────────
+//  LOCATION
+// ─────────────────────────────────────────────
+function goLoc(loc) {
+  const rv = document.getElementById('view-room');
+  const ov = document.getElementById('view-outside');
+  const br = document.getElementById('btn-room');
+  const bo = document.getElementById('btn-out');
+  if (loc === 'room') {
+    rv.classList.remove('hidden'); ov.classList.remove('show');
+    br.classList.add('active');    bo.classList.remove('active');
+  } else {
+    rv.classList.add('hidden');    ov.classList.add('show');
+    bo.classList.add('active');    br.classList.remove('active');
+    closeZone();
+  }
+}
+
+// ─────────────────────────────────────────────
+//  ZONE DETAILS
+// ─────────────────────────────────────────────
+let _openZone = null;
+
+function openZone(z) {
+  if (_openZone === z) { closeZone(); return; }
+  _openZone = z;
+  ['gym','hustle','walk','kitchen'].forEach(id => {
+    document.getElementById('zc-'+id)?.classList.toggle('active', id === z);
+  });
+  const s = calc();
+  const detail = document.getElementById('zone-detail');
+  document.getElementById('zd-title').textContent = {
+    gym:'🏋️ Gym', hustle:'💼 Side Hustle', walk:'🚶 Walk', kitchen:'🍳 Kitchen'
+  }[z];
+  document.getElementById('zd-body').innerHTML = buildZoneHTML(z, s);
+  detail.classList.add('show');
+}
+
+function closeZone() {
+  _openZone = null;
+  document.getElementById('zone-detail').classList.remove('show');
+  ['gym','hustle','walk','kitchen'].forEach(id => document.getElementById('zc-'+id)?.classList.remove('active'));
+}
+
+function buildZoneHTML(z, s) {
+  if (z === 'gym') {
+    const dots = Array.from({length:14},(_,i) => {
+      const d = daysAgo(i);
+      const done = !!s.gymLog[d];
+      return `<div class="dot" style="background:${done?'#22c55e':'#1a1a22'};border-color:${done?'#22c55e':'#2a2a32'}" title="${d}"></div>`;
+    }).join('');
+    const streak = calcStreak(s.gymLog);
+    return `
+      <div style="font-size:10px;color:var(--muted);margin-bottom:6px">Last 14 days</div>
+      <div class="dot-track">${dots}</div>
+      <div style="margin-top:10px;display:flex;gap:16px;font-size:12px">
+        <span>This week: <strong style="color:${s.gymSess7>=3?'var(--green)':'var(--gold)'}">${s.gymSess7} sessions</strong></span>
+        <span>Streak: <strong style="color:var(--orange)">${streak} days</strong></span>
+      </div>
+      <div style="margin-top:8px;font-size:10px;color:var(--muted)">Log gym sessions in the Wellness Dashboard. They show up here automatically.</div>`;
+  }
+
+  if (z === 'hustle') {
+    if (s.actHustles.length === 0) return `
+      <div style="font-size:12px;color:var(--muted);line-height:1.7">
+        No active hustles yet.<br><br>
+        Head to the <strong style="color:var(--gold)">Money Dashboard → Hustles</strong> to add one.
+        That's where real money starts. The 9-5 is a tool — not the destination.
+      </div>`;
+    return s.actHustles.map(h => `
+      <div style="background:var(--bg2);border-radius:10px;padding:10px;margin-bottom:8px">
+        <div style="font-weight:700;font-size:13px">${h.name||'Unnamed'}</div>
+        ${h.desc?`<div style="font-size:10px;color:var(--muted);margin-top:2px">${h.desc}</div>`:''}
+        <div style="font-size:12px;color:var(--green);margin-top:4px;font-weight:700">${h.revenue?fmt(h.revenue)+' revenue':'No revenue logged yet'}</div>
+        ${h.action?`<div style="font-size:10px;color:var(--gold);margin-top:4px">▶ Next step: ${h.action}</div>`:''}
+      </div>`).join('');
+  }
+
+  if (z === 'walk') return `
+    <div style="font-size:12px;color:var(--muted);line-height:1.8">
+      No tracking needed. Just go.<br><br>
+      <strong style="color:var(--text)">20 minutes outside changes your brain chemistry.</strong>
+      Cortisol drops. Ideas arrive. Problems shrink.<br><br>
+      Every serious builder has a walking habit. It's not wasted time — it's processing time.
+    </div>`;
+
+  if (z === 'kitchen') {
+    const todayLog = s.dietLog[today()];
+    const meals = todayLog
+      ? (Array.isArray(todayLog) ? todayLog : Object.values(todayLog))
+      : [];
+    if (meals.length === 0) return `
+      <div style="font-size:12px;color:var(--muted)">
+        No meals logged today.<br>
+        Track meals in the <strong style="color:var(--gold)">Wellness Dashboard</strong> and they'll appear here.
+      </div>`;
+    return `
+      <div style="font-size:10px;color:var(--muted);margin-bottom:8px">Today — ${meals.length} meal${meals.length!==1?'s':''}</div>
+      ${meals.map(m=>`<div style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">${typeof m==='string'?m:(m.name||m.goal||JSON.stringify(m))}</div>`).join('')}`;
+  }
+
+  return '';
+}
+
+function calcStreak(log) {
+  let streak = 0;
+  for (let i=0; i<60; i++) {
+    if (log[daysAgo(i)]) streak++;
+    else if (i > 0) break;
+  }
+  return streak;
+}
+
+// ─────────────────────────────────────────────
+//  DEVICE TOGGLES
+// ─────────────────────────────────────────────
+let _pcOn       = false;
+let _miniOn     = false;
+let _lastDevice = null;   // 'pc' or 'mac' — whichever was turned on last
+let _curtainsDrawn = false;
+let _lightOn    = false;
+
+function updateRoom() {
+  const room = document.getElementById('the-room');
+  if (!room) return;
+  // room-glow is a SIBLING of .room (not a child), so room filter never touches it.
+  // No counter-filter needed — glow brightness is always exactly what the CSS says.
+  if (_lightOn) {
+    room.className = 'room lit';
+  } else if (_curtainsDrawn) {
+    room.className = 'room dim';
+  } else {
+    room.className = 'room mid';
+  }
+}
+
+function toggleCurtains() {
+  _curtainsDrawn = !_curtainsDrawn;
+  const win = document.getElementById('room-window');
+  if (win) {
+    const h = new Date().getHours();
+    const isNight = h >= 22 || h < 6;
+    win.className = 'window' + (_curtainsDrawn ? ' curtains' : isNight ? ' night' : '');
+  }
+  updateRoom();
+}
+
+function toggleLight() {
+  _lightOn = !_lightOn;
+  const sw = document.getElementById('light-switch');
+  if (sw) sw.className = 'light-switch' + (_lightOn ? ' on' : '');
+  updateRoom();
+}
+
+function updateDevices() {
+  const mon   = document.getElementById('monitor');
+  const glow  = document.getElementById('room-glow');
+  const win   = document.getElementById('room-window');
+  const tower = document.getElementById('pc-tower');
+  const mini  = document.getElementById('d-mini');
+
+  // Monitor colour: last-on device wins; neither on = dark
+  const anyOn = _pcOn || _miniOn;
+  let monClass = 'd-monitor';
+  if (anyOn) monClass += _lastDevice === 'mac' ? ' on-mac' : ' on-pc';
+  if (mon) mon.className = monClass;
+
+  // Room glow — colour matches active monitor
+  if (glow) glow.className = 'room-glow' + (!anyOn ? '' : _lastDevice === 'mac' ? ' on-mac' : ' on-pc');
+
+  // Window — curtains state is authoritative; falls back to time-of-day
+  const h = new Date().getHours();
+  const isNight = h >= 22 || h < 6;
+  let winClass = 'window';
+  if (_curtainsDrawn)  winClass += ' curtains';
+  else if (isNight)    winClass += ' night';
+  if (win) win.className = winClass;
+
+  // Window spill light — only visible when curtains open and daytime
+  const winLight = document.getElementById('win-light');
+  if (winLight) winLight.style.opacity = (!_curtainsDrawn && !isNight) ? '1' : '0';
+
+  // Tower LED
+  if (tower) tower.className = 'tower' + (_pcOn ? '' : ' off');
+
+  // Mac Mini LED
+  if (mini) mini.className = 'd-mini' + (_miniOn ? ' on' : '');
+}
+
+function togglePC(e) {
+  e.stopPropagation();
+  _pcOn = !_pcOn;
+  if (_pcOn) _lastDevice = 'pc';
+  updateDevices();
+}
+
+function toggleMini(e) {
+  e.stopPropagation();
+  _miniOn = !_miniOn;
+  if (_miniOn) _lastDevice = 'mac';
+  updateDevices();
+}
+
+// ─────────────────────────────────────────────
+//  ACTIVITY MENUS
+// ─────────────────────────────────────────────
+let _manualStatus = null;
+let _manualStatusTime = 0;
+let _activityStart = null;
+let _activityName  = null;
+let _activityInterval = null;
+
+function showFutonMenu(e) {
+  e.stopPropagation();
+  // Second click on futon while already there → back to center
+  if (_currentZone === 'futon' || _currentZone === 'futon_sleep') {
+    closeActivityMenu();
+    clearActivityTimer();
+    resetCharVisual();
+    moveChar('center');
+    _manualStatus = null;
+    render();
+    return;
+  }
+  resetCharVisual();
+  moveChar('futon');
+  showActivityMenu([
+    { icon:'🧘', label:'Meditating',     status:'🧘 Meditating' },
+    { icon:'😴', label:'Going to sleep', status:'😴 Sleeping'    },
+    { icon:'💤', label:'Short nap',      status:'💤 Napping'     },
+  ], { top: 368, left: 25 });
+}
+
+function showDeskMenu(e) {
+  e.stopPropagation();
+  // Second click on desk while already there → back to center
+  if (_currentZone === 'desk') {
+    closeActivityMenu();
+    clearActivityTimer();
+    moveChar('center');
+    _manualStatus = null;
+    render();
+    return;
+  }
+  moveChar('desk');
+  showActivityMenu([
+    { icon:'💰', label:'Online hustle',       status:'💰 On the grind'    },
+    { icon:'🎬', label:'Recording content',   status:'🎬 Recording'       },
+    { icon:'🎮', label:'Gaming / doom scroll',status:'🎮 Wasting time...' },
+    { icon:'⚡', label:'Productive work',     status:'⚡ Locked in'       },
+  ], { top: 116, left: 50 }, 'down');
+}
+
+function showActivityMenu(options, pos, dir) {
+  closeActivityMenu();
+  const room = document.getElementById('the-room');
+  const menu = document.createElement('div');
+  menu.className = 'act-menu';
+  menu.id = 'act-menu';
+  // dir:'down' drops below anchor; default stacks above
+  menu.style.top  = dir === 'down'
+    ? pos.top + 'px'
+    : (pos.top - options.length * 34 - 8) + 'px';
+  menu.style.left = pos.left + 'px';
+
+  options.forEach((opt, i) => {
+    const b = document.createElement('div');
+    b.className = 'act-bubble';
+    b.style.animationDelay = (i * 0.07) + 's';
+    b.innerHTML = opt.icon + ' ' + opt.label;
+    b.onclick = ev => { ev.stopPropagation(); selectActivity(opt); };
+    menu.appendChild(b);
+  });
+
+  room.appendChild(menu);
+
+  // Close on click outside
+  setTimeout(() => document.addEventListener('click', closeActivityMenu, { once: true }), 10);
+}
+
+function closeActivityMenu() {
+  document.getElementById('act-menu')?.remove();
+}
+
+function selectActivity(opt) {
+  closeActivityMenu();
+  clearActivityTimer();
+  // leave chair if sitting
+  _sittingOnChair = false;
+  document.getElementById('chair')?.classList.remove('seated');
+  _manualStatus     = opt.status;
+  _manualStatusTime = Date.now();
+  _activityStart    = Date.now();
+  _activityName     = opt.icon + ' ' + opt.label;
+  applyActivityVisual(opt);
+  updateActivityBubble();
+  _activityInterval = setInterval(updateActivityBubble, 1000);
+}
+
+function applyActivityVisual(opt) {
+  const head   = document.getElementById('char-head');
+  const figure = document.getElementById('char-figure');
+  const isSleep = opt.status === '😴 Sleeping' || opt.status === '💤 Napping';
+  const isMed   = opt.status === '🧘 Meditating';
+
+  if (isSleep) {
+    moveChar('futon_sleep');
+    if (head)   head.className   = 'char-head sleeping';
+    if (figure) figure.className = 'char-figure laying';
+  } else if (isMed) {
+    moveChar('futon');
+    if (head)   head.className   = 'char-head meditating';
+    if (figure) figure.className = 'char-figure';
+  } else {
+    // desk activities — move to desk, normal eyes
+    moveChar('desk');
+    if (head)   head.className   = 'char-head';
+    if (figure) figure.className = 'char-figure';
+  }
+}
+
+function resetCharVisual() {
+  const head   = document.getElementById('char-head');
+  const figure = document.getElementById('char-figure');
+  if (head)   head.className   = 'char-head';
+  if (figure) figure.className = 'char-figure';
+}
+
+function updateActivityBubble() {
+  if (!_activityStart || !_manualStatus) return;
+  const bubble = document.getElementById('char-bubble');
+  if (!bubble) return;
+  const elapsed = Math.floor((Date.now() - _activityStart) / 1000);
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  const t = mins > 0 ? mins + 'm ' + secs + 's' : secs + 's';
+  bubble.innerHTML = _manualStatus
+    + ' <span style="font-size:9px;opacity:.6">' + t + '</span>'
+    + '<span onclick="stopActivity(event)" style="cursor:pointer;color:#ef4444;font-size:9px;'
+    + 'background:rgba(239,68,68,.18);padding:1px 6px;border-radius:8px;margin-left:4px;pointer-events:auto">■ stop</span>';
+  bubble.style.borderColor = 'var(--gold)';
+}
+
+function stopActivity(e) {
+  if (e) e.stopPropagation();
+  if (!_activityStart) return;
+  const dur  = Math.floor((Date.now() - _activityStart) / 1000);
+  const mins = Math.floor(dur / 60);
+  const secs = dur % 60;
+  const dStr = mins > 0 ? mins + 'm ' + secs + 's' : dur + 's';
+  // log it
+  try {
+    const log = JSON.parse(localStorage.getItem('life_sim_activity_log') || '[]');
+    log.unshift({ activity: _activityName, date: today(), durationSecs: dur, display: dStr });
+    localStorage.setItem('life_sim_activity_log', JSON.stringify(log.slice(0, 200)));
+  } catch(err) {}
+  clearActivityTimer();
+  resetCharVisual();
+  moveChar('center');   // always walk back to middle when activity ends
+  _activityStart    = null;
+  _manualStatus     = null;
+  _activityName     = null;
+  const bubble = document.getElementById('char-bubble');
+  if (bubble) {
+    bubble.innerHTML = '✅ Done · ' + dStr;
+    bubble.style.borderColor = 'var(--green)';
+  }
+  setTimeout(render, 3000);
+}
+
+function clearActivityTimer() {
+  if (_activityInterval) { clearInterval(_activityInterval); _activityInterval = null; }
+}
+
+// ─────────────────────────────────────────────
+//  CHAIR
+// ─────────────────────────────────────────────
+let _sittingOnChair = false;
+
+function toggleChair(e) {
+  e.stopPropagation();
+  _sittingOnChair = !_sittingOnChair;
+  const chairEl = document.getElementById('chair');
+  if (_sittingOnChair) {
+    resetCharVisual();
+    moveChar('chair');
+    if (chairEl) chairEl.classList.add('seated');
+    const bubble = document.getElementById('char-bubble');
+    if (bubble) { bubble.innerHTML = '🪑 Sitting'; bubble.style.borderColor = 'var(--muted)'; }
+    _manualStatus     = '🪑 Sitting';
+    _manualStatusTime = Date.now();
+  } else {
+    moveChar('center');
+    if (chairEl) chairEl.classList.remove('seated');
+    _manualStatus = null;
+    render();
+  }
+}
+
+// ─────────────────────────────────────────────
+//  POSTER
+// ─────────────────────────────────────────────
+function showPoster() {
+  if (document.getElementById('poster-modal')) return;
+  const modal = document.createElement('div');
+  modal.className = 'poster-modal';
+  modal.id = 'poster-modal';
+  modal.onclick = () => modal.remove();
+  modal.innerHTML = `
+    <div class="poster-inner" onclick="event.stopPropagation()">
+      <div style="font-size:9px;letter-spacing:4px;color:#4a4858;text-transform:uppercase;margin-bottom:20px">on your wall</div>
+      <div style="font-size:26px;font-weight:800;color:#ddd4b8;letter-spacing:3px;line-height:1.5;margin-bottom:28px">
+        EAT.<br>SLEEP.<br>WORK.<br>REPEAT.
+      </div>
+      <div style="font-size:11.5px;color:#706880;line-height:1.9;margin-bottom:24px">
+        You're 20.<br>
+        That's the whole advantage right there.<br><br>
+        No mortgage. No dependants. No decisions locked in yet.<br>
+        Just time — and you've got more of it than you think.<br><br>
+        Most people your age are sleeping in,<br>
+        spending on nothing, drifting.<br>
+        You're in this room. Building.<br><br>
+        <span style="color:#a89870">Every desk session is a rep.<br>
+        Every nap is recovery, not laziness.<br>
+        Every hustle dollar is evidence.</span><br><br>
+        You don't need motivation. You need the next hour.<br>
+        That's it. Just the next hour.
+      </div>
+      <button onclick="document.getElementById('poster-modal').remove()"
+        style="background:transparent;border:1px solid #2a2838;color:#5a5868;
+        padding:8px 28px;border-radius:20px;cursor:pointer;font-size:10px;
+        letter-spacing:2px;text-transform:uppercase;transition:border-color .2s,color .2s"
+        onmouseover="this.style.borderColor='#a89870';this.style.color='#a89870'"
+        onmouseout="this.style.borderColor='#2a2838';this.style.color='#5a5868'">
+        close
+      </button>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+render();
+setInterval(render, 30000);
+window.addEventListener('focus', render);
+</script>
+</body>
+</html>
