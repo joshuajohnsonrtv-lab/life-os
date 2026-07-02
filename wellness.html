@@ -1618,14 +1618,13 @@
     <!-- Weight chart -->
     <div class="card">
       <div class="card-title">⚖️ Weight Over Time (kg)</div>
-      <div style="position:relative;height:200px"><canvas id="chart-weight"></canvas></div>
+      <div style="position:relative;height:260px"><canvas id="chart-weight"></canvas></div>
     </div>
 
-    <!-- Other measurements chart -->
+    <!-- Body fat chart -->
     <div class="card">
-      <div class="card-title">📐 Body Measurements Over Time (cm)</div>
-      <div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:6px" id="measure-chart-toggles"></div>
-      <div style="position:relative;height:220px"><canvas id="chart-measurements"></canvas></div>
+      <div class="card-title">🔥 Body Fat Over Time (%)</div>
+      <div style="position:relative;height:260px" id="chart-bodyfat-wrap"><canvas id="chart-bodyfat"></canvas></div>
     </div>
 
     <!-- History table -->
@@ -2006,47 +2005,6 @@
         <input type="number" id="m-bodyfat" placeholder="e.g. 18" step="0.1" min="0" max="60">
       </div>
     </div>
-    <div style="font-size:12px;color:var(--muted2);margin-bottom:10px;font-weight:600">CIRCUMFERENCE (cm)</div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Chest</label>
-        <input type="number" id="m-chest" placeholder="cm" step="0.5" min="0">
-      </div>
-      <div class="form-group">
-        <label>Waist</label>
-        <input type="number" id="m-waist" placeholder="cm" step="0.5" min="0">
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Hips</label>
-        <input type="number" id="m-hips" placeholder="cm" step="0.5" min="0">
-      </div>
-      <div class="form-group">
-        <label>Neck</label>
-        <input type="number" id="m-neck" placeholder="cm" step="0.5" min="0">
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Left Arm</label>
-        <input type="number" id="m-leftarm" placeholder="cm" step="0.5" min="0">
-      </div>
-      <div class="form-group">
-        <label>Right Arm</label>
-        <input type="number" id="m-rightarm" placeholder="cm" step="0.5" min="0">
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Left Thigh</label>
-        <input type="number" id="m-leftthigh" placeholder="cm" step="0.5" min="0">
-      </div>
-      <div class="form-group">
-        <label>Right Thigh</label>
-        <input type="number" id="m-rightthigh" placeholder="cm" step="0.5" min="0">
-      </div>
-    </div>
     <div class="form-group">
       <label>Notes</label>
       <input type="text" id="m-notes" placeholder="Morning weight? Post-workout?">
@@ -2393,7 +2351,7 @@ const PAGE_NAMES = {
 
 function showPage(page) {
   // Destroy all charts before switching pages to avoid canvas reuse errors
-  ['t-sleep','t-hydration','t-gym','t-consist','t-calories','weight','bodyfields'].forEach(destroyChart);
+  ['t-sleep','t-hydration','t-gym','t-consist','t-calories','weight','bodyfat'].forEach(destroyChart);
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
@@ -3699,17 +3657,7 @@ function deleteSRReset(date) {
 const MEASURE_FIELDS = [
   {id:'weight', label:'Weight', unit:'kg', color:'#8b5cf6'},
   {id:'bodyfat', label:'Body Fat', unit:'%', color:'#ef4444'},
-  {id:'chest', label:'Chest', unit:'cm', color:'#06b6d4'},
-  {id:'waist', label:'Waist', unit:'cm', color:'#f59e0b'},
-  {id:'hips', label:'Hips', unit:'cm', color:'#ec4899'},
-  {id:'neck', label:'Neck', unit:'cm', color:'#10b981'},
-  {id:'leftarm', label:'L Arm', unit:'cm', color:'#3b82f6'},
-  {id:'rightarm', label:'R Arm', unit:'cm', color:'#6366f1'},
-  {id:'leftthigh', label:'L Thigh', unit:'cm', color:'#14b8a6'},
-  {id:'rightthigh', label:'R Thigh', unit:'cm', color:'#a78bfa'},
 ];
-
-let activeBodyCharts = new Set(['chest','waist','hips']);
 let _chartInstances = {};
 
 function destroyChart(id) {
@@ -3759,14 +3707,24 @@ function renderMeasurements() {
     document.getElementById('chart-weight').parentElement.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Log at least 2 weight entries to see the chart</div>`;
   }
 
-  // Body measurements chart toggles
-  const toggleEl = document.getElementById('measure-chart-toggles');
-  if(toggleEl) {
-    toggleEl.innerHTML = MEASURE_FIELDS.filter(f => f.id !== 'weight' && f.id !== 'bodyfat').map(f =>
-      `<span class="tag ${activeBodyCharts.has(f.id)?'selected':''}" style="${activeBodyCharts.has(f.id)?'background:'+f.color+';border-color:'+f.color:''}" onclick="toggleBodyChart('${f.id}')">${f.label}</span>`
-    ).join('');
+  // Body fat chart
+  destroyChart('bodyfat');
+  const bfData = entries.filter(([,v]) => v.bodyfat).map(([d,v]) => ({x:d, y:parseFloat(v.bodyfat)}));
+  const bfWrap = document.getElementById('chart-bodyfat-wrap');
+  if(bfData.length > 1) {
+    if(bfWrap && !bfWrap.querySelector('canvas')) bfWrap.innerHTML = '<canvas id="chart-bodyfat"></canvas>';
+    const bfCanvas = document.getElementById('chart-bodyfat');
+    if(bfCanvas) {
+      const ctx2 = bfCanvas.getContext('2d');
+      _chartInstances['bodyfat'] = new Chart(ctx2, {
+        type: 'line',
+        data: { datasets: [{ label:'Body Fat (%)', data: bfData, borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,0.1)', tension:0.3, fill:true, pointRadius:4, pointHoverRadius:6 }] },
+        options: { ...chartDefaults(), scales: { x:{...xScaleDate()}, y:{...yScaleLeft('%')} } }
+      });
+    }
+  } else if(bfWrap) {
+    bfWrap.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Log at least 2 body fat entries to see the chart</div>`;
   }
-  renderBodyMeasureChart(entries);
 
   // History table
   const histEl = document.getElementById('measure-history');
@@ -3783,43 +3741,6 @@ function renderMeasurements() {
   </table></div>`;
 }
 
-function renderBodyMeasureChart(entries) {
-  destroyChart('bodyfields');
-  const fields = MEASURE_FIELDS.filter(f => f.id !== 'weight' && f.id !== 'bodyfat' && activeBodyCharts.has(f.id));
-  const canvas = document.getElementById('chart-measurements');
-  if(!canvas) return;
-  if(!entries.length || fields.every(f => entries.filter(([,v])=>v[f.id]).length < 2)) {
-    canvas.parentElement.innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px">Log at least 2 entries with selected measurements to see chart</div>`;
-    return;
-  }
-  const ctx = canvas.getContext('2d');
-  _chartInstances['bodyfields'] = new Chart(ctx, {
-    type: 'line',
-    data: {
-      datasets: fields.map(f => ({
-        label: `${f.label} (cm)`,
-        data: entries.filter(([,v])=>v[f.id]).map(([d,v])=>({x:d, y:parseFloat(v[f.id])})),
-        borderColor: f.color, backgroundColor: f.color+'22', tension:0.3, fill:false, pointRadius:3
-      }))
-    },
-    options: { ...chartDefaults(), scales: { x:{...xScaleDate()}, y:{...yScaleLeft('cm')} } }
-  });
-}
-
-function toggleBodyChart(fieldId) {
-  if(activeBodyCharts.has(fieldId)) activeBodyCharts.delete(fieldId);
-  else activeBodyCharts.add(fieldId);
-  const data = getData();
-  const entries = Object.entries(data.measurements.log).sort((a,b) => a[0].localeCompare(b[0]));
-  document.querySelectorAll('#measure-chart-toggles .tag').forEach(el => {
-    const id = el.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
-    if(!id) return;
-    const f = MEASURE_FIELDS.find(f=>f.id===id);
-    if(activeBodyCharts.has(id)) { el.classList.add('selected'); el.style.background=f.color; el.style.borderColor=f.color; el.style.color='#fff'; }
-    else { el.classList.remove('selected'); el.style.background=''; el.style.borderColor=''; el.style.color=''; }
-  });
-  renderBodyMeasureChart(entries);
-}
 
 function openMeasureModal() {
   document.getElementById('measure-date').value = today();
