@@ -524,6 +524,112 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 
 
+/* ── CHARACTER ANIMATIONS ── */
+
+/* IDLE — gentle breathing bob on every standing state */
+@keyframes char-idle-bob {
+  0%,100%{transform:translateY(0);}
+  50%     {transform:translateY(-1.5px);}
+}
+.char-figure{animation:char-idle-bob 2.8s ease-in-out infinite;}
+
+/* SLEEPING — slow whole-body pulse while laying */
+@keyframes char-sleep-breathe {
+  0%,100%{transform:scale(1);}
+  45%    {transform:scale(1.045);}
+}
+.char-figure.laying{animation:char-sleep-breathe 3.6s ease-in-out infinite;}
+
+/* ZZZ — floats up above the bubble when sleeping */
+@keyframes char-zzz-float {
+  0%  {opacity:0;transform:translate(0,0)   scale(.7);}
+  35% {opacity:1;}
+  100%{opacity:0;transform:translate(8px,-16px) scale(1.2);}
+}
+.char-bubble.zzz::before{
+  content:'z z z';
+  position:absolute;top:-18px;right:2px;
+  font-size:8px;letter-spacing:3px;font-weight:700;
+  color:#90b4ee;pointer-events:none;
+  animation:char-zzz-float 2.2s ease-out infinite;
+}
+
+/* MEDITATING — float up + purple aura glow on head */
+@keyframes char-med-float {
+  0%,100%{transform:translateY(0);}
+  50%    {transform:translateY(-3px);}
+}
+@keyframes char-med-aura {
+  0%,100%{box-shadow:0 0 0 0 rgba(167,139,250,0);}
+  50%    {box-shadow:0 0 10px 4px rgba(167,139,250,.38);}
+}
+.char-figure.meditating{animation:char-med-float 3s ease-in-out infinite;}
+.char-head.meditating  {animation:char-med-aura  3s ease-in-out infinite;}
+
+/* COOKING — side-to-side stir sway */
+@keyframes char-cook {
+  0%,100%{transform:translateY(0)   rotate(0deg);}
+  30%    {transform:translateY(-1.5px) rotate(2.5deg);}
+  70%    {transform:translateY(-1.5px) rotate(-2.5deg);}
+}
+.char-figure.cooking{animation:char-cook 1s ease-in-out infinite;}
+
+/* FRIDGE CHECK — lean-in peek */
+@keyframes char-fridge-check {
+  0%,65%,100%{transform:translateX(0);}
+  32%        {transform:translateX(4px);}
+}
+.char-figure.fridge-check{animation:char-fridge-check 2.4s ease-in-out infinite;}
+
+/* AT-DESK WORKING — bird's-eye view, typing micro-bounce */
+@keyframes char-desk-type {
+  0%,100%{transform:translateY(0);}
+  25%,75%{transform:translateY(-1px);}
+  50%    {transform:translateY(0);}
+}
+.char-figure.at-desk{
+  position:relative;gap:0;
+  animation:char-desk-type 0.9s ease-in-out infinite;
+}
+/* head = small oval (top-down view) */
+.char-figure.at-desk .char-head{
+  width:13px;height:11px;border-radius:50%;
+  flex-shrink:0;margin-bottom:1px;
+}
+/* neck hidden from above */
+.char-figure.at-desk .char-neck{display:none;}
+/* body = wide oval shoulders from above; clip-path cleared so arms show */
+.char-figure.at-desk .char-body{
+  width:24px;height:9px;
+  clip-path:none;
+  background:linear-gradient(180deg,#111 0%,#1a1a1a 100%);
+  border-radius:50%;
+  overflow:visible;
+  margin-top:0;
+}
+/* left arm stretching forward */
+.char-figure.at-desk .char-body::before{
+  content:'';position:absolute;
+  top:1px;left:-10px;
+  width:11px;height:5px;
+  background:#111;border-radius:3px;
+  transform:rotate(-22deg);transform-origin:right center;
+}
+/* right arm stretching forward */
+.char-figure.at-desk .char-body::after{
+  content:'';position:absolute;
+  top:1px;right:-10px;
+  width:11px;height:5px;
+  background:#111;border-radius:3px;
+  transform:rotate(22deg);transform-origin:left center;
+}
+/* chair flipped to face desk when working at it */
+.chair.at-desk{
+  transform:scaleY(-1);
+  transform-origin:center center;
+}
+.chair.at-desk .chair-back,.chair.at-desk .chair-seat{border-color:var(--gold);}
+
 /* ── OUTSIDE ── */
 .outside-wrap{flex:1;padding:20px;overflow-y:auto;display:none;}
 .outside-wrap.show{display:block;}
@@ -1749,12 +1855,15 @@ function applyActivityVisual(opt) {
   } else if (isMed) {
     moveChar('futon');
     if (head)   head.className   = 'char-head meditating';
-    if (figure) figure.className = 'char-figure';
+    if (figure) figure.className = 'char-figure meditating';
   } else {
-    // desk activities — move to desk, normal eyes
+    // desk activities — bird's-eye seated working view
     moveChar('desk');
     if (head)   head.className   = 'char-head';
-    if (figure) figure.className = 'char-figure';
+    if (figure) figure.className = 'char-figure at-desk';
+    // Flip chair so its back faces toward viewer (working position)
+    const chairEl = document.getElementById('chair');
+    if (chairEl) { chairEl.classList.add('seated'); chairEl.classList.add('at-desk'); }
   }
 }
 
@@ -1763,6 +1872,10 @@ function resetCharVisual() {
   const figure = document.getElementById('char-figure');
   if (head)   head.className   = 'char-head';
   if (figure) figure.className = 'char-figure';
+  // Un-flip chair from desk-working mode
+  document.getElementById('chair')?.classList.remove('at-desk');
+  // Remove sleep Z's from bubble
+  document.getElementById('char-bubble')?.classList.remove('zzz');
 }
 
 function updateActivityBubble() {
@@ -1778,6 +1891,9 @@ function updateActivityBubble() {
     + '<span onclick="stopActivity(event)" style="cursor:pointer;color:#ef4444;font-size:9px;'
     + 'background:rgba(239,68,68,.18);padding:1px 6px;border-radius:8px;margin-left:4px;pointer-events:auto">■ stop</span>';
   bubble.style.borderColor = 'var(--gold)';
+  // Z's only while sleeping/napping
+  const isSleepStatus = _manualStatus === '😴 Sleeping' || _manualStatus === '💤 Napping';
+  bubble.classList.toggle('zzz', isSleepStatus);
 }
 
 function stopActivity(e) {
@@ -2176,6 +2292,13 @@ function kMoveChar(zone) {
   if (!el) return;
   el.style.top  = p.top  + 'px';
   el.style.left = p.left + 'px';
+  // Apply activity-specific animation to kitchen char figure
+  const kFig = el.querySelector('.char-figure');
+  if (kFig) {
+    kFig.className = 'char-figure';
+    if (zone === 'fridge') kFig.classList.add('fridge-check');
+    if (zone === 'cooker') kFig.classList.add('cooking');
+  }
 }
 
 function kitchenClick() {
@@ -2365,12 +2488,21 @@ function loadState() {
       _activityName     = s.activityName;
       _manualStatus     = s.status;
       _manualStatusTime = Date.now();
-      // Restore sleeping/meditating visual
+      // Restore visual for each activity type
       const head   = document.getElementById('char-head');
       const figure = document.getElementById('char-figure');
       if (s.status === '😴 Sleeping' || s.status === '💤 Napping') {
         if (head)   head.className   = 'char-head sleeping';
         if (figure) figure.className = 'char-figure laying';
+      } else if (s.status === '🧘 Meditating') {
+        if (head)   head.className   = 'char-head meditating';
+        if (figure) figure.className = 'char-figure meditating';
+      } else if (s.zone === 'desk') {
+        // desk activity — restore bird's-eye working view
+        if (head)   head.className   = 'char-head';
+        if (figure) figure.className = 'char-figure at-desk';
+        const chairEl = document.getElementById('chair');
+        if (chairEl) { chairEl.classList.add('seated'); chairEl.classList.add('at-desk'); }
       }
       clearActivityTimer();
       updateActivityBubble();
