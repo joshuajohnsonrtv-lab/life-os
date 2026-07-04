@@ -1528,6 +1528,7 @@ function moveChar(zone, instant) {
 //  RENDER
 // ─────────────────────────────────────────────
 let _firstRender = true;
+let _initDone    = false; // blocks saveState() during init so it can't stomp saved localStorage
 
 function render() {
   const s = calc();
@@ -2750,6 +2751,7 @@ function gamingStayWeak() {
 //  STATE PERSISTENCE (survives tab close/reopen)
 // ─────────────────────────────────────────────
 function saveState() {
+  if (!_initDone) return; // never stomp saved state during the init render pass
   try {
     // Which scene is currently visible?
     const loc = document.getElementById('view-kitchen')?.classList.contains('show') ? 'kitchen'
@@ -2898,9 +2900,22 @@ window.addEventListener('resize', scaleRoom);
 render();
 updateRoomPoster();
 loadState(); // restore character position + active activity after tab reopen
+_initDone = true; // ← unlock saveState AFTER loadState so render()'s moveChar doesn't stomp saved data
+
 setInterval(render, 30000);
-setInterval(saveState, 5000); // auto-save every 5s so tab-close always captures exact state
-window.addEventListener('focus', render);
+setInterval(saveState, 5000); // auto-save every 5s
+
+// Safari iOS: save before tab is frozen/closed (pagehide is more reliable than beforeunload on iOS)
+window.addEventListener('pagehide', saveState);
+
+// Safari iOS: restore state when page comes back from bfcache (back-forward cache)
+window.addEventListener('pageshow', function(e) {
+  if (e.persisted) {
+    // Page was restored from bfcache — re-apply state (timers resume but DOM needs refresh)
+    render();
+    loadState();
+  }
+});
 </script>
 
 <!-- ── GAMING WARNING OVERLAY ── -->
