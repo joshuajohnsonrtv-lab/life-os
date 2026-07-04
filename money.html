@@ -5037,6 +5037,15 @@ function updateMobTitle(page) {
   const t = document.getElementById('mob-topbar-title');
   if (t) t.textContent = names[page] || '💰 MONEY OS';
 }
+
+// Cross-frame: accept showMoneyPage from the Life OS hub
+window.addEventListener('message', function(ev) {
+  if (ev.source !== window.parent) return;
+  if (ev.data && ev.data.action === 'showMoneyPage' && ev.data.page) {
+    showPage(ev.data.page);
+    updateMobTitle(ev.data.page);
+  }
+});
 </script>
 
 <!-- ═══ WHEEL EXPAND BUTTON ═══ -->

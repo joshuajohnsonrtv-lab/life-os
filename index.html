@@ -228,22 +228,34 @@
     });
   });
 
-  // Cross-frame: life-sim cooker → wellness meals page
+  // Cross-frame routing from life-sim → wellness / money
   window.addEventListener('message', function(ev) {
-    if (!ev.data || ev.data.action !== 'openWellnessMeals') return;
-    // Only accept from the sim frame (ignore wellness or other sources)
     const simFrame = document.getElementById('frame-sim');
     if (ev.source !== simFrame?.contentWindow) return;
-    // Switch to wellness tab
-    switchTab('wellness', document.getElementById('tab-wellness'));
-    sessionStorage.setItem('life_os_tab', 'wellness');
-    // Give the wellness iframe a beat to load/settle, then navigate to mealideas
-    setTimeout(() => {
-      const wf = document.getElementById('frame-wellness');
-      if (wf && wf.contentWindow) {
-        wf.contentWindow.postMessage({ action: 'showWellnessPage', page: 'mealideas' }, '*');
-      }
-    }, 250);
+    if (!ev.data || !ev.data.action) return;
+    const { action } = ev.data;
+
+    function toWellness(page) {
+      switchTab('wellness', document.getElementById('tab-wellness'));
+      sessionStorage.setItem('life_os_tab', 'wellness');
+      setTimeout(() => {
+        const wf = document.getElementById('frame-wellness');
+        if (wf?.contentWindow) wf.contentWindow.postMessage({ action: 'showWellnessPage', page }, '*');
+      }, 250);
+    }
+    function toMoney(page) {
+      switchTab('money', document.getElementById('tab-money'));
+      sessionStorage.setItem('life_os_tab', 'money');
+      setTimeout(() => {
+        const mf = document.getElementById('frame-money');
+        if (mf?.contentWindow) mf.contentWindow.postMessage({ action: 'showMoneyPage', page }, '*');
+      }, 250);
+    }
+
+    if (action === 'openWellnessMeals')  toWellness('mealideas');
+    if (action === 'openWellnessGym')    toWellness('gym');
+    if (action === 'openMoneyHustles')   toMoney('hustles');
+    if (action === 'openMoneyIncome')    toMoney('income');
   });
 </script>
 </body>

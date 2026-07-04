@@ -763,6 +763,23 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .dot-track{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px;}
 .dot{width:13px;height:13px;border-radius:3px;border:1px solid #222;}
 
+/* ── ZONE ACTION BUTTONS ── */
+.zone-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.zone-btn{
+  flex:1;min-width:90px;padding:9px 10px;border-radius:10px;
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--muted2);font-size:11px;font-weight:700;cursor:pointer;
+  transition:border-color .15s,background .15s,color .15s;text-align:center;font-family:inherit;
+}
+.zone-btn:hover{border-color:var(--gold);background:rgba(245,197,66,.07);color:var(--gold);}
+.zone-btn.zb-gold{background:rgba(245,197,66,.1);border-color:rgba(245,197,66,.35);color:var(--gold);}
+.zone-btn.zb-gold:hover{background:rgba(245,197,66,.18);}
+.walk-log-row{display:flex;gap:8px;align-items:center;margin-top:12px;}
+.walk-log-row select{
+  flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;cursor:pointer;
+}
+
 /* ── ACTIVITY MENU ── */
 .act-menu{
   position:absolute;z-index:30;
@@ -1722,6 +1739,18 @@ function closeZone() {
   ['gym','hustle','walk','kitchen'].forEach(id => document.getElementById('zc-'+id)?.classList.remove('active'));
 }
 
+function _getWalkLog() {
+  try { return JSON.parse(localStorage.getItem('life_sim_walks') || '[]'); } catch(e) { return []; }
+}
+function logWalk(mins) {
+  mins = parseInt(mins) || 0;
+  if (!mins) return;
+  const log = _getWalkLog();
+  log.unshift({ date: today(), mins, ts: Date.now() });
+  localStorage.setItem('life_sim_walks', JSON.stringify(log.slice(0, 200)));
+  openZone('walk'); // refresh panel
+}
+
 function buildZoneHTML(z, s) {
   if (z === 'gym') {
     const dots = Array.from({length:14},(_,i) => {
@@ -1737,46 +1766,76 @@ function buildZoneHTML(z, s) {
         <span>This week: <strong style="color:${s.gymSess7>=3?'var(--green)':'var(--gold)'}">${s.gymSess7} sessions</strong></span>
         <span>Streak: <strong style="color:var(--orange)">${streak} days</strong></span>
       </div>
-      <div style="margin-top:8px;font-size:10px;color:var(--muted)">Log gym sessions in the Wellness Dashboard. They show up here automatically.</div>`;
+      <div class="zone-btns">
+        <button class="zone-btn zb-gold" onclick="window.parent.postMessage({action:'openWellnessGym'},'*')">💪 Log Workout</button>
+        <button class="zone-btn" onclick="window.parent.postMessage({action:'openWellnessMeals'},'*')">🥗 Log Meals</button>
+      </div>`;
   }
 
   if (z === 'hustle') {
-    if (s.actHustles.length === 0) return `
-      <div style="font-size:12px;color:var(--muted);line-height:1.7">
-        No active hustles yet.<br><br>
-        Head to the <strong style="color:var(--gold)">Money Dashboard → Hustles</strong> to add one.
-        That's where real money starts. The 9-5 is a tool — not the destination.
+    const cards = s.actHustles.length === 0
+      ? `<div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:4px">
+           No active hustles yet. Add one in the Money Dashboard and it'll show here.
+         </div>`
+      : s.actHustles.map(h => `
+          <div style="background:var(--bg2);border-radius:10px;padding:10px;margin-bottom:8px">
+            <div style="font-weight:700;font-size:13px">${h.name||'Unnamed'}</div>
+            ${h.desc?`<div style="font-size:10px;color:var(--muted);margin-top:2px">${h.desc}</div>`:''}
+            <div style="font-size:12px;color:var(--green);margin-top:4px;font-weight:700">${h.revenue?fmt(h.revenue)+' revenue':'No revenue logged yet'}</div>
+            ${h.action?`<div style="font-size:10px;color:var(--gold);margin-top:4px">▶ Next: ${h.action}</div>`:''}
+          </div>`).join('');
+    return cards + `
+      <div class="zone-btns">
+        <button class="zone-btn zb-gold" onclick="window.parent.postMessage({action:'openMoneyHustles'},'*')">🚀 My Hustles</button>
+        <button class="zone-btn" onclick="window.parent.postMessage({action:'openMoneyIncome'},'*')">💵 Log Income</button>
       </div>`;
-    return s.actHustles.map(h => `
-      <div style="background:var(--bg2);border-radius:10px;padding:10px;margin-bottom:8px">
-        <div style="font-weight:700;font-size:13px">${h.name||'Unnamed'}</div>
-        ${h.desc?`<div style="font-size:10px;color:var(--muted);margin-top:2px">${h.desc}</div>`:''}
-        <div style="font-size:12px;color:var(--green);margin-top:4px;font-weight:700">${h.revenue?fmt(h.revenue)+' revenue':'No revenue logged yet'}</div>
-        ${h.action?`<div style="font-size:10px;color:var(--gold);margin-top:4px">▶ Next step: ${h.action}</div>`:''}
-      </div>`).join('');
   }
 
-  if (z === 'walk') return `
-    <div style="font-size:12px;color:var(--muted);line-height:1.8">
-      No tracking needed. Just go.<br><br>
-      <strong style="color:var(--text)">20 minutes outside changes your brain chemistry.</strong>
-      Cortisol drops. Ideas arrive. Problems shrink.<br><br>
-      Every serious builder has a walking habit. It's not wasted time — it's processing time.
-    </div>`;
+  if (z === 'walk') {
+    const walks    = _getWalkLog();
+    const todayW   = walks.filter(w => w.date === today());
+    const totalMin = todayW.reduce((a,w) => a + (w.mins||0), 0);
+    const recent   = walks.slice(0, 6);
+    const recentHTML = recent.length ? recent.map(w => `
+      <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="color:var(--muted)">${w.date === today() ? 'Today' : w.date}</span>
+        <strong style="color:var(--green)">${w.mins} min</strong>
+      </div>`).join('') : '';
+    return `
+      <div style="margin-bottom:10px">
+        ${totalMin > 0
+          ? `<div style="font-size:13px;font-weight:800;color:var(--green)">${totalMin} min walked today</div>`
+          : `<div style="font-size:12px;color:var(--muted)">No walks logged today.</div>`}
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">20 minutes outside rewires your brain. Cortisol drops. Ideas arrive.</div>
+      </div>
+      ${recentHTML}
+      <div class="walk-log-row">
+        <select id="walk-dur">
+          <option value="15">15 min</option>
+          <option value="20" selected>20 min</option>
+          <option value="30">30 min</option>
+          <option value="45">45 min</option>
+          <option value="60">60 min</option>
+          <option value="90">90 min</option>
+        </select>
+        <button class="zone-btn zb-gold" style="flex:1" onclick="logWalk(document.getElementById('walk-dur').value)">✓ Log Walk</button>
+      </div>`;
+  }
 
   if (z === 'kitchen') {
     const todayLog = s.dietLog[today()];
     const meals = todayLog
       ? (Array.isArray(todayLog) ? todayLog : Object.values(todayLog))
       : [];
-    if (meals.length === 0) return `
-      <div style="font-size:12px;color:var(--muted)">
-        No meals logged today.<br>
-        Track meals in the <strong style="color:var(--gold)">Wellness Dashboard</strong> and they'll appear here.
+    const mealsHTML = meals.length === 0
+      ? `<div style="font-size:12px;color:var(--muted);margin-bottom:4px">No meals logged today.</div>`
+      : `<div style="font-size:10px;color:var(--muted);margin-bottom:8px">Today — ${meals.length} meal${meals.length!==1?'s':''}</div>
+         ${meals.map(m=>`<div style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">${typeof m==='string'?m:(m.name||m.goal||JSON.stringify(m))}</div>`).join('')}`;
+    return mealsHTML + `
+      <div class="zone-btns">
+        <button class="zone-btn zb-gold" onclick="closeZone();goLoc('kitchen')">🍳 Go to Kitchen</button>
+        <button class="zone-btn" onclick="window.parent.postMessage({action:'openWellnessMeals'},'*')">🥗 Log a Meal</button>
       </div>`;
-    return `
-      <div style="font-size:10px;color:var(--muted);margin-bottom:8px">Today — ${meals.length} meal${meals.length!==1?'s':''}</div>
-      ${meals.map(m=>`<div style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">${typeof m==='string'?m:(m.name||m.goal||JSON.stringify(m))}</div>`).join('')}`;
   }
 
   return '';
