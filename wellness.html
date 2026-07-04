@@ -10,22 +10,27 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
   :root {
-    --bg: #0d0d14;
-    --card: #151520;
-    --card2: #1c1c2e;
-    --border: #2a2a40;
-    --purple: #8b5cf6;
-    --purple-dim: #6d28d9;
-    --cyan: #06b6d4;
-    --green: #10b981;
-    --amber: #f59e0b;
-    --red: #ef4444;
-    --pink: #ec4899;
-    --blue: #3b82f6;
-    --text: #e2e8f0;
-    --muted: #64748b;
-    --muted2: #94a3b8;
-    --radius: 14px;
+    --bg:        #080a0f;
+    --bg2:       #0d0f16;
+    --card:      #111620;
+    --card2:     #161d2b;
+    --border:    rgba(255,255,255,0.07);
+    --border2:   rgba(255,255,255,0.12);
+    --purple:    #a855f7;
+    --purple-dim:#7c3aed;
+    --purple-bg: rgba(168,85,247,0.12);
+    --cyan:      #06b6d4;
+    --green:     #22c55e;
+    --green-dim: rgba(34,197,94,0.12);
+    --amber:     #f59e0b;
+    --red:       #ef4444;
+    --red-dim:   rgba(239,68,68,0.12);
+    --pink:      #ec4899;
+    --blue:      #3b82f6;
+    --text:      #f0f4ff;
+    --muted:     rgba(255,255,255,0.35);
+    --muted2:    rgba(255,255,255,0.60);
+    --radius:    14px;
     --radius-sm: 8px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,7 +46,7 @@
   #sidebar {
     width: 220px;
     min-height: 100vh;
-    background: var(--card);
+    background: var(--bg2);
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
@@ -54,30 +59,31 @@
     padding: 24px 20px 16px;
     border-bottom: 1px solid var(--border);
   }
-  .sidebar-header h1 { font-size: 16px; font-weight: 700; color: var(--purple); letter-spacing: 0.5px; }
+  .sidebar-header h1 { font-size: 16px; font-weight: 800; color: var(--purple); letter-spacing: -0.3px; }
   .sidebar-header p { font-size: 11px; color: var(--muted); margin-top: 2px; }
   .nav-section-label {
     padding: 16px 20px 6px;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
   }
   .nav-item {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 20px;
+    padding: 10px 14px;
     cursor: pointer;
-    border-radius: 0;
-    transition: background 0.15s;
-    font-size: 13.5px;
+    border-radius: var(--radius-sm);
+    margin: 1px 8px;
+    transition: background 0.15s, color 0.15s;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--muted2);
-    border-left: 3px solid transparent;
   }
-  .nav-item:hover { background: var(--card2); color: var(--text); }
-  .nav-item.active { background: var(--card2); color: var(--text); border-left-color: var(--purple); }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+  .nav-item.active { background: var(--purple-bg); color: var(--purple); font-weight: 700; }
   .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
   .nav-badge {
     margin-left: auto;
@@ -86,16 +92,16 @@
     font-size: 10px;
     padding: 1px 6px;
     border-radius: 20px;
-    font-weight: 600;
+    font-weight: 700;
   }
-  .nav-badge.warn { background: var(--amber); }
-  .nav-badge.muted { background: var(--border); color: var(--muted); }
+  .nav-badge.warn { background: var(--amber); color: #000; }
+  .nav-badge.muted { background: rgba(255,255,255,0.06); color: var(--muted2); }
 
   /* MAIN CONTENT */
   #main {
     margin-left: 220px;
     flex: 1;
-    padding: 28px 32px;
+    padding: 32px;
     min-height: 100vh;
   }
   .page { display: none; }
@@ -106,15 +112,15 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
     flex-wrap: wrap;
     gap: 12px;
   }
-  .page-header h2 { font-size: 24px; font-weight: 700; }
-  .page-header p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .page-header h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  .page-header p { font-size: 14px; color: var(--muted2); margin-top: 4px; }
   .date-pill {
     background: var(--card2);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border2);
     border-radius: 20px;
     padding: 6px 14px;
     font-size: 12px;
@@ -130,11 +136,11 @@
     margin-bottom: 16px;
   }
   .card-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--muted2);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
     margin-bottom: 14px;
     display: flex;
     align-items: center;
@@ -148,33 +154,49 @@
   .btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    padding: 8px 16px;
+    padding: 10px 18px;
     border-radius: var(--radius-sm);
-    border: none;
+    border: 1px solid var(--border2);
+    background: var(--card2);
+    color: var(--text);
     cursor: pointer;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
     transition: all 0.15s;
+    font-family: inherit;
   }
-  .btn-primary { background: var(--purple); color: #fff; }
-  .btn-primary:hover { background: var(--purple-dim); }
-  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-  .btn-outline:hover { background: var(--card2); }
-  .btn-green { background: var(--green); color: #fff; }
+  .btn:hover { border-color: var(--purple); color: var(--purple); }
+  .btn-primary { background: var(--purple); color: #fff; border-color: var(--purple); font-weight: 700; }
+  .btn-primary:hover { background: var(--purple-dim); border-color: var(--purple-dim); color: #fff; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted2); }
+  .btn-outline:hover { border-color: var(--purple); color: var(--purple); }
+  .btn-green { background: var(--green); color: #fff; border-color: var(--green); }
   .btn-green:hover { opacity: 0.85; }
-  .btn-red { background: var(--red); color: #fff; }
-  .btn-sm { padding: 5px 10px; font-size: 12px; }
-  .btn-icon { padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 14px; color: var(--text); }
-  .btn-icon:hover { background: var(--card2); }
+  .btn-red { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .btn-icon { padding: 4px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 14px; color: var(--muted2); }
+  .btn-icon:hover { color: var(--text); border-color: var(--border2); }
+
+  /* BADGES */
+  .badge {
+    display: inline-block; padding: 2px 10px; border-radius: 99px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+  }
+  .badge-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(168,85,247,0.3); }
+  .badge-green  { background: var(--green-dim); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+  .badge-red    { background: var(--red-dim);   color: var(--red);   border: 1px solid rgba(239,68,68,0.3); }
+  .badge-cyan   { background: rgba(6,182,212,0.12); color: var(--cyan); border: 1px solid rgba(6,182,212,0.3); }
+  .badge-grey   { background: rgba(255,255,255,0.06); color: var(--muted2); border: 1px solid var(--border); }
 
   /* FORM ELEMENTS */
   input, select, textarea {
     background: var(--card2);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border2);
     color: var(--text);
     border-radius: var(--radius-sm);
-    padding: 8px 12px;
+    padding: 10px 12px;
     font-size: 13px;
     width: 100%;
     outline: none;
@@ -185,7 +207,7 @@
   input[type="number"] { -moz-appearance: textfield; }
   input[type="number"]::-webkit-inner-spin-button { display: none; }
   textarea { resize: vertical; min-height: 70px; }
-  label { font-size: 12px; color: var(--muted2); display: block; margin-bottom: 5px; }
+  label { font-size: 12px; font-weight: 600; color: var(--muted2); display: block; margin-bottom: 5px; }
   .form-group { margin-bottom: 14px; }
   .form-row { display: flex; gap: 12px; }
   .form-row .form-group { flex: 1; }
@@ -232,15 +254,17 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 18px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
   .stat-icon { font-size: 24px; margin-bottom: 4px; }
-  .stat-value { font-size: 28px; font-weight: 700; }
-  .stat-label { font-size: 12px; color: var(--muted); }
-  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .stat-value { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+  .stat-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .stat-sub { font-size: 12px; color: var(--muted2); margin-top: 4px; }
+  .stat-delta-up { color: var(--green); font-size: 12px; font-weight: 600; }
+  .stat-delta-down { color: var(--red); font-size: 12px; font-weight: 600; }
 
   /* WORKOUT LOG */
   .exercise-row {
@@ -404,8 +428,8 @@
     max-height: 80vh;
     overflow-y: auto;
   }
-  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-  .modal-title { font-size: 16px; font-weight: 700; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .modal-title { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
   .modal-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; }
 
   /* SCROLLBAR */
@@ -500,7 +524,7 @@
     position: fixed;
     top: 0; left: 0; right: 0;
     height: 54px;
-    background: var(--card);
+    background: var(--bg2);
     border-bottom: 1px solid var(--border);
     align-items: center;
     justify-content: space-between;
@@ -509,8 +533,9 @@
   }
   #mobile-topbar-title {
     font-size: 15px;
-    font-weight: 700;
-    color: var(--text);
+    font-weight: 800;
+    color: var(--purple);
+    letter-spacing: -0.2px;
   }
   #mobile-topbar-cloud {
     font-size: 11px;
@@ -532,7 +557,7 @@
     position: fixed;
     bottom: 0; left: 0; right: 0;
     height: 70px;
-    background: var(--card);
+    background: var(--bg2);
     border-top: 1px solid var(--border);
     align-items: center;
     justify-content: space-around;
@@ -556,7 +581,7 @@
   .mob-nav-btn .mob-icon { font-size: 24px; line-height: 1; }
   .mob-nav-btn .mob-label { font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
   .mob-nav-btn.active { color: var(--purple); }
-  .mob-nav-btn:active { background: rgba(139,92,246,0.1); }
+  .mob-nav-btn:active { background: rgba(168,85,247,0.1); }
 
   /* ── MOBILE MENU GRID ── */
   .mob-menu-section-full {
@@ -1631,15 +1656,15 @@
 
       <!-- Status banner -->
       <div style="text-align:center;padding:14px 24px;border-radius:14px;margin-bottom:20px;font-size:18px;font-weight:800;
-                  background:linear-gradient(135deg,rgba(16,185,129,0.18),rgba(16,185,129,0.06));
-                  border:2px solid #10b981;color:#10b981;box-shadow:0 0 24px rgba(16,185,129,0.2)">
+                  background:linear-gradient(135deg,rgba(34,197,94,0.18),rgba(34,197,94,0.06));
+                  border:2px solid #22c55e;color:#22c55e;box-shadow:0 0 24px rgba(34,197,94,0.2)">
         🟢 STREAK ACTIVE
       </div>
 
       <!-- Giant day counter -->
       <div id="sr-streak-card" class="card" style="text-align:center;padding:48px 20px;margin-bottom:20px;
-           border:2px solid #10b981;box-shadow:0 0 40px rgba(16,185,129,0.12)">
-        <div id="sr-streak-num" style="font-size:120px;font-weight:800;line-height:1;color:#10b981">0</div>
+           border:2px solid #22c55e;box-shadow:0 0 40px rgba(34,197,94,0.12)">
+        <div id="sr-streak-num" style="font-size:120px;font-weight:800;line-height:1;color:#22c55e">0</div>
         <div style="font-size:26px;font-weight:700;margin-top:6px;color:var(--muted2)">days</div>
         <div id="sr-streak-label" style="font-size:15px;color:var(--muted);margin-top:10px"></div>
         <div id="sr-milestone-badge" style="margin-top:16px"></div>
@@ -1677,7 +1702,7 @@
         <div class="card-title">📅 Last 30 Days</div>
         <div id="sr-calendar"></div>
         <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:var(--muted)">
-          <span><span style="display:inline-block;width:12px;height:12px;background:#10b981;border-radius:3px;margin-right:4px;vertical-align:middle"></span>Streak days</span>
+          <span><span style="display:inline-block;width:12px;height:12px;background:#22c55e;border-radius:3px;margin-right:4px;vertical-align:middle"></span>Streak days</span>
           <span><span style="display:inline-block;width:12px;height:12px;background:var(--red);border-radius:3px;margin-right:4px;vertical-align:middle;opacity:0.7"></span>Reset</span>
         </div>
       </div>
@@ -2773,7 +2798,7 @@ function setDietStar(n) {
   document.querySelectorAll('#diet-stars .star').forEach((s,i) => s.classList.toggle('active', i < n));
 }
 
-const MEAL_COLORS = { breakfast:'#f59e0b', lunch:'#10b981', dinner:'#8b5cf6', snack:'#06b6d4', supplement:'#ec4899' };
+const MEAL_COLORS = { breakfast:'#f59e0b', lunch:'#22c55e', dinner:'#a855f7', snack:'#06b6d4', supplement:'#ec4899' };
 const MEAL_ICONS = { breakfast:'🌅', lunch:'☀️', dinner:'🌙', snack:'🍎', supplement:'💊' };
 
 function renderDiet() {
@@ -2795,7 +2820,7 @@ function renderDiet() {
         <div class="meal-header">
           <div style="display:flex;align-items:center;gap:8px">
             <span style="font-size:18px">${MEAL_ICONS[m.type]||'🍽'}</span>
-            <span class="meal-type-badge" style="background:${MEAL_COLORS[m.type]||'#64748b'}22;color:${MEAL_COLORS[m.type]||'#64748b'}">${m.type.charAt(0).toUpperCase()+m.type.slice(1)}</span>
+            <span class="meal-type-badge" style="background:${MEAL_COLORS[m.type]||'rgba(255,255,255,0.12)'}22;color:${MEAL_COLORS[m.type]||'rgba(255,255,255,0.6)'}">${m.type.charAt(0).toUpperCase()+m.type.slice(1)}</span>
             ${m.time ? `<span style="font-size:11px;color:var(--muted)">${m.time}</span>` : ''}
           </div>
           <button class="btn-icon" onclick="deleteMeal(${i})" style="font-size:12px;padding:3px 7px">✕</button>
@@ -3301,7 +3326,7 @@ const SR_MILESTONES = [
   {days:60,label:'60 Days — Elite level 💎',color:'var(--purple)'},
   {days:90,label:'90 Days — Monk mode unlocked 🧘',color:'#f59e0b'},
   {days:180,label:'180 Days — Half a year 👑',color:'#ec4899'},
-  {days:365,label:'1 YEAR — Legendary 🌟',color:'#10b981'},
+  {days:365,label:'1 YEAR — Legendary 🌟',color:'#22c55e'},
 ];
 
 function calcSRStreak(data) {
@@ -3366,7 +3391,7 @@ function renderRetention() {
   statsEl.innerHTML = `
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:0">
       <div class="card" style="text-align:center;padding:16px">
-        <div style="font-size:32px;font-weight:800;color:#10b981">${streak}</div>
+        <div style="font-size:32px;font-weight:800;color:#22c55e">${streak}</div>
         <div style="font-size:11px;color:var(--muted)">Current</div>
       </div>
       <div class="card" style="text-align:center;padding:16px">
@@ -3532,7 +3557,7 @@ function deleteSRReset(date) {
 
 // ==================== BODY MEASUREMENTS ====================
 const MEASURE_FIELDS = [
-  {id:'weight', label:'Weight', unit:'kg', color:'#8b5cf6'},
+  {id:'weight', label:'Weight', unit:'kg', color:'#a855f7'},
   {id:'bodyfat', label:'Body Fat', unit:'%', color:'#ef4444'},
 ];
 let _chartInstances = {};
@@ -3577,7 +3602,7 @@ function renderMeasurements() {
     const ctx = document.getElementById('chart-weight').getContext('2d');
     _chartInstances['weight'] = new Chart(ctx, {
       type: 'line',
-      data: { datasets: [{ label:'Weight (kg)', data: weightData, borderColor:'#8b5cf6', backgroundColor:'rgba(139,92,246,0.1)', tension:0.3, fill:true, pointRadius:4, pointHoverRadius:6 }] },
+      data: { datasets: [{ label:'Weight (kg)', data: weightData, borderColor:'#a855f7', backgroundColor:'rgba(168,85,247,0.1)', tension:0.3, fill:true, pointRadius:4, pointHoverRadius:6 }] },
       options: { ...chartDefaults(), scales: { x:{...xScaleDate()}, y:{...yScaleLeft('kg')} } }
     });
   } else {
@@ -3666,15 +3691,15 @@ function getDatesRange(days) {
 function chartDefaults() {
   return {
     responsive: true, maintainAspectRatio: false,
-    plugins: { legend:{ labels:{ color:'#94a3b8', font:{size:11} } } },
+    plugins: { legend:{ labels:{ color:'rgba(255,255,255,0.60)', font:{size:11} } } },
     animation: { duration: 400 }
   };
 }
 function xScaleDate() {
-  return { type:'category', ticks:{ color:'#64748b', maxRotation:45, font:{size:10} }, grid:{ color:'#2a2a40' } };
+  return { type:'category', ticks:{ color:'rgba(255,255,255,0.35)', maxRotation:45, font:{size:10} }, grid:{ color:'rgba(255,255,255,0.06)' } };
 }
 function yScaleLeft(unit) {
-  return { ticks:{ color:'#64748b', font:{size:10}, callback: v => v+(unit?unit:'') }, grid:{ color:'#2a2a40' } };
+  return { ticks:{ color:'rgba(255,255,255,0.35)', font:{size:10}, callback: v => v+(unit?unit:'') }, grid:{ color:'rgba(255,255,255,0.06)' } };
 }
 
 function renderTrends() {
@@ -3691,8 +3716,8 @@ function renderTrends() {
   if(ctxSleep) _chartInstances['t-sleep'] = new Chart(ctxSleep, {
     type:'line',
     data:{ labels, datasets:[
-      { label:'Sleep (h)', data:sleepVals, borderColor:'#8b5cf6', backgroundColor:'rgba(139,92,246,0.1)', tension:0.3, fill:true, spanGaps:true, pointRadius:3 },
-      { label:`Goal (${goal}h)`, data:dates.map(()=>goal), borderColor:'#64748b', borderDash:[5,5], pointRadius:0, fill:false }
+      { label:'Sleep (h)', data:sleepVals, borderColor:'#a855f7', backgroundColor:'rgba(168,85,247,0.1)', tension:0.3, fill:true, spanGaps:true, pointRadius:3 },
+      { label:`Goal (${goal}h)`, data:dates.map(()=>goal), borderColor:'rgba(255,255,255,0.25)', borderDash:[5,5], pointRadius:0, fill:false }
     ]},
     options:{ ...chartDefaults(), scales:{ x:{...xScaleDate()}, y:{...yScaleLeft('h'), min:0, max:12} } }
   });
@@ -3706,7 +3731,7 @@ function renderTrends() {
     type:'bar',
     data:{ labels, datasets:[
       { label:'Glasses', data:hydroVals, backgroundColor: hydroVals.map(v => v>=hydroGoal?'rgba(6,182,212,0.7)':'rgba(245,158,11,0.5)'), borderRadius:4 },
-      { label:`Goal (${hydroGoal})`, data:dates.map(()=>hydroGoal), type:'line', borderColor:'#64748b', borderDash:[5,5], pointRadius:0, fill:false }
+      { label:`Goal (${hydroGoal})`, data:dates.map(()=>hydroGoal), type:'line', borderColor:'rgba(255,255,255,0.25)', borderDash:[5,5], pointRadius:0, fill:false }
     ]},
     options:{ ...chartDefaults(), scales:{ x:{...xScaleDate()}, y:{...yScaleLeft(''), min:0} } }
   });
@@ -3730,7 +3755,7 @@ function renderTrends() {
   const ctxGym = document.getElementById('chart-gym')?.getContext('2d');
   if(ctxGym) _chartInstances['t-gym'] = new Chart(ctxGym, {
     type:'bar',
-    data:{ labels:weekLabels, datasets:[{ label:'Sessions', data:weekCounts, backgroundColor:'rgba(139,92,246,0.7)', borderRadius:4 }] },
+    data:{ labels:weekLabels, datasets:[{ label:'Sessions', data:weekCounts, backgroundColor:'rgba(168,85,247,0.7)', borderRadius:4 }] },
     options:{ ...chartDefaults(), scales:{ x:{...xScaleDate()}, y:{...yScaleLeft(''), min:0, max: Math.max(7, ...weekCounts)+1, ticks:{stepSize:1}} } }
   });
 
@@ -3753,7 +3778,7 @@ function renderTrends() {
   const ctxConsist = document.getElementById('chart-consistency')?.getContext('2d');
   if(ctxConsist) _chartInstances['t-consist'] = new Chart(ctxConsist, {
     type:'line',
-    data:{ labels, datasets:[{ label:'Routine %', data:consistVals, borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.1)', tension:0.3, fill:true, spanGaps:true, pointRadius:3 }] },
+    data:{ labels, datasets:[{ label:'Routine %', data:consistVals, borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,0.1)', tension:0.3, fill:true, spanGaps:true, pointRadius:3 }] },
     options:{ ...chartDefaults(), scales:{ x:{...xScaleDate()}, y:{...yScaleLeft('%'), min:0, max:100} } }
   });
 

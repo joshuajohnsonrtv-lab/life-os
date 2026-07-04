@@ -438,13 +438,16 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   clip-path:polygon(0% 45%,18% 0%,32% 38%,68% 38%,82% 0%,100% 45%,100% 100%,0% 100%);
   top:-8px;left:0;
 }
-/* tail curling off right end */
+/* tail: sweeps right then curls up at the tip */
 .cat-body::after{
   content:'';position:absolute;
-  width:9px;height:12px;
-  border:2.5px solid #2f2f2f;
-  border-radius:0 50% 50% 0;border-left:none;
-  right:-8px;top:-2px;
+  width:13px;height:18px;
+  border:2.5px solid #505050;
+  border-left:none;border-bottom:none;
+  border-radius:0 50% 0 0;
+  right:-12px;top:-10px;
+  transform:rotate(12deg);
+  transform-origin:left bottom;
 }
 @keyframes cat-breathe{
   0%,100%{transform:scaleY(1);}
