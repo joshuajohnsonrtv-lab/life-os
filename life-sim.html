@@ -34,12 +34,21 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .refresh-btn:hover{border-color:var(--gold);color:var(--gold);}
 
 /* ── LOC BAR ── */
-.loc-bar{display:flex;gap:0;padding:8px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.loc-bar{display:flex;align-items:center;gap:0;padding:8px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.loc-group{display:flex;gap:0;flex-shrink:0;}
 .loc-btn{padding:7px 18px;border:1px solid var(--border);background:transparent;
   color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
-.loc-btn:first-child{border-radius:8px 0 0 8px;}
-.loc-btn:last-child{border-radius:0 8px 8px 0;border-left:none;}
+.loc-group .loc-btn:first-child{border-radius:8px 0 0 8px;}
+.loc-group .loc-btn:last-child{border-radius:0 8px 8px 0;border-left:none;}
 .loc-btn.active{background:var(--gold);color:#000;border-color:var(--gold);}
+.save-btn{
+  margin-left:auto;padding:6px 14px;
+  background:transparent;border:1px solid var(--border);border-radius:8px;
+  color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;
+  transition:border-color .2s,color .2s;white-space:nowrap;
+}
+.save-btn:hover{border-color:var(--gold);color:var(--gold);}
+.save-btn.saved{border-color:var(--gold);color:var(--gold);}
 
 /* ── BODY ── */
 .sim-body{display:flex;flex:1;overflow:hidden;}
@@ -415,8 +424,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   border-radius:50%;border:2px solid #383838;background:radial-gradient(circle,#1a1a1a,#0a0a0a);
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 2px 8px rgba(0,0,0,.6);
-  transition:box-shadow .4s;
+  transition:box-shadow .4s;cursor:pointer;
 }
+.fan:hover{box-shadow:0 0 8px rgba(245,197,66,.25),0 2px 8px rgba(0,0,0,.6);}
 .fan.on{box-shadow:0 0 14px rgba(180,220,255,.3),0 2px 8px rgba(0,0,0,.6);}
 .fan-blade{
   width:24px;height:24px;border-radius:50%;
@@ -1127,9 +1137,12 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 <!-- LOCATION BAR -->
 <div class="loc-bar">
-  <button class="loc-btn active" id="btn-room" onclick="goLoc('room')">🏠 Your Room</button>
-  <button class="loc-btn" id="btn-out" onclick="goLoc('outside')">🌍 Outside</button>
-  <button class="loc-btn kitchen" id="btn-kitchen" onclick="goLoc('kitchen')">🍳 Kitchen</button>
+  <div class="loc-group">
+    <button class="loc-btn active" id="btn-room" onclick="goLoc('room')">🏠 Your Room</button>
+    <button class="loc-btn" id="btn-out" onclick="goLoc('outside')">🌍 Outside</button>
+    <button class="loc-btn kitchen" id="btn-kitchen" onclick="goLoc('kitchen')">🍳 Kitchen</button>
+  </div>
+  <button class="save-btn" id="save-btn" onclick="manualSave()">💾 Save</button>
 </div>
 
 <!-- BODY -->
@@ -1194,8 +1207,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
         <div class="db-w"></div><div class="db-b"></div><div class="db-w"></div>
       </div>
 
-      <!-- Fan -->
-      <div class="fan" id="fan"><div class="fan-blade" id="fan-blade"></div></div>
+      <!-- Fan — click to save state -->
+      <div class="fan" id="fan" onclick="manualSave()" title="Save state"><div class="fan-blade" id="fan-blade"></div></div>
 
       <!-- Door -->
       <div class="door" onclick="showDoorMenu(event)" title="Leave room">
@@ -2665,6 +2678,14 @@ function gamingStayWeak() {
 // ─────────────────────────────────────────────
 function saveState() {
   try {
+    // Which scene is currently visible?
+    const loc = document.getElementById('view-kitchen')?.classList.contains('show') ? 'kitchen'
+              : document.getElementById('view-outside')?.classList.contains('show') ? 'outside'
+              : 'room';
+    // Capture actual CSS classes so they restore exactly
+    const figEl   = document.getElementById('char-figure');
+    const headEl  = document.getElementById('char-head');
+    const chairEl = document.getElementById('chair');
     localStorage.setItem('life_sim_runtime', JSON.stringify({
       zone:          _currentZone,
       sitting:       _sittingOnChair,
@@ -2677,6 +2698,14 @@ function saveState() {
       lastDevice:    _lastDevice,
       curtains:      _curtainsDrawn,
       lightOn:       _lightOn,
+      // Scene + char visual (so kitchen/outside + any animation restores)
+      loc,
+      figClass:   figEl   ? figEl.className   : 'char-figure',
+      headClass:  headEl  ? headEl.className  : 'char-head',
+      chairClass: chairEl ? chairEl.className : 'chair',
+      // Kitchen state
+      kZone:    _kZone    || 'entry',
+      kSitting: _kSitting || false,
     }));
   } catch(e) {}
 }
@@ -2685,70 +2714,100 @@ function loadState() {
   try {
     const s = JSON.parse(localStorage.getItem('life_sim_runtime') || 'null');
     if (!s) return;
-    // Restore room / device state
-    if (s.pcOn   !== undefined) _pcOn         = s.pcOn;
-    if (s.miniOn !== undefined) _miniOn       = s.miniOn;
-    if (s.lastDevice)           _lastDevice   = s.lastDevice;
-    if (s.curtains !== undefined) _curtainsDrawn = s.curtains;
-    if (s.lightOn !== undefined)  _lightOn      = s.lightOn;
+
+    // ── 1. Device / room state ──
+    if (s.pcOn      !== undefined) _pcOn          = s.pcOn;
+    if (s.miniOn    !== undefined) _miniOn        = s.miniOn;
+    if (s.lastDevice)              _lastDevice    = s.lastDevice;
+    if (s.curtains  !== undefined) _curtainsDrawn = s.curtains;
+    if (s.lightOn   !== undefined) _lightOn       = s.lightOn;
     updateDevices();
     updateRoom();
-    // Sync light-switch visual
     const sw = document.getElementById('light-switch');
     if (sw) sw.className = 'light-switch' + (_lightOn ? ' on' : '');
-    // Restore zone position
+
+    // ── 2. Room character position ──
     if (s.zone && POS[s.zone]) {
       _currentZone = s.zone;
-      const el = document.getElementById('char');
-      if (el) {
-        el.style.top  = (POS[s.zone].top)  + 'px';
-        el.style.left = (POS[s.zone].left) + 'px';
+      const charEl = document.getElementById('char');
+      if (charEl) {
+        charEl.style.top  = POS[s.zone].top  + 'px';
+        charEl.style.left = POS[s.zone].left + 'px';
       }
-      // Restore visual state for the zone
-      if (s.zone === 'desk') document.querySelector('.desk')?.classList.add('active-zone');
+      if (s.zone === 'desk' || s.zone === 'chair')
+        document.querySelector('.desk')?.classList.add('active-zone');
       if (s.zone === 'futon' || s.zone === 'futon_sleep')
         document.querySelector('.futon')?.classList.add('active-zone');
     }
-    // Restore chair
+
+    // ── 3. Chair sitting ──
     if (s.sitting) {
       _sittingOnChair = true;
-      document.getElementById('chair')?.classList.add('seated');
       document.querySelector('.desk')?.classList.add('active-zone');
-      // Restore seated-idle visual (no activity running, just sitting)
-      const figEl = document.getElementById('char-figure');
-      if (figEl) figEl.classList.add('seated-idle');
     }
-    // Restore active activity (keep timer running)
+
+    // ── 4. Character visual — restore saved className strings directly.
+    //       This handles every state: idle, laying, at-desk, cooking,
+    //       fridge-check, meditating, seated-idle — no more guessing.
+    const figure  = document.getElementById('char-figure');
+    const head    = document.getElementById('char-head');
+    const chairEl = document.getElementById('chair');
+    if (s.figClass   && figure)   figure.className   = s.figClass;
+    if (s.headClass  && head)     head.className     = s.headClass;
+    if (s.chairClass && chairEl)  chairEl.className  = s.chairClass;
+
+    // ── 5. Activity timer ──
     if (s.activityStart && s.activityName && s.status) {
-      _activityStart    = s.activityStart; // raw ms timestamp
+      _activityStart    = s.activityStart;
       _activityName     = s.activityName;
       _manualStatus     = s.status;
       _manualStatusTime = Date.now();
-      // Restore visual for each activity type
-      const head   = document.getElementById('char-head');
-      const figure = document.getElementById('char-figure');
-      if (s.status === '😴 Sleeping' || s.status === '💤 Napping') {
-        if (head)   head.className   = 'char-head sleeping';
-        if (figure) figure.className = 'char-figure laying';
-      } else if (s.status === '🧘 Meditating') {
-        if (head)   head.className   = 'char-head meditating';
-        if (figure) figure.className = 'char-figure meditating';
-      } else {
-        // desk activity — restore bird's-eye working view (zone = 'chair')
-        if (head)   head.className   = 'char-head';
-        if (figure) figure.className = 'char-figure at-desk';
-        const chairEl = document.getElementById('chair');
-        if (chairEl) { chairEl.classList.add('seated'); chairEl.classList.add('at-desk'); }
-        _sittingOnChair = true;
-      }
       clearActivityTimer();
       updateActivityBubble();
       _activityInterval = setInterval(updateActivityBubble, 1000);
+      // Re-arm gaming warning for time already elapsed
+      if (_activityName && _activityName.includes('Gaming')) {
+        const elapsed   = Date.now() - _activityStart;
+        const remaining = 60 * 1000 - elapsed;
+        if (remaining > 0) scheduleGamingWarning(remaining);
+        else showGamingWarning();
+      }
     } else if (s.status) {
       _manualStatus     = s.status;
       _manualStatusTime = Date.now();
     }
+
+    // ── 6. Scene (kitchen / outside override room view) ──
+    if (s.loc === 'kitchen') {
+      goLoc('kitchen');
+      if (s.kZone && s.kZone !== 'entry') {
+        _kZone    = s.kZone;
+        _kSitting = !!s.kSitting;
+        kMoveChar(s.kZone);
+        if (s.kSitting && s.kZone.startsWith('stool')) {
+          document.getElementById('kstool-' + s.kZone.slice(-1))
+            ?.classList.add('occupied');
+        }
+      }
+      if (s.status) {
+        const kb = document.getElementById('k-bubble');
+        if (kb) kb.textContent = s.status;
+      }
+    } else if (s.loc === 'outside') {
+      goLoc('outside');
+    }
   } catch(e) {}
+}
+
+function manualSave() {
+  saveState();
+  const btn = document.getElementById('save-btn');
+  if (btn) {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✓ Saved';
+    btn.classList.add('saved');
+    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('saved'); }, 1600);
+  }
 }
 
 // ─────────────────────────────────────────────
