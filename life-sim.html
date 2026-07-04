@@ -1207,8 +1207,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
         <div class="db-w"></div><div class="db-b"></div><div class="db-w"></div>
       </div>
 
-      <!-- Fan — click to save state -->
-      <div class="fan" id="fan" onclick="manualSave()" title="Save state"><div class="fan-blade" id="fan-blade"></div></div>
+      <!-- Fan — click to save state (stopPropagation so room click doesn't fire) -->
+      <div class="fan" id="fan" onclick="event.stopPropagation();manualSave();" title="Save state"><div class="fan-blade" id="fan-blade"></div></div>
 
       <!-- Door -->
       <div class="door" onclick="showDoorMenu(event)" title="Leave room">
