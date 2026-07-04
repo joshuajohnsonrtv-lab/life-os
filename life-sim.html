@@ -1738,28 +1738,58 @@ function showProgressModal() {
         </div>`).join('')
     : `<div style="font-size:10px;color:var(--muted)">None active — add one in Money → Hustles.</div>`;
 
-  // Output score factors
-  const factors = [
-    { label:'Gym sessions (7d)', val: s.gymSess7, max: 5, unit:'', good: s.gymSess7>=3 },
-    { label:'Avg sleep',         val: s.sleepAvg > 0 ? s.sleepAvg.toFixed(1)+'h' : '—', pct: s.sleepAvg > 0 ? Math.min(100, Math.round((s.sleepAvg/8)*100)) : 0, good: s.sleepAvg>=7 },
-    { label:'Water days (7d)',   val: s.hydDays, max: 7, unit:'d', good: s.hydDays>=5 },
-    { label:'Meals today',       val: s.mealCount, max: 3, unit:'', good: s.mealCount>=2 },
-    { label:'Active hustles',    val: s.actHustles.length, max: null, good: s.actHustles.length>0 },
-    { label:'Month income',      val: fmt(s.monthIncome), pct: monthProg, good: monthProg>=50 },
+  // Score per category (matches calc() formula exactly)
+  const incomePts = (s.monthIncome > 0 ? 10 : 0)
+                  + (s.monthIncome >= 500  ? 10 : 0)
+                  + (s.monthIncome >= 1500 ? 10 : 0)
+                  + (s.monthIncome >= 3000 ?  5 : 0);
+  const hustlePts = Math.min(s.actHustles.length * 12, 25);
+  const gymPts    = Math.min(s.gymSess7 * 4, 22);
+  const sleepPts  = (s.sleepAvg >= 7 && s.sleepAvg <= 9) ? 10 : (s.sleepAvg >= 6 ? 5 : 0);
+  const hydroPts  = Math.round((s.hydDays / 7) * 8);
+
+  const cats = [
+    { emoji:'💰', label:'Income',     pts:incomePts, max:35,
+      detail: s.monthIncome > 0 ? fmt(s.monthIncome)+' this month' : 'No income logged',
+      next: incomePts < 35
+        ? (s.monthIncome < 500 ? 'Log £500+ to earn +10 pts' : s.monthIncome < 1500 ? 'Log £1,500+ for +10 pts' : s.monthIncome < 3000 ? 'Log £3,000+ for +5 pts' : '')
+        : 'Max reached ✓' },
+    { emoji:'🚀', label:'Hustles',    pts:hustlePts, max:25,
+      detail: s.actHustles.length + ' active hustle' + (s.actHustles.length!==1?'s':''),
+      next: hustlePts < 25 ? 'Add more hustles for +12 pts each (max 25)' : 'Max reached ✓' },
+    { emoji:'🏋️', label:'Gym',       pts:gymPts,    max:22,
+      detail: s.gymSess7 + '/7 sessions this week',
+      next: gymPts < 22 ? (7 - s.gymSess7) + ' more session'+(7-s.gymSess7!==1?'s':'')+' = +'+(Math.min(s.gymSess7+1,5)*4 - gymPts)+' pts' : 'Max reached ✓' },
+    { emoji:'😴', label:'Sleep',      pts:sleepPts,  max:10,
+      detail: s.sleepAvg > 0 ? s.sleepAvg.toFixed(1)+'h avg (7d)' : 'No sleep logged',
+      next: sleepPts < 10 ? (s.sleepAvg < 6 ? 'Log 6h+ sleep for +5 pts' : 'Aim for 7–9h for +10 pts') : 'Max reached ✓' },
+    { emoji:'💧', label:'Hydration',  pts:hydroPts,  max:8,
+      detail: s.hydDays + '/7 days hitting goal',
+      next: hydroPts < 8 ? 'Hit daily water goal more days this week' : 'Max reached ✓' },
   ];
 
-  const factorHTML = factors.map(f => {
-    const barPct = f.pct !== undefined ? f.pct : (f.max ? Math.min(100, Math.round((parseFloat(f.val)/f.max)*100)) : null);
-    const col = f.good ? 'var(--green)' : 'var(--gold)';
+  const factorHTML = cats.map(c => {
+    const barPct = Math.round((c.pts / c.max) * 100);
+    const col = c.pts >= c.max ? 'var(--green)' : c.pts > 0 ? 'var(--gold)' : 'var(--muted)';
     return `
-      <div style="display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid var(--border)">
-        <div style="display:flex;justify-content:space-between;font-size:11px">
-          <span style="color:var(--muted)">${f.label}</span>
-          <span style="font-weight:800;color:${col}">${f.val}${f.unit||''}</span>
+      <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="font-size:15px">${c.emoji}</span>
+            <span style="font-size:12px;font-weight:700;color:var(--text)">${c.label}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:10px;color:var(--muted)">${c.pts}/${c.max} pts</span>
+            <span style="font-size:14px;font-weight:900;color:${col};min-width:32px;text-align:right">${c.pts}%</span>
+          </div>
         </div>
-        ${barPct !== null ? `<div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
-          <div style="height:100%;width:${barPct}%;background:${col};border-radius:2px;transition:width 1s ease"></div>
-        </div>` : ''}
+        <div style="height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;margin-bottom:5px">
+          <div style="height:100%;width:${barPct}%;background:${col};border-radius:3px;transition:width 1s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted)">
+          <span>${c.detail}</span>
+          <span style="color:${c.pts>=c.max?'var(--green)':'rgba(255,255,255,0.3)'};font-style:italic">${c.next}</span>
+        </div>
       </div>`;
   }).join('');
 
@@ -1773,7 +1803,10 @@ function showProgressModal() {
 
     <!-- Score factors -->
     <div class="sblock">
-      <div class="sblock-title">What builds your score</div>
+      <div class="sblock-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Score Breakdown</span>
+        <span style="font-size:9px;color:var(--muted);font-weight:400">each % = 1 point out of 100</span>
+      </div>
       ${factorHTML}
     </div>
 

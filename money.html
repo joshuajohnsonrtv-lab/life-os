@@ -1048,9 +1048,8 @@
 
   <!-- ═══ DASHBOARD ═══ -->
   <div class="page active" id="page-dashboard">
-    <div class="page-header">
-      <h2>📊 Dashboard</h2>
-      <p id="dash-date" style="color:var(--muted2)"></p>
+    <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between">
+      <p id="dash-date" style="font-size:13px;color:var(--muted2);font-weight:500"></p>
     </div>
     <div id="dash-ticker" class="ticker"></div>
     <div class="grid-4" style="margin-bottom:20px" id="dash-stats"></div>
@@ -1909,7 +1908,7 @@ function renderDashboard() {
   const goalsEl = document.getElementById('dash-goals');
   const activeGoals = (data.goals.items || []).filter(g => !g.complete).slice(0, 4);
   if (!activeGoals.length) {
-    goalsEl.innerHTML = `<div class="empty"><div class="empty-icon">🎯</div><p>No goals yet</p></div>`;
+    goalsEl.innerHTML = `<div class="empty"><div class="empty-icon">🎯</div><p>No goals set yet</p><button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="showPage('goals')">Set a Goal →</button></div>`;
   } else {
     goalsEl.innerHTML = activeGoals.map(g => {
       const pct = Math.min(100, Math.round((parseFloat(g.current||0) / parseFloat(g.target||1)) * 100));
@@ -1933,7 +1932,7 @@ function renderDashboard() {
   const hustlesEl = document.getElementById('dash-hustles');
   const hustles = (data.hustles.items || []).filter(h => h.status !== 'idea').slice(0, 5);
   if (!hustles.length) {
-    hustlesEl.innerHTML = `<div class="empty"><div class="empty-icon">🚀</div><p>No active hustles yet</p></div>`;
+    hustlesEl.innerHTML = `<div class="empty"><div class="empty-icon">🚀</div><p>No active hustles yet</p><button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="showPage('hustles')">Add a Hustle →</button></div>`;
   } else {
     hustlesEl.innerHTML = hustles.map(h => {
       const statusColors = { earning:'var(--green)', active:'var(--gold)', building:'var(--cyan)', idea:'var(--muted)' };
@@ -1955,7 +1954,7 @@ function renderDashboard() {
   const recentEl = document.getElementById('dash-recent-income');
   const recent = [...entries].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 6);
   if (!recent.length) {
-    recentEl.innerHTML = `<div class="empty"><div class="empty-icon">💵</div><p>No income logged yet</p></div>`;
+    recentEl.innerHTML = `<div class="empty"><div class="empty-icon">💵</div><p>No income logged yet</p><button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="showPage('income')">Log Income →</button></div>`;
   } else {
     const sources = Object.fromEntries((data.income.sources||[]).map(s => [s.id, s]));
     recentEl.innerHTML = recent.map(e => {
