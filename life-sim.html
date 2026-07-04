@@ -1035,6 +1035,29 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px;}
 .tmpl-del:hover{border-color:#ef4444;color:#ef4444;}
 .j-empty{font-size:12px;color:rgba(255,255,255,.22);padding:10px 2px;}
+.j-tabs{display:flex;gap:0;border-bottom:1px solid #1e1e30;flex-shrink:0;}
+.j-tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;
+  color:rgba(255,255,255,.35);font-size:12px;font-weight:700;padding:10px 6px;cursor:pointer;
+  letter-spacing:.3px;transition:color .15s,border-color .15s;font-family:inherit;}
+.j-tab-btn.active{color:#a855f7;border-bottom-color:#a855f7;}
+.j-tab-btn:hover{color:rgba(255,255,255,.65);}
+.j-journal-body{overflow-y:auto;flex:1;padding:10px 16px;display:flex;flex-direction:column;gap:8px;}
+.j-journal-txt{width:100%;background:#141420;border:1px solid #2a2840;color:rgba(255,255,255,.88);
+  padding:10px 12px;border-radius:8px;font-size:13px;resize:none;outline:none;
+  font-family:inherit;line-height:1.5;min-height:100px;}
+.j-journal-txt:focus{border-color:#a855f7;}
+.j-journal-txt::placeholder{color:rgba(255,255,255,.22);}
+.j-moods{display:flex;gap:6px;flex-wrap:wrap;}
+.j-mood-btn{background:none;border:1px solid #2a2840;border-radius:6px;padding:5px 9px;
+  font-size:16px;cursor:pointer;transition:all .15s;}
+.j-mood-btn.active{border-color:#a855f7;background:rgba(168,85,247,.18);}
+.j-journal-entry{padding:8px 10px;background:#141420;border:1px solid #1e1e30;
+  border-radius:8px;cursor:pointer;}
+.j-journal-entry:hover{border-color:#2a2840;}
+.j-entry-hdr{display:flex;align-items:center;gap:8px;margin-bottom:3px;}
+.j-entry-date{font-size:11px;font-weight:600;color:rgba(255,255,255,.4);}
+.j-entry-text{font-size:12px;color:rgba(255,255,255,.65);line-height:1.45;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 
 /* ── KITCHEN VIEW ── */
 .kitchen-wrap{flex:1;display:none;align-items:center;justify-content:center;
@@ -2558,6 +2581,9 @@ function closeFaceModal() {
 // ─────────────────────────────────────────────
 //  JOURNAL / TO-DO LIST
 // ─────────────────────────────────────────────
+let _jActiveTab = 'todo'; // 'todo' | 'journal'
+let _simJournalMood = '';
+
 function showJournal(e) {
   e.stopPropagation();
   const existing = document.getElementById('journal-modal');
@@ -2566,8 +2592,34 @@ function showJournal(e) {
   modal.className = 'journal-modal';
   modal.id = 'journal-modal';
   modal.onclick = ev => { if (ev.target === modal) modal.remove(); };
-  _renderJournal(modal, false);
+  _renderJournalModal(modal);
   document.body.appendChild(modal);
+}
+
+function _switchJTab(tab) {
+  _jActiveTab = tab;
+  const m = document.getElementById('journal-modal');
+  if (m) _renderJournalModal(m);
+}
+
+function _renderJournalModal(modal) {
+  const inner = document.createElement('div');
+  inner.className = 'journal-inner';
+  inner.onclick = ev => ev.stopPropagation();
+  inner.innerHTML = `
+    <div class="j-hdr">
+      <div class="j-title">📓 Desk</div>
+      <button class="j-x" onclick="document.getElementById('journal-modal').remove()">×</button>
+    </div>
+    <div class="j-tabs">
+      <button class="j-tab-btn${_jActiveTab==='todo'?' active':''}" onclick="_switchJTab('todo')">📋 To-Do</button>
+      <button class="j-tab-btn${_jActiveTab==='journal'?' active':''}" onclick="_switchJTab('journal')">✍️ Journal</button>
+    </div>
+    <div id="j-tab-content" style="display:flex;flex-direction:column;flex:1;overflow:hidden;"></div>`;
+  modal.innerHTML = '';
+  modal.appendChild(inner);
+  if (_jActiveTab === 'todo') _renderTodoTab();
+  else _renderJournalTab();
 }
 
 function _jTodos()     { return JSON.parse(localStorage.getItem('life_sim_todos')     || '[]'); }
@@ -2575,7 +2627,7 @@ function _jSaveTodos(t){ localStorage.setItem('life_sim_todos', JSON.stringify(t
 function _jTmpls()     { return JSON.parse(localStorage.getItem('life_sim_todo_tmpls')|| '[]'); }
 function _jSaveTmpls(t){ localStorage.setItem('life_sim_todo_tmpls', JSON.stringify(t)); }
 
-function _renderJournal(modal, showTmpls) {
+function _renderTodoTab(showTmpls) {
   const todos = _jTodos(), tmpls = _jTmpls();
   const rows = todos.map((t, i) => `
     <div class="todo-row${t.done?' t-done':''}">
@@ -2593,55 +2645,119 @@ function _renderJournal(modal, showTmpls) {
           <button class="tmpl-del"  onclick="_jDelTmpl(${i})">×</button>
         </div>`).join('') : '<div class="j-empty">No templates saved yet.</div>'}
     </div>` : '';
-  modal.innerHTML = `
-    <div class="journal-inner" onclick="event.stopPropagation()">
-      <div class="j-hdr">
-        <div class="j-title">📓 Today's Tasks</div>
-        <button class="j-x" onclick="document.getElementById('journal-modal').remove()">×</button>
-      </div>
-      <div class="j-body">
-        ${todos.length ? rows : '<div class="j-empty">Nothing here yet — add a task below.</div>'}
-        ${tmplSection}
-      </div>
-      <div class="j-add">
-        <input id="j-inp" type="text" placeholder="Add a task…" onkeydown="if(event.key==='Enter')_jAdd()">
-        <button class="j-add-btn" onclick="_jAdd()">+</button>
-      </div>
-      <div class="j-foot">
-        <button onclick="_jSaveTmpl()">💾 Save as Template</button>
-        <button onclick="_jToggleTmpls()">${showTmpls?'📋 Hide':'📋 Templates'}</button>
-      </div>
+  const content = document.getElementById('j-tab-content');
+  if (!content) return;
+  content.innerHTML = `
+    <div class="j-body">
+      ${todos.length ? rows : '<div class="j-empty">Nothing here yet — add a task below.</div>'}
+      ${tmplSection}
+    </div>
+    <div class="j-add">
+      <input id="j-inp" type="text" placeholder="Add a task…" onkeydown="if(event.key==='Enter')_jAdd()">
+      <button class="j-add-btn" onclick="_jAdd()">+</button>
+    </div>
+    <div class="j-foot">
+      <button onclick="_jSaveTmpl()">💾 Save as Template</button>
+      <button onclick="_jToggleTmpls()">${showTmpls?'📋 Hide':'📋 Templates'}</button>
     </div>`;
-  // Re-focus input if it existed
   setTimeout(()=>{ const inp=document.getElementById('j-inp'); if(inp)inp.focus(); },50);
 }
 
-function _jToggle(i){ const t=_jTodos(); t[i].done=!t[i].done; _jSaveTodos(t); const m=document.getElementById('journal-modal'); if(m)_renderJournal(m,!!m.querySelector('.tmpl-list')); }
-function _jDel(i)   { const t=_jTodos(); t.splice(i,1); _jSaveTodos(t); const m=document.getElementById('journal-modal'); if(m)_renderJournal(m,!!m.querySelector('.tmpl-list')); }
+function _simGetWellnessData() {
+  try { return JSON.parse(localStorage.getItem('wellness_data')) || {}; } catch(e) { return {}; }
+}
+function _simSaveWellnessData(d) {
+  try { localStorage.setItem('wellness_data', JSON.stringify(d)); } catch(e) {}
+}
+
+function _renderJournalTab(editDate) {
+  const today = new Date().toISOString().split('T')[0];
+  const date = editDate || today;
+  const wdata = _simGetWellnessData();
+  const jlog = (wdata.journal && wdata.journal.log) || {};
+  const entry = jlog[date] || {};
+  const moods = ['😊','😐','😞','😤','😴','🤩','😰','🙏'];
+  const content = document.getElementById('j-tab-content');
+  if (!content) return;
+
+  // Recent entries (exclude today if empty)
+  const recents = Object.entries(jlog).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,5);
+
+  content.innerHTML = `
+    <div class="j-journal-body">
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <input type="date" id="j-jdate" value="${date}" max="${today}"
+          style="background:#141420;border:1px solid #2a2840;color:rgba(255,255,255,.7);
+          padding:5px 8px;border-radius:6px;font-size:11px;font-family:inherit;outline:none;"
+          onchange="_renderJournalTab(this.value)">
+        <span style="font-size:11px;color:rgba(255,255,255,.28)">mood:</span>
+        <div class="j-moods" id="j-moods">
+          ${moods.map(m=>`<button class="j-mood-btn${entry.mood===m?' active':''}" onclick="_setSimMood('${m}')" title="${m}">${m}</button>`).join('')}
+        </div>
+      </div>
+      <textarea id="j-jtxt" class="j-journal-txt" placeholder="Write something…">${(entry.text||'').replace(/</g,'&lt;')}</textarea>
+      <button onclick="_saveSimJournal()" style="background:#a855f7;border:none;color:white;padding:9px;
+        border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;flex-shrink:0">
+        💾 Save Entry</button>
+      ${recents.length ? `
+        <div style="font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.22);text-transform:uppercase;padding-top:4px;flex-shrink:0">Recent Entries</div>
+        ${recents.map(([d,e])=>`
+          <div class="j-journal-entry" onclick="_renderJournalTab('${d}')">
+            <div class="j-entry-hdr">
+              <span class="j-entry-date">${d}</span>
+              ${e.mood?`<span style="font-size:14px">${e.mood}</span>`:''}
+            </div>
+            ${e.text?`<div class="j-entry-text">${e.text.replace(/</g,'&lt;')}</div>`:'<div class="j-entry-text" style="color:rgba(255,255,255,.3)">No text</div>'}
+          </div>`).join('')}` : ''}
+    </div>`;
+  _simJournalMood = entry.mood || '';
+  setTimeout(()=>{ const t=document.getElementById('j-jtxt'); if(t)t.focus(); },50);
+}
+
+function _setSimMood(m) {
+  _simJournalMood = (_simJournalMood === m) ? '' : m;
+  document.querySelectorAll('.j-mood-btn').forEach(b => b.classList.toggle('active', b.textContent === _simJournalMood));
+}
+
+function _saveSimJournal() {
+  const txt = (document.getElementById('j-jtxt')||{}).value||'';
+  const date = (document.getElementById('j-jdate')||{}).value || new Date().toISOString().split('T')[0];
+  const wdata = _simGetWellnessData();
+  if (!wdata.journal) wdata.journal = { log: {} };
+  if (!wdata.journal.log) wdata.journal.log = {};
+  wdata.journal.log[date] = { text: txt.trim(), mood: _simJournalMood, energy: 0, tags: [], timestamp: new Date().toISOString() };
+  _simSaveWellnessData(wdata);
+  // Flash the button
+  const btn = document.querySelector('.j-journal-body button');
+  if (btn) { btn.textContent = '✓ Saved!'; setTimeout(()=>{ btn.textContent = '💾 Save Entry'; },1400); }
+  _renderJournalTab(date);
+}
+
+function _jToggle(i){ const t=_jTodos(); t[i].done=!t[i].done; _jSaveTodos(t); _renderTodoTab(!!document.querySelector('.tmpl-list')); }
+function _jDel(i)   { const t=_jTodos(); t.splice(i,1); _jSaveTodos(t); _renderTodoTab(false); }
 function _jAdd()    {
   const inp=document.getElementById('j-inp'); if(!inp)return;
   const txt=inp.value.trim(); if(!txt)return;
   const t=_jTodos(); t.push({text:txt,done:false}); _jSaveTodos(t);
-  const m=document.getElementById('journal-modal'); if(m)_renderJournal(m,false);
+  _renderTodoTab(false);
 }
 function _jSaveTmpl(){
   const todos=_jTodos(); if(!todos.length){alert('Add some tasks first!');return;}
   const name=prompt('Template name:'); if(!name)return;
   const tmpls=_jTmpls(); tmpls.push({name,items:todos.filter(t=>!t.done).map(t=>t.text)});
-  _jSaveTmpls(tmpls); const m=document.getElementById('journal-modal'); if(m)_renderJournal(m,true);
+  _jSaveTmpls(tmpls); _renderTodoTab(true);
 }
 function _jToggleTmpls(){
-  const m=document.getElementById('journal-modal'); if(!m)return;
-  _renderJournal(m,!m.querySelector('.tmpl-list'));
+  _renderTodoTab(!document.querySelector('.tmpl-list'));
 }
 function _jLoadTmpl(i){
   const tmpls=_jTmpls(); const t=tmpls[i]; if(!t)return;
   _jSaveTodos(t.items.map(text=>({text,done:false})));
-  const m=document.getElementById('journal-modal'); if(m)_renderJournal(m,false);
+  _renderTodoTab(false);
 }
 function _jDelTmpl(i){
   const tmpls=_jTmpls(); tmpls.splice(i,1); _jSaveTmpls(tmpls);
-  const m=document.getElementById('journal-modal'); if(m)_renderJournal(m,true);
+  _renderTodoTab(true);
 }
 
 // ─────────────────────────────────────────────

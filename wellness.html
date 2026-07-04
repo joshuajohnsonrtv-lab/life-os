@@ -801,12 +801,10 @@
     <button class="mob-grid-card" onclick="showPage('hydration');closeMobileMenu()"><span class="mob-grid-emoji">💧</span><span class="mob-grid-label">Hydration</span></button>
     <button class="mob-grid-card" onclick="showPage('diet');closeMobileMenu()"><span class="mob-grid-emoji">🥗</span><span class="mob-grid-label">Diet</span></button>
     <button class="mob-grid-card" onclick="showPage('mealideas');closeMobileMenu()"><span class="mob-grid-emoji">🍽️</span><span class="mob-grid-label">Meal Ideas</span></button>
-    <button class="mob-grid-card" onclick="showPage('nafoods');closeMobileMenu()"><span class="mob-grid-emoji">🧂</span><span class="mob-grid-label">Na:K Foods</span></button>
 
     <div class="mob-menu-section-full">🧴 Routine</div>
     <button class="mob-grid-card" onclick="showPage('skincare');closeMobileMenu()"><span class="mob-grid-emoji">🧴</span><span class="mob-grid-label">Skincare</span></button>
     <button class="mob-grid-card" onclick="showPage('facial');closeMobileMenu()"><span class="mob-grid-emoji">✨</span><span class="mob-grid-label">Facial & Mewing</span></button>
-    <button class="mob-grid-card" onclick="showPage('debloat');closeMobileMenu()"><span class="mob-grid-emoji">🌊</span><span class="mob-grid-label">Debloat</span></button>
     <button class="mob-grid-card" onclick="showPage('retention');closeMobileMenu()"><span class="mob-grid-emoji">🔒</span><span class="mob-grid-label">SR Tracker</span></button>
 
     <div class="mob-menu-section-full">🪞 Looksmax</div>
@@ -815,9 +813,7 @@
 
     <div class="mob-menu-section-full">📈 Insights</div>
     <button class="mob-grid-card" onclick="showPage('measurements');closeMobileMenu()"><span class="mob-grid-emoji">📏</span><span class="mob-grid-label">Measurements</span></button>
-    <button class="mob-grid-card" onclick="showPage('trends');closeMobileMenu()"><span class="mob-grid-emoji">📈</span><span class="mob-grid-label">Trends</span></button>
     <button class="mob-grid-card" onclick="showPage('reportcard');closeMobileMenu()"><span class="mob-grid-emoji">🗒️</span><span class="mob-grid-label">Report Card</span></button>
-    <button class="mob-grid-card" onclick="showPage('journal');closeMobileMenu()"><span class="mob-grid-emoji">✍️</span><span class="mob-grid-label">Journal</span></button>
     <button class="mob-grid-card" onclick="showPage('allrecords');closeMobileMenu()"><span class="mob-grid-emoji">📋</span><span class="mob-grid-label">All Records</span></button>
 
     <div class="mob-menu-section-full">⚙️ Settings</div>
@@ -856,17 +852,11 @@
   <div class="nav-item" onclick="showPage('facial')" id="nav-facial">
     <span class="icon">✨</span><span>Facial & Mewing</span>
   </div>
-  <div class="nav-item" onclick="showPage('debloat')" id="nav-debloat">
-    <span class="icon">🌊</span><span>Debloat</span>
-  </div>
   <div class="nav-item" onclick="showPage('retention')" id="nav-retention">
     <span class="icon">🔒</span><span>SR Tracker</span>
   </div>
   <div class="nav-item" onclick="showPage('mealideas')" id="nav-mealideas">
     <span class="icon">🍽️</span><span>Meal Ideas</span>
-  </div>
-  <div class="nav-item" onclick="showPage('nafoods')" id="nav-nafoods">
-    <span class="icon">🧂</span><span>Na:K Foods</span>
   </div>
   <div class="nav-section-label">Looksmax</div>
   <div class="nav-item" onclick="showPage('looksmax')" id="nav-looksmax">
@@ -876,14 +866,8 @@
   <div class="nav-item" onclick="showPage('measurements')" id="nav-measurements">
     <span class="icon">📏</span><span>Measurements</span>
   </div>
-  <div class="nav-item" onclick="showPage('trends')" id="nav-trends">
-    <span class="icon">📈</span><span>Trends</span>
-  </div>
   <div class="nav-item" onclick="showPage('reportcard')" id="nav-reportcard">
     <span class="icon">🗒️</span><span>Report Card</span>
-  </div>
-  <div class="nav-item" onclick="showPage('journal')" id="nav-journal">
-    <span class="icon">✍️</span><span>Journal</span>
   </div>
   <div class="nav-section-label">Records</div>
   <div class="nav-item" onclick="showPage('allrecords')" id="nav-allrecords">
@@ -926,10 +910,18 @@
     <!-- Overview Grid -->
     <div class="overview-grid" id="overview-grid"></div>
 
-    <!-- Streaks -->
-    <div class="card">
-      <div class="card-title">🔥 Current Streaks</div>
-      <div id="streaks-display" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+    <!-- Switchable trend chart -->
+    <div class="card" style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="card-title" style="margin:0" id="dash-chart-title">😴 Sleep — Last 30 Days</div>
+        <select id="dash-chart-metric" onchange="renderDashChart()" style="font-size:12px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 8px">
+          <option value="sleep" selected>😴 Sleep</option>
+          <option value="hydration">💧 Hydration</option>
+          <option value="gym">🏋️ Gym</option>
+          <option value="calories">🥗 Calories</option>
+        </select>
+      </div>
+      <div style="position:relative;height:180px"><canvas id="chart-dash-main"></canvas></div>
     </div>
 
     <!-- Today's Quick Log -->
@@ -1540,57 +1532,6 @@
 
   </div>
 
-  <!-- ========== DEBLOAT ========== -->
-  <div class="page" id="page-debloat">
-    <div class="page-header">
-      <div>
-        <h2>🌊 Debloating Sodium Routine</h2>
-        <p>Manage sodium intake and debloating practices</p>
-      </div>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">Today's Routine</div>
-        <div id="debloat-checklist"></div>
-        <div class="inline-add">
-          <input type="text" id="debloat-new-step" placeholder="Add step...">
-          <button class="btn btn-primary btn-sm" onclick="addDebloatStep()">Add</button>
-        </div>
-        <hr class="divider">
-        <div class="card-title">Sodium Intake</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Today's Sodium (mg)</label>
-            <input type="number" id="sodium-input" placeholder="e.g. 1500" min="0" onchange="updateSodiumMeter()">
-          </div>
-          <div class="form-group">
-            <label>Daily Goal (mg)</label>
-            <input type="number" id="sodium-goal" value="2300" min="500" onchange="updateSodiumMeter()">
-          </div>
-        </div>
-        <div id="sodium-meter-wrap">
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px">
-            <span>Sodium Level</span>
-            <span id="sodium-meter-label">0 / 2300 mg</span>
-          </div>
-          <div class="sodium-meter">
-            <div class="sodium-fill" id="sodium-fill" style="width:0%;background:var(--green)"></div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Notes</label>
-          <textarea id="debloat-notes" placeholder="How's the bloating today?"></textarea>
-        </div>
-        <button class="btn btn-primary" style="width:100%" onclick="saveDebloat()">Save</button>
-      </div>
-      <div class="card">
-        <div class="card-title">Tips & History</div>
-        <div class="tip" style="margin-bottom:12px">💡 High sodium? Drink extra water, eat potassium-rich foods (banana, avocado), and avoid processed foods today.</div>
-        <div id="debloat-history"></div>
-      </div>
-    </div>
-  </div>
-
   <!-- ========== BODY MEASUREMENTS ========== -->
   <div class="page" id="page-measurements">
     <div class="page-header">
@@ -1625,44 +1566,6 @@
   </div>
 
   <!-- ========== TRENDS ========== -->
-  <div class="page" id="page-trends">
-    <div class="page-header">
-      <div>
-        <h2>📈 Trends</h2>
-        <p>Visual patterns across all your tracked data</p>
-      </div>
-      <select id="trends-range" onchange="renderTrends()" style="width:140px">
-        <option value="14">Last 14 days</option>
-        <option value="30" selected>Last 30 days</option>
-        <option value="90">Last 90 days</option>
-      </select>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">😴 Sleep Duration (hours)</div>
-        <div style="position:relative;height:180px"><canvas id="chart-sleep"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">💧 Daily Hydration (glasses)</div>
-        <div style="position:relative;height:180px"><canvas id="chart-hydration"></canvas></div>
-      </div>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">🏋️ Gym Sessions per Week</div>
-        <div style="position:relative;height:180px"><canvas id="chart-gym"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">✨ Routine Consistency (%)</div>
-        <div style="position:relative;height:180px"><canvas id="chart-consistency"></canvas></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">🥗 Daily Calories</div>
-      <div style="position:relative;height:180px"><canvas id="chart-calories"></canvas></div>
-    </div>
-  </div>
-
   <!-- ========== WEEKLY REPORT CARD ========== -->
   <div class="page" id="page-reportcard">
     <div class="page-header">
@@ -1695,61 +1598,6 @@
   </div>
 
   <!-- ========== JOURNAL ========== -->
-  <div class="page" id="page-journal">
-    <div class="page-header">
-      <div>
-        <h2>✍️ Daily Journal</h2>
-        <p>Your personal daily log — thoughts, feelings, anything</p>
-      </div>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">Today's Entry</div>
-        <div class="form-group">
-          <label>Date</label>
-          <input type="date" id="journal-date" onchange="loadJournalEntry()">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Mood</label>
-            <div id="journal-mood-row" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
-              <span class="mood-btn" data-mood="😄" onclick="setJournalMood('😄')" title="Great">😄</span>
-              <span class="mood-btn" data-mood="🙂" onclick="setJournalMood('🙂')" title="Good">🙂</span>
-              <span class="mood-btn" data-mood="😐" onclick="setJournalMood('😐')" title="Neutral">😐</span>
-              <span class="mood-btn" data-mood="😔" onclick="setJournalMood('😔')" title="Low">😔</span>
-              <span class="mood-btn" data-mood="😤" onclick="setJournalMood('😤')" title="Frustrated">😤</span>
-              <span class="mood-btn" data-mood="😴" onclick="setJournalMood('😴')" title="Tired">😴</span>
-              <span class="mood-btn" data-mood="🤒" onclick="setJournalMood('🤒')" title="Unwell">🤒</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Energy (1–5)</label>
-            <div class="stars" id="journal-energy">
-              <span class="star" onclick="setJournalEnergy(1)">⚡</span>
-              <span class="star" onclick="setJournalEnergy(2)">⚡</span>
-              <span class="star" onclick="setJournalEnergy(3)">⚡</span>
-              <span class="star" onclick="setJournalEnergy(4)">⚡</span>
-              <span class="star" onclick="setJournalEnergy(5)">⚡</span>
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Entry</label>
-          <textarea id="journal-text" placeholder="How was your day? Any wins, struggles, things you noticed about your body, mindset, progress..." style="min-height:180px"></textarea>
-        </div>
-        <div class="form-group">
-          <label>Tags <span style="color:var(--muted);font-size:11px">(comma-separated)</span></label>
-          <input type="text" id="journal-tags" placeholder="e.g. good sleep, high energy, bloated">
-        </div>
-        <button class="btn btn-primary" style="width:100%" onclick="saveJournal()">Save Entry</button>
-      </div>
-      <div class="card">
-        <div class="card-title">Past Entries</div>
-        <div id="journal-history"></div>
-      </div>
-    </div>
-  </div>
-
   <!-- ========== SR TRACKER ========== -->
   <div class="page" id="page-retention">
     <div class="page-header">
@@ -1884,70 +1732,60 @@
 
     <!-- Meal cards grid -->
     <div id="meal-ideas-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px"></div>
-  </div>
 
-  <!-- ========== NA:K FOODS ========== -->
-  <div class="page" id="page-nafoods">
-    <div class="page-header">
-      <div>
-        <h2>🧂 Na:K Food Catalogue</h2>
-        <p>Foods at or better than a 1:2 sodium-to-potassium ratio — ideal for debloating and sodium balance</p>
+    <!-- Na:K section (collapsible) -->
+    <div style="margin-top:28px">
+      <button onclick="this.nextElementSibling.classList.toggle('hidden');this.querySelector('.nak-chevron').textContent=this.nextElementSibling.classList.contains('hidden')?'▾':'▴'"
+        style="display:flex;align-items:center;gap:10px;background:none;border:none;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;padding:0;margin-bottom:12px">
+        <span>🧂 Na:K Food Catalogue</span>
+        <span class="nak-chevron" style="color:var(--muted);font-size:11px">▾</span>
+      </button>
+      <div id="nak-inline-section" class="hidden">
+        <div class="card" style="margin-bottom:14px;border-left:3px solid var(--cyan)">
+          <div style="font-size:13px;line-height:1.8;color:var(--muted2)">
+            <strong style="color:var(--text)">Why this ratio matters:</strong> The WHO recommends eating at least twice as much potassium as sodium (1:2 Na:K by weight). Potassium actively flushes sodium out of your cells, reduces water retention, and counteracts bloating. A ratio of <span style="color:var(--green);font-weight:700">10:1 K:Na or higher</span> is exceptional. <span style="color:var(--amber);font-weight:700">3:1–9:1</span> is good. <span style="color:var(--cyan);font-weight:700">2:1</span> is the minimum target.
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+          <input type="text" id="nak-search" placeholder="🔍 Search foods..." style="width:220px" oninput="renderNaKFoods()">
+          <select id="nak-category" onchange="renderNaKFoods()" style="width:160px">
+            <option value="all">All Categories</option>
+            <option value="fruit">🍓 Fruits</option>
+            <option value="veg">🥦 Vegetables</option>
+            <option value="protein">🍗 Proteins</option>
+            <option value="nuts">🥜 Nuts & Seeds</option>
+            <option value="legumes">🫘 Legumes</option>
+            <option value="grains">🌾 Grains & Other</option>
+          </select>
+          <select id="nak-sort" onchange="renderNaKFoods()" style="width:180px">
+            <option value="ratio">Sort: Best ratio first</option>
+            <option value="potassium">Sort: Most potassium</option>
+            <option value="alpha">Sort: A–Z</option>
+          </select>
+        </div>
+        <div id="nak-stats-bar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px"></div>
+        <div class="card" style="overflow-x:auto;padding:0">
+          <table class="measure-table" id="nak-table" style="min-width:600px">
+            <thead>
+              <tr>
+                <th style="padding:14px 16px">Food</th>
+                <th>Category</th>
+                <th>Sodium (mg)</th>
+                <th>Potassium (mg)</th>
+                <th>K:Na Ratio</th>
+                <th>Rating</th>
+                <th>Best for</th>
+              </tr>
+            </thead>
+            <tbody id="nak-tbody"></tbody>
+          </table>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:10px">All values per 100g uncooked/raw. Sources: USDA FoodData Central.</div>
       </div>
     </div>
-
-    <!-- Explainer -->
-    <div class="card" style="margin-bottom:20px;border-left:3px solid var(--cyan)">
-      <div style="font-size:13px;line-height:1.8;color:var(--muted2)">
-        <strong style="color:var(--text)">Why this ratio matters:</strong> The WHO recommends eating at least twice as much potassium as sodium (1:2 Na:K by weight). Potassium actively flushes sodium out of your cells, reduces water retention, lowers blood pressure, and counteracts bloating. Most processed foods have the ratio backwards — this catalogue shows you what to eat to fix that. A ratio of <span style="color:var(--green);font-weight:700">10:1 K:Na or higher</span> is exceptional. <span style="color:var(--amber);font-weight:700">3:1–9:1</span> is good. <span style="color:var(--cyan);font-weight:700">2:1</span> is the minimum target.
-      </div>
-    </div>
-
-    <!-- Controls -->
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
-      <input type="text" id="nak-search" placeholder="🔍 Search foods..." style="width:220px" oninput="renderNaKFoods()">
-      <select id="nak-category" onchange="renderNaKFoods()" style="width:160px">
-        <option value="all">All Categories</option>
-        <option value="fruit">🍓 Fruits</option>
-        <option value="veg">🥦 Vegetables</option>
-        <option value="protein">🍗 Proteins</option>
-        <option value="nuts">🥜 Nuts & Seeds</option>
-        <option value="legumes">🫘 Legumes</option>
-        <option value="grains">🌾 Grains & Other</option>
-      </select>
-      <select id="nak-sort" onchange="renderNaKFoods()" style="width:180px">
-        <option value="ratio">Sort: Best ratio first</option>
-        <option value="potassium">Sort: Most potassium</option>
-        <option value="name">Sort: A–Z</option>
-      </select>
-      <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted2);cursor:pointer;margin-bottom:0">
-        <input type="checkbox" id="nak-exceptional" onchange="renderNaKFoods()" style="width:auto">
-        Exceptional only (10:1+)
-      </label>
-    </div>
-
-    <!-- Stats bar -->
-    <div id="nak-stats-bar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px"></div>
-
-    <!-- Table -->
-    <div class="card" style="overflow-x:auto;padding:0">
-      <table class="measure-table" id="nak-table" style="min-width:600px">
-        <thead>
-          <tr>
-            <th style="padding:14px 16px">Food</th>
-            <th>Category</th>
-            <th>Sodium (mg)</th>
-            <th>Potassium (mg)</th>
-            <th>K:Na Ratio</th>
-            <th>Rating</th>
-            <th>Best for</th>
-          </tr>
-        </thead>
-        <tbody id="nak-tbody"></tbody>
-      </table>
-    </div>
-    <div style="font-size:11px;color:var(--muted);margin-top:10px">All values per 100g uncooked/raw unless stated. Sources: USDA FoodData Central.</div>
   </div>
 
+  <!-- ========== NA:K FOODS (standalone page removed — merged into Meal Ideas above) ========== -->
   <!-- ========== ALL RECORDS ========== -->
   <div class="page" id="page-allrecords">
     <div class="page-header">
@@ -2334,7 +2172,7 @@ function formatDateFull(d) {
 const PAGE_NAMES = {
   dashboard:'🏠 Dashboard', gym:'🏋️ Gym', sleep:'😴 Sleep', hydration:'💧 Hydration',
   diet:'🥗 Diet', skincare:'🧴 Skincare', facial:'✨ Facial & Mewing',
-  debloat:'🌊 Debloat', retention:'🔒 SR Tracker', mealideas:'🍽️ Meal Ideas',
+  retention:'🔒 SR Tracker', mealideas:'🍽️ Meal Ideas',
   nafoods:'🧂 Na:K Foods', measurements:'📏 Measurements', trends:'📈 Trends',
   reportcard:'🗒️ Report Card', journal:'✍️ Journal', allrecords:'📋 All Records',
   looksmax:'🪞 Looksmaxxing'
@@ -2399,15 +2237,11 @@ function renderPage(page) {
     skincare: renderSkincare,
     facial: renderFacial,
     mewing: () => showPage('facial'), // mewing merged into facial tab
-    debloat: renderDebloat,
     allrecords: renderAllRecords,
     mealideas: renderMealIdeas,
     retention: renderRetention,
     measurements: renderMeasurements,
-    trends: renderTrends,
     reportcard: renderReportCard,
-    journal: renderJournal,
-    nafoods: renderNaFoods,
     looksmax: renderLooksmax
   };
   if(fns[page]) fns[page]();
@@ -2471,13 +2305,6 @@ function renderDashboard() {
       if(!log || !log.done) return {status:'skip', text:'Not logged'};
       return {status:'done', text: log.duration ? log.duration+'min' : 'Done'};
     }},
-    { key: 'debloat', icon: '🌊', name: 'Debloat', fn: () => {
-      const log = data.debloat.log[t] || {};
-      const done = (log.completed||[]).length;
-      const total = data.debloat.steps.length;
-      if(!done) return {status:'skip', text:'Not started'};
-      return {status: done>=total ? 'done' : 'partial', text: done+'/'+total+' steps'};
-    }}
   ];
 
   const grid = document.getElementById('overview-grid');
@@ -2506,7 +2333,63 @@ function renderDashboard() {
   }
 
   // Streaks
-  renderStreaks();
+  renderDashChart();
+}
+
+let _dashChartInst = null;
+function renderDashChart() {
+  const metric = (document.getElementById('dash-chart-metric') || {}).value || 'sleep';
+  const data = getData();
+  const labels = [], values = [];
+  const days = 30;
+  const titles = { sleep:'😴 Sleep — Last 30 Days', hydration:'💧 Hydration — Last 30 Days', gym:'🏋️ Gym — Last 30 Days', calories:'🥗 Calories — Last 30 Days' };
+  const colors = { sleep:'#a855f7', hydration:'#06b6d4', gym:'#f59e0b', calories:'#22c55e' };
+  document.getElementById('dash-chart-title').textContent = titles[metric] || titles.sleep;
+
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    labels.push(d.toLocaleDateString('en-GB', {day:'numeric',month:'short'}));
+    if (metric === 'sleep') {
+      const s = data.sleep.log[key];
+      values.push(s ? calcSleepHours(s.bedtime, s.wakeTime) : null);
+    } else if (metric === 'hydration') {
+      values.push(data.hydration.log[key] || 0);
+    } else if (metric === 'gym') {
+      const g = data.gym.log[key];
+      values.push(g && g.exercises && g.exercises.length > 0 ? 1 : 0);
+    } else if (metric === 'calories') {
+      const dl = data.diet.log[key];
+      values.push(dl ? (dl.meals || []).reduce((s, m) => s + (parseInt(m.calories) || 0), 0) : null);
+    }
+  }
+
+  const ctx = document.getElementById('chart-dash-main');
+  if (!ctx) return;
+  if (_dashChartInst) { _dashChartInst.destroy(); _dashChartInst = null; }
+  _dashChartInst = new Chart(ctx, {
+    type: metric === 'gym' ? 'bar' : 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        borderColor: colors[metric],
+        backgroundColor: metric === 'gym' ? colors[metric] + '99' : colors[metric] + '22',
+        borderWidth: 2,
+        pointRadius: 2,
+        tension: 0.3,
+        spanGaps: true
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#666', font: { size: 10 }, maxTicksLimit: 8 }, grid: { display: false } },
+        y: { ticks: { color: '#666', font: { size: 10 } }, grid: { color: '#ffffff11' }, beginAtZero: true }
+      }
+    }
+  });
 }
 
 function renderStreaks() {
