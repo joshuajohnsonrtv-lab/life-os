@@ -355,10 +355,58 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   border:1px dashed rgba(100,140,255,.12);border-radius:4px;
 }
 .pillow{
-  position:absolute;top:381px;left:19px;width:20px;height:44px;z-index:6;
+  position:absolute;top:380px;left:21px;width:20px;height:44px;z-index:6;
   background:linear-gradient(180deg,#304070,#202e58);
   border:1px solid #405080;border-radius:5px;
   box-shadow:0 2px 6px rgba(0,0,0,.5);
+}
+
+/* ── SLEEPING CAT ── */
+.room-cat{
+  position:absolute;top:389px;left:186px;
+  width:38px;height:22px;
+  z-index:5;pointer-events:none;
+}
+.cat-body{
+  position:relative;width:30px;height:14px;
+  background:#2f2f2f;border-radius:50%;
+  box-shadow:0 1px 5px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.04);
+  animation:cat-breathe 4.1s ease-in-out infinite;
+  transform-origin:center;
+}
+/* head with ear nubs via clip-path */
+.cat-body::before{
+  content:'';position:absolute;
+  width:14px;height:11px;
+  background:#2f2f2f;
+  clip-path:polygon(0% 45%,18% 0%,32% 38%,68% 38%,82% 0%,100% 45%,100% 100%,0% 100%);
+  top:-8px;left:0;
+}
+/* tail curling off right end */
+.cat-body::after{
+  content:'';position:absolute;
+  width:9px;height:12px;
+  border:2.5px solid #2f2f2f;
+  border-radius:0 50% 50% 0;border-left:none;
+  right:-8px;top:-2px;
+}
+@keyframes cat-breathe{
+  0%,100%{transform:scaleY(1);}
+  50%{transform:scaleY(1.12);}
+}
+/* cat ZZZ — offset from character's ZZZ so they don't sync */
+@keyframes cat-zzz{
+  0%{opacity:0;transform:translate(0,0) scale(.6);}
+  30%{opacity:1;}
+  100%{opacity:0;transform:translate(4px,-13px) scale(1);}
+}
+.room-cat::after{
+  content:'z z';position:absolute;
+  top:-9px;right:1px;
+  font-size:7px;font-weight:700;letter-spacing:2px;
+  color:#7aa8d8;pointer-events:none;
+  animation:cat-zzz 2.7s ease-out infinite;
+  animation-delay:1.3s;
 }
 
 /* ── FAN — mid-right, clear of window ── */
@@ -1139,6 +1187,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <!-- Futon -->
       <div class="futon" onclick="showFutonMenu(event)" title="Rest on futon"></div>
       <div class="pillow"></div>
+      <div class="room-cat"><div class="cat-body"></div></div>
 
       <!-- Dumbbell — between door and fan -->
       <div class="dumbbell" onclick="showDumbbellMenu(event)" title="Train">
