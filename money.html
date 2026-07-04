@@ -982,24 +982,13 @@
     <button class="mob-menu-close" onclick="closeMobMenu()">✕</button>
   </div>
   <div class="mob-grid">
-    <div class="mob-section-label">📊 Overview</div>
     <button class="mob-grid-card" onclick="showPage('dashboard');updateMobTitle('dashboard');closeMobMenu()"><span class="mob-grid-emoji">📊</span><span class="mob-grid-label">Dashboard</span></button>
-    <div class="mob-section-label">💵 Track</div>
     <button class="mob-grid-card" onclick="showPage('income');updateMobTitle('income');closeMobMenu()"><span class="mob-grid-emoji">💵</span><span class="mob-grid-label">Income</span></button>
     <button class="mob-grid-card" onclick="showPage('expenses');updateMobTitle('expenses');closeMobMenu()"><span class="mob-grid-emoji">💸</span><span class="mob-grid-label">Expenses</span></button>
     <button class="mob-grid-card" onclick="showPage('subscriptions');updateMobTitle('subscriptions');closeMobMenu()"><span class="mob-grid-emoji">🔄</span><span class="mob-grid-label">Subscriptions</span></button>
-
-    <div class="mob-section-label">🎯 Goals</div>
     <button class="mob-grid-card" onclick="showPage('goals');updateMobTitle('goals');closeMobMenu()"><span class="mob-grid-emoji">🎯</span><span class="mob-grid-label">Goals</span></button>
-    <button class="mob-grid-card" onclick="showPage('savings');updateMobTitle('savings');closeMobMenu()"><span class="mob-grid-emoji">🏦</span><span class="mob-grid-label">Savings</span></button>
     <button class="mob-grid-card" onclick="showPage('milestones');updateMobTitle('milestones');closeMobMenu()"><span class="mob-grid-emoji">🗓️</span><span class="mob-grid-label">Milestones</span></button>
-
-    <div class="mob-section-label">🚀 Build</div>
     <button class="mob-grid-card" onclick="showPage('hustles');updateMobTitle('hustles');closeMobMenu()"><span class="mob-grid-emoji">🚀</span><span class="mob-grid-label">Hustles</span></button>
-    <button class="mob-grid-card" onclick="showPage('delusion');updateMobTitle('delusion');closeMobMenu()"><span class="mob-grid-emoji">👁️</span><span class="mob-grid-label">Delusionment</span></button>
-    <button class="mob-grid-card" onclick="showPage('ladder');updateMobTitle('ladder');closeMobMenu()"><span class="mob-grid-emoji">📈</span><span class="mob-grid-label">The Ladder</span></button>
-
-    <div class="mob-section-label">⚙️ Settings</div>
     <button class="mob-grid-card" onclick="openFirebaseSetup();closeMobMenu()"><span class="mob-grid-emoji">☁️</span><span class="mob-grid-label">Cloud Sync</span></button>
     <button class="mob-grid-card" onclick="exportData();closeMobMenu()"><span class="mob-grid-emoji">💾</span><span class="mob-grid-label">Export</span></button>
     <button class="mob-grid-card" onclick="document.getElementById('import-file').click();closeMobMenu()"><span class="mob-grid-emoji">📂</span><span class="mob-grid-label">Import</span></button>
@@ -1016,12 +1005,9 @@
     <div class="logo-sub">Financial Ascension</div>
   </div>
 
-  <div class="nav-section">Overview</div>
   <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
     <span class="icon">📊</span><span>Dashboard</span>
   </div>
-
-  <div class="nav-section">Track</div>
   <div class="nav-item" onclick="showPage('income')" id="nav-income">
     <span class="icon">💵</span><span>Income</span>
   </div>
@@ -1034,26 +1020,11 @@
   <div class="nav-item" onclick="showPage('goals')" id="nav-goals">
     <span class="icon">🎯</span><span>Goals</span>
   </div>
-
-  <div class="nav-section">Analyse</div>
-  <div class="nav-item" onclick="showPage('savings')" id="nav-savings">
-    <span class="icon">🏦</span><span>Savings</span>
-  </div>
   <div class="nav-item" onclick="showPage('milestones')" id="nav-milestones">
     <span class="icon">🗓️</span><span>Milestones</span>
   </div>
-
-  <div class="nav-section">Build</div>
   <div class="nav-item" onclick="showPage('hustles')" id="nav-hustles">
     <span class="icon">🚀</span><span>Hustles</span>
-  </div>
-
-  <div class="nav-section">Mindset</div>
-  <div class="nav-item" onclick="showPage('ladder')" id="nav-ladder">
-    <span style="font-size:16px;width:20px;text-align:center">📈</span><span>The Ladder</span>
-  </div>
-  <div class="nav-item" onclick="showPage('delusion')" id="nav-delusion">
-    <span class="icon">👁️</span><span>Pure Delusionment</span>
   </div>
 
   <div class="sidebar-footer">
@@ -1201,75 +1172,6 @@
   </div>
 
   <!-- ═══ PURE DELUSIONMENT ═══ -->
-  <div class="page" id="page-delusion">
-    <div class="page-header">
-      <h2>👁️ Pure Delusionment</h2>
-      <p>Dream bigger than logic allows. Write it down. Make it inevitable.</p>
-    </div>
-
-    <!-- Dream numbers -->
-    <div class="grid-3" style="margin-bottom:20px" id="delusion-numbers"></div>
-
-    <div class="grid-2" style="margin-bottom:20px">
-      <!-- Dream life -->
-      <div class="card card-gold">
-        <div class="card-title">🌍 Dream Life Statement</div>
-        <textarea id="delusion-lifestyle" placeholder="Describe your life at your dream income level. Where do you live? What do you drive? How do you spend your time? Write it in present tense as if it's already real." style="min-height:160px;background:transparent;border-color:rgba(245,197,66,0.2);" oninput="saveDelusion()"></textarea>
-      </div>
-      <!-- Affirmations -->
-      <div class="card">
-        <div class="card-title">⚡ Money Affirmations</div>
-        <div id="affirmations-list"></div>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <input type="text" id="new-affirmation" placeholder="I am a money magnet..." style="flex:1">
-          <button class="btn btn-gold btn-sm" onclick="addAffirmation()">Add</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Dream numbers editor -->
-    <div class="card" style="margin-bottom:20px">
-      <div class="card-title">💰 Your Dream Numbers</div>
-      <div class="grid-2" style="margin-bottom:16px">
-        <div class="form-group" style="margin-bottom:0">
-          <label>Dream Net Worth</label>
-          <input type="text" id="dream-networth" placeholder="£1,000,000" oninput="saveDelusion()">
-        </div>
-        <div class="form-group" style="margin-bottom:0">
-          <label>Dream Monthly Income</label>
-          <input type="text" id="dream-monthly" placeholder="£10,000/mo" oninput="saveDelusion()">
-        </div>
-      </div>
-      <hr style="margin:0 0 16px">
-      <div style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap">
-        <div class="form-group" style="margin-bottom:0;flex:1;min-width:120px">
-          <label>Your Current Age</label>
-          <input type="number" id="dream-current-age" placeholder="e.g. 24" min="1" max="120" oninput="saveDelusion()">
-        </div>
-        <div class="form-group" style="margin-bottom:0;flex:1;min-width:120px">
-          <label>Target Age 🎯</label>
-          <input type="number" id="dream-target-age" placeholder="e.g. 30" min="1" max="120" oninput="saveDelusion()">
-        </div>
-        <div id="delusion-age-countdown" style="flex:2;min-width:160px;padding:10px 14px;background:rgba(245,197,66,0.07);border:1px solid rgba(245,197,66,0.2);border-radius:10px;display:none">
-          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">Time to make it happen</div>
-          <div id="delusion-age-countdown-text" style="font-size:18px;font-weight:800;color:var(--gold)"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Daily mindset journal -->
-    <div class="card">
-      <div class="card-title">📓 Daily Mindset Journal</div>
-      <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
-        <input type="date" id="delusion-journal-date" style="width:180px">
-        <span style="font-size:13px;color:var(--muted)">What money moves are you making today?</span>
-      </div>
-      <textarea id="delusion-journal-text" placeholder="Today I am focused on... The money I'm creating today... The actions I'm taking..." style="min-height:120px" oninput="saveDelusionJournal()"></textarea>
-      <div id="delusion-journal-history" style="margin-top:16px"></div>
-    </div>
-  </div>
-
-
   <!-- ═══ EXPENSES ═══ -->
   <div class="page" id="page-expenses">
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start">
@@ -1330,48 +1232,6 @@
   </div>
 
   <!-- ═══ SAVINGS ═══ -->
-  <div class="page" id="page-savings">
-    <div class="page-header">
-      <h2>🏦 Savings</h2>
-      <p>Your total wealth snapshot — all your pots in one place</p>
-    </div>
-
-    <!-- HERO TOTAL -->
-    <div id="savings-hero" style="margin-bottom:28px"></div>
-
-    <!-- TARGETS ROW -->
-    <div id="savings-targets-row" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px"></div>
-
-    <!-- POTS GRID -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <div class="section-title" style="margin-bottom:0">Savings Pots</div>
-      <button class="btn btn-primary btn-sm" onclick="openSavingsPotModal()">+ Add Pot</button>
-    </div>
-    <div id="savings-pots-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:24px"></div>
-
-    <!-- SETTINGS ROW -->
-    <div class="card" style="margin-bottom:20px">
-      <div class="card-title" style="margin-bottom:14px">⚙️ Settings</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div class="form-group">
-          <label>Monthly Savings Target (£)</label>
-          <input type="number" id="sv-monthly-target" placeholder="e.g. 500" min="0"
-            oninput="saveSavingsSettings()">
-        </div>
-        <div class="form-group">
-          <label>Total Savings Goal (£)</label>
-          <input type="number" id="sv-goal" placeholder="e.g. 20000" min="0"
-            oninput="saveSavingsSettings()">
-        </div>
-      </div>
-      <div class="form-group" style="margin-top:4px">
-        <label>Notes</label>
-        <textarea id="sv-notes" placeholder="Savings strategy, reminders, targets..." style="min-height:60px"
-          oninput="saveSavingsSettings()"></textarea>
-      </div>
-    </div>
-  </div>
-
   <!-- ═══ MILESTONES ═══ -->
   <div class="page" id="page-milestones">
     <div class="page-header">
@@ -1381,63 +1241,6 @@
     <div id="milestones-timeline"></div>
   </div>
 
-  <!-- ═══ THE LADDER ═══ -->
-  <div class="page" id="page-ladder">
-    <div class="page-header">
-      <div>
-        <h2 style="font-size:26px;font-weight:900;letter-spacing:-0.5px">📈 The Ladder</h2>
-        <p style="color:var(--muted);margin-top:4px;font-size:13px">Two paths. One destination. Pick yours.</p>
-      </div>
-    </div>
-
-    <!-- Mode toggle — 3 tabs -->
-    <div style="display:flex;gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:5px;margin-bottom:20px">
-      <button id="ladder-toggle-employee" onclick="setLadderMode('employee')"
-        style="flex:1;padding:10px 8px;border-radius:10px;border:none;cursor:pointer;font-size:12px;font-weight:700;transition:all 0.2s;background:var(--gold);color:#000">
-        💼 Employee
-      </button>
-      <button id="ladder-toggle-hustle" onclick="setLadderMode('hustle')"
-        style="flex:1;padding:10px 8px;border-radius:10px;border:none;cursor:pointer;font-size:12px;font-weight:700;transition:all 0.2s;background:transparent;color:var(--muted)">
-        🚀 Hustler
-      </button>
-      <button id="ladder-toggle-visual" onclick="setLadderMode('visual')"
-        style="flex:1;padding:10px 8px;border-radius:10px;border:none;cursor:pointer;font-size:12px;font-weight:700;transition:all 0.2s;background:transparent;color:var(--muted)">
-        🖼️ Visual
-      </button>
-    </div>
-
-    <!-- Intro blocks -->
-    <div id="ladder-intro-employee" class="ladder-intro">
-      <h3>Every level is earned.<br>Most people never move.</h3>
-      <p>This isn't about money. It's about the life that money buys — or doesn't. Read this slowly. Find where you are. Sit with it. Then decide whether you're good with that.</p>
-    </div>
-    <div id="ladder-intro-hustle" class="ladder-intro" style="display:none;border-color:rgba(168,85,247,0.3);background:rgba(168,85,247,0.04)">
-      <h3>The unconventional path.<br>Higher risk. Higher ceiling. No cap.</h3>
-      <p>This is the route for people who refuse to sell 40 years of their life for a salary, a pension, and a gold watch. It's not easier. It's harder. Most people fail. The ones who don't build things that last beyond them. Ceiling: <strong style="color:#a855f7">£100,000,000/year.</strong></p>
-    </div>
-
-    <!-- Income summary (text modes only) -->
-    <div id="ladder-income-summary" style="background:rgba(245,197,66,0.06);border:1px solid rgba(245,197,66,0.2);border-radius:14px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap"></div>
-
-    <!-- Text ladder spine -->
-    <div class="ladder-spine" id="ladder-cards-container"></div>
-
-    <!-- Visual gallery (hidden by default) -->
-    <div id="ladder-visual-container" style="display:none">
-      <!-- sub-toggle for employee vs hustler in visual mode -->
-      <div style="display:flex;gap:8px;margin-bottom:18px">
-        <button id="vis-toggle-employee" onclick="setVisualPath('employee')"
-          style="flex:1;padding:9px;border-radius:10px;border:1px solid var(--gold);cursor:pointer;font-size:12px;font-weight:700;background:var(--gold);color:#000;transition:all 0.2s">
-          💼 Employee Path
-        </button>
-        <button id="vis-toggle-hustle" onclick="setVisualPath('hustle')"
-          style="flex:1;padding:9px;border-radius:10px;border:1px solid var(--border);cursor:pointer;font-size:12px;font-weight:700;background:transparent;color:var(--muted);transition:all 0.2s">
-          🚀 Hustler Path
-        </button>
-      </div>
-      <div id="ladder-visual-cards"></div>
-    </div>
-  </div>
 
 </main>
 
@@ -2046,7 +1849,6 @@ function renderDashboard() {
   ticker.innerHTML = [
     { label: 'This Month', val: fmt(thisTotal), color: 'var(--gold)' },
     { label: 'Last Month', val: fmt(lastTotal), color: 'var(--muted2)' },
-    { label: 'All-Time', val: fmt(allTime), color: 'var(--green)' },
     { label: 'Hustle Revenue/mo', val: fmt(monthlyRevenue), color: 'var(--cyan)' },
     { label: 'Active Hustles', val: activeHustles, color: 'var(--gold)' },
   ].map(t => `<div class="ticker-item">
@@ -2058,7 +1860,6 @@ function renderDashboard() {
   document.getElementById('dash-stats').innerHTML = [
     { label: 'Income This Month', value: fmt(thisTotal), color: 'var(--gold)',
       sub: delta !== null ? `<span class="${parseFloat(delta)>=0?'stat-delta-up':'stat-delta-down'}">${parseFloat(delta)>=0?'▲':'▼'} ${Math.abs(delta)}% vs last month</span>` : 'First month logged' },
-    { label: 'All-Time Income', value: fmt(allTime), color: 'var(--green)', sub: `${entries.length} entries` },
     { label: 'Hustle Revenue', value: fmt(monthlyRevenue) + '/mo', color: 'var(--cyan)', sub: `${activeHustles} active hustles` },
     { label: 'Active Goals', value: (data.goals.items || []).filter(g => !g.complete).length, color: 'var(--purple)',
       sub: (data.goals.items || []).filter(g => g.complete).length + ' completed' },
