@@ -805,8 +805,7 @@
 
     <div class="mob-menu-section-full">🧴 Routine</div>
     <button class="mob-grid-card" onclick="showPage('skincare');closeMobileMenu()"><span class="mob-grid-emoji">🧴</span><span class="mob-grid-label">Skincare</span></button>
-    <button class="mob-grid-card" onclick="showPage('facial');closeMobileMenu()"><span class="mob-grid-emoji">✨</span><span class="mob-grid-label">Facial</span></button>
-    <button class="mob-grid-card" onclick="showPage('mewing');closeMobileMenu()"><span class="mob-grid-emoji">😤</span><span class="mob-grid-label">Mewing</span></button>
+    <button class="mob-grid-card" onclick="showPage('facial');closeMobileMenu()"><span class="mob-grid-emoji">✨</span><span class="mob-grid-label">Facial & Mewing</span></button>
     <button class="mob-grid-card" onclick="showPage('debloat');closeMobileMenu()"><span class="mob-grid-emoji">🌊</span><span class="mob-grid-label">Debloat</span></button>
     <button class="mob-grid-card" onclick="showPage('retention');closeMobileMenu()"><span class="mob-grid-emoji">🔒</span><span class="mob-grid-label">SR Tracker</span></button>
 
@@ -855,10 +854,7 @@
     <span class="icon">🧴</span><span>Skincare</span>
   </div>
   <div class="nav-item" onclick="showPage('facial')" id="nav-facial">
-    <span class="icon">✨</span><span>Facial</span>
-  </div>
-  <div class="nav-item" onclick="showPage('mewing')" id="nav-mewing">
-    <span class="icon">😤</span><span>Mewing</span>
+    <span class="icon">✨</span><span>Facial & Mewing</span>
   </div>
   <div class="nav-item" onclick="showPage('debloat')" id="nav-debloat">
     <span class="icon">🌊</span><span>Debloat</span>
@@ -1159,10 +1155,13 @@
   <div class="page" id="page-facial">
     <div class="page-header">
       <div>
-        <h2>✨ Facial Exercises</h2>
-        <p>Track your daily facial exercise routine</p>
+        <h2>✨ Facial & Mewing</h2>
+        <p>Track your facial exercises and mewing practice</p>
       </div>
     </div>
+
+    <!-- ── FACIAL EXERCISES ── -->
+    <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">✨ Facial Exercises</div>
     <div class="grid-2">
       <div class="card">
         <div class="card-title">Today's Exercises</div>
@@ -1186,16 +1185,9 @@
         <div id="facial-history"></div>
       </div>
     </div>
-  </div>
 
-  <!-- ========== MEWING ========== -->
-  <div class="page" id="page-mewing">
-    <div class="page-header">
-      <div>
-        <h2>😤 Mewing Tracker</h2>
-        <p>Track your mewing practice and consistency</p>
-      </div>
-    </div>
+    <!-- ── MEWING ── -->
+    <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:24px 0 10px">😤 Mewing</div>
     <div class="grid-2">
       <div class="card">
         <div class="card-title">Today's Log</div>
@@ -1972,8 +1964,7 @@
           <option value="hydration">💧 Hydration</option>
           <option value="diet">🥗 Diet</option>
           <option value="skincare">🧴 Skincare</option>
-          <option value="facial">✨ Facial</option>
-          <option value="mewing">😤 Mewing</option>
+          <option value="facial">✨ Facial & Mewing</option>
           <option value="debloat">🌊 Debloat</option>
         </select>
       </div>
@@ -2342,7 +2333,7 @@ function formatDateFull(d) {
 // Page name map for mobile topbar
 const PAGE_NAMES = {
   dashboard:'🏠 Dashboard', gym:'🏋️ Gym', sleep:'😴 Sleep', hydration:'💧 Hydration',
-  diet:'🥗 Diet', skincare:'🧴 Skincare', facial:'✨ Facial', mewing:'😤 Mewing',
+  diet:'🥗 Diet', skincare:'🧴 Skincare', facial:'✨ Facial & Mewing',
   debloat:'🌊 Debloat', retention:'🔒 SR Tracker', mealideas:'🍽️ Meal Ideas',
   nafoods:'🧂 Na:K Foods', measurements:'📏 Measurements', trends:'📈 Trends',
   reportcard:'🗒️ Report Card', journal:'✍️ Journal', allrecords:'📋 All Records',
@@ -2407,7 +2398,7 @@ function renderPage(page) {
     diet: renderDiet,
     skincare: renderSkincare,
     facial: renderFacial,
-    mewing: renderMewing,
+    mewing: () => showPage('facial'), // mewing merged into facial tab
     debloat: renderDebloat,
     allrecords: renderAllRecords,
     mealideas: renderMealIdeas,
@@ -3172,6 +3163,9 @@ function renderFacial() {
       <span style="font-size:13px;font-weight:600;color:${color}">${c}/${tot}</span>
     </div>`;
   }).join('');
+
+  // Also render the mewing section below
+  renderMewing();
 }
 
 function toggleFacial(ex) {

@@ -29,6 +29,23 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .out-fill{height:100%;border-radius:4px;background:var(--gold);transition:width 1.2s ease,background 1s ease;}
 .out-pct{font-size:13px;font-weight:900;min-width:36px;text-align:right;transition:color 1s ease;}
 
+/* ── FACIAL EXERCISE MODAL ── */
+.face-check-item{display:flex;align-items:center;gap:10px;padding:9px 0;
+  border-bottom:1px solid var(--border);cursor:pointer;user-select:none;}
+.face-check-item:last-child{border-bottom:none;}
+.face-check-box{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+  flex-shrink:0;transition:all .15s;}
+.face-check-item.done .face-check-box{background:var(--green);border-color:var(--green);color:#000;}
+.face-check-label{font-size:12px;font-weight:600;flex:1;}
+.face-check-item.done .face-check-label{text-decoration:line-through;color:var(--muted);}
+.face-start-btn{width:100%;padding:13px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,rgba(245,197,66,.18),rgba(245,197,66,.08));
+  border:1px solid rgba(245,197,66,.35);color:var(--gold);
+  font-size:13px;font-weight:800;cursor:pointer;transition:all .15s;font-family:inherit;}
+.face-start-btn:hover{background:rgba(245,197,66,.22);}
+.face-start-btn.active{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:#ef4444;}
+
 /* ── PROGRESS MODAL ── */
 .prog-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:900;
   opacity:0;pointer-events:none;transition:opacity .25s;}
@@ -668,6 +685,21 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   32%        {transform:translateX(4px);}
 }
 .char-figure.fridge-check{animation:char-fridge-check 2.4s ease-in-out infinite;}
+
+/* FACIAL EXERCISES — head rapidly wobbles side-to-side (jaw/cheek work) */
+@keyframes char-face-ex-head {
+  0%  {transform:rotate(-7deg) scaleX(1.06);}
+  25% {transform:rotate(7deg)  scaleX(0.94);}
+  50% {transform:rotate(-5deg) scaleX(1.04);}
+  75% {transform:rotate(5deg)  scaleX(0.96);}
+  100%{transform:rotate(-7deg) scaleX(1.06);}
+}
+@keyframes char-face-ex-body {
+  0%,100%{transform:translateY(0);}
+  50%    {transform:translateY(-2px);}
+}
+.char-figure.face-ex{animation:char-face-ex-body .6s ease-in-out infinite;}
+.char-head.face-ex  {animation:char-face-ex-head .35s ease-in-out infinite;}
 
 /* AT-DESK WORKING — bird's-eye view, typing micro-bounce */
 @keyframes char-desk-type {
@@ -2425,15 +2457,102 @@ function _navPoster(dir) {
 // ─────────────────────────────────────────────
 //  DUMBBELL MENU
 // ─────────────────────────────────────────────
+// ─── FACIAL EXERCISE MODAL ───────────────────────────
+function _getFacialData() {
+  try {
+    const d = JSON.parse(localStorage.getItem('wellness_data') || 'null');
+    if (!d || !d.facialExercises) return { exercises: ['Chin tucks', 'Face curls', 'Jaw stretch', 'Cheek puff', 'Brow lift'], log: {} };
+    return d.facialExercises;
+  } catch(e) { return { exercises: ['Chin tucks', 'Face curls', 'Jaw stretch', 'Cheek puff', 'Brow lift'], log: {} }; }
+}
+function _saveFacialComplete(ex) {
+  try {
+    const raw = JSON.parse(localStorage.getItem('wellness_data') || '{}');
+    if (!raw.facialExercises) raw.facialExercises = { exercises: [], log: {} };
+    const t = new Date().toISOString().split('T')[0];
+    if (!raw.facialExercises.log[t]) raw.facialExercises.log[t] = { completed: [], notes: '' };
+    const arr = raw.facialExercises.log[t].completed;
+    const idx = arr.indexOf(ex);
+    if (idx >= 0) arr.splice(idx, 1); else arr.push(ex);
+    localStorage.setItem('wellness_data', JSON.stringify(raw));
+  } catch(e) {}
+}
+function _renderFaceModal() {
+  const fe = _getFacialData();
+  const t = new Date().toISOString().split('T')[0];
+  const completed = (fe.log[t] || {}).completed || [];
+  const isFaceActive = _activityName === '✨ Facial exercises';
+
+  const listHTML = fe.exercises.length ? fe.exercises.map(ex => {
+    const done = completed.includes(ex);
+    return `<div class="face-check-item ${done?'done':''}" onclick="event.stopPropagation();_toggleFaceEx('${ex.replace(/'/g,"\\'")}')">
+      <div class="face-check-box">${done?'✓':''}</div>
+      <span class="face-check-label">${ex}</span>
+    </div>`;
+  }).join('') : `<div style="font-size:11px;color:var(--muted);padding:8px 0">No exercises set — add some in Wellness → Facial & Mewing</div>`;
+
+  const done = completed.filter(ex => fe.exercises.includes(ex)).length;
+  const total = fe.exercises.length;
+  const pct = total ? Math.round((done/total)*100) : 0;
+
+  document.getElementById('face-modal-body').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:700">Today · ${done}/${total}</span>
+      <span style="font-size:13px;font-weight:900;color:var(--green)">${pct}%</span>
+    </div>
+    <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:14px">
+      <div style="height:100%;width:${pct}%;background:var(--green);border-radius:2px;transition:width .6s ease"></div>
+    </div>
+    ${listHTML}
+    <div style="margin-top:16px">
+      <button class="face-start-btn ${isFaceActive?'active':''}" onclick="event.stopPropagation();_toggleFaceSession()">
+        ${isFaceActive ? '■ Stop session' : '✨ Start facial exercise session'}
+      </button>
+    </div>
+    <div style="margin-top:10px;text-align:center">
+      <span style="font-size:10px;color:var(--muted);cursor:pointer;text-decoration:underline"
+        onclick="event.stopPropagation();closeFaceModal();window.parent.postMessage({action:'openWellnessFacial'},'*')">
+        Open in Wellness →
+      </span>
+    </div>
+  `;
+}
+function _toggleFaceEx(ex) {
+  _saveFacialComplete(ex);
+  _renderFaceModal();
+}
+function _toggleFaceSession() {
+  if (_activityName === '✨ Facial exercises') {
+    stopActivity({ stopPropagation:()=>{} });
+  } else {
+    closeFaceModal();
+    moveChar('center');
+    const figure = document.getElementById('char-figure');
+    const head   = document.getElementById('char-head');
+    if (figure) { figure.className = 'char-figure face-ex'; }
+    if (head)   { head.className   = 'char-head face-ex'; }
+    _sittingOnChair = false;
+    _activityStart    = Date.now();
+    _activityName     = '✨ Facial exercises';
+    _manualStatus     = '✨ Facial exercises';
+    _manualStatusTime = Date.now();
+    clearActivityTimer();
+    updateActivityBubble();
+    _activityInterval = setInterval(updateActivityBubble, 1000);
+    saveState();
+  }
+}
 function showDumbbellMenu(e) {
   e.stopPropagation();
-  showActivityMenu([
-    { icon:'😮', label:'Mewing',       status:'😮 Mewing'        },
-    { icon:'💪', label:'Face curls',   status:'💪 Face curls'    },
-    { icon:'🤸', label:'Face pulls',   status:'🤸 Face pulls'    },
-    { icon:'🧘', label:'Chin tucks',   status:'🧘 Chin tucks'    },
-    { icon:'🙆', label:'Stretching',   status:'🙆 Stretching'    },
-  ], { top: 250, left: 270 });
+  document.getElementById('face-overlay').classList.add('open');
+  document.getElementById('face-sheet').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  _renderFaceModal();
+}
+function closeFaceModal() {
+  document.getElementById('face-overlay').classList.remove('open');
+  document.getElementById('face-sheet').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 // ─────────────────────────────────────────────
@@ -3040,6 +3159,17 @@ window.addEventListener('pageshow', function(e) {
   }
 });
 </script>
+
+<!-- ── FACIAL EXERCISE MODAL ── -->
+<div class="prog-overlay" id="face-overlay" onclick="closeFaceModal()"></div>
+<div class="prog-sheet" id="face-sheet">
+  <div class="prog-sheet-handle"></div>
+  <div class="prog-sheet-head">
+    <span class="prog-sheet-title">✨ Facial & Mewing</span>
+    <button class="prog-sheet-close" onclick="closeFaceModal()">✕</button>
+  </div>
+  <div class="prog-sheet-body" id="face-modal-body"></div>
+</div>
 
 <!-- ── PROGRESS MODAL ── -->
 <div class="prog-overlay" id="prog-overlay" onclick="closeProgressModal()"></div>
