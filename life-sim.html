@@ -702,6 +702,51 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .act-bubble:hover{background:rgba(245,197,66,.1);border-color:var(--gold);color:var(--gold);}
 @keyframes bubblePop{to{opacity:1;transform:translateY(0) scale(1);}}
 
+/* ── GAMING WARNING OVERLAY ── */
+#gaming-warn{
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,.93);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s;
+}
+#gaming-warn.show{opacity:1;pointer-events:auto;}
+.gwarn-box{
+  background:#0b0b14;
+  border:1px solid rgba(220,38,38,.3);
+  border-radius:20px;padding:34px 28px 28px;
+  max-width:320px;width:90%;text-align:center;
+  box-shadow:0 0 80px rgba(220,38,38,.12);
+}
+.gwarn-icon{font-size:38px;margin-bottom:14px;}
+.gwarn-title{
+  font-size:17px;font-weight:800;color:#fff;
+  margin-bottom:10px;line-height:1.35;
+}
+.gwarn-body{
+  font-size:12.5px;color:rgba(255,255,255,.55);
+  line-height:1.75;margin-bottom:26px;
+}
+.gwarn-btn-better{
+  width:100%;background:linear-gradient(135deg,#6d28d9,#a855f7);
+  border:none;border-radius:13px;color:#fff;
+  font-size:14px;font-weight:800;padding:15px;cursor:pointer;
+  letter-spacing:.4px;margin-bottom:10px;
+  transition:transform .1s,box-shadow .15s;
+}
+.gwarn-btn-better:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(139,92,246,.5);}
+.gwarn-btn-weak{
+  width:100%;background:transparent;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:13px;color:rgba(255,255,255,.28);
+  font-size:11px;font-weight:600;padding:10px;cursor:pointer;
+  transition:border-color .15s,color .15s;
+}
+.gwarn-btn-weak:hover{border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.45);}
+.gwarn-suggestions{
+  display:flex;flex-direction:column;gap:7px;margin-top:10px;
+}
+
 /* PC tower tooltip */
 .tower-tip{
   position:absolute;top:118px;left:48px;font-size:8px;color:#383838;
@@ -1550,6 +1595,9 @@ function roomClick() {
   if (_currentZone === 'center') return; // already there
   closeActivityMenu();
   clearActivityTimer();
+  clearGamingWarningTimer();
+  hideGamingWarning();
+  _gamingStayWeakCount = 0;
   resetCharVisual();
   moveChar('center');
   _manualStatus = null;
@@ -1843,6 +1891,15 @@ function selectActivity(opt) {
   applyActivityVisual(opt);
   updateActivityBubble();
   _activityInterval = setInterval(updateActivityBubble, 1000);
+  // Gaming warning — fires after 3 min if wasting time; clears for any real activity
+  if (opt.status === '🎮 Wasting time...') {
+    _gamingStayWeakCount = 0;
+    scheduleGamingWarning();
+  } else {
+    clearGamingWarningTimer();
+    hideGamingWarning();
+    _gamingStayWeakCount = 0;
+  }
   saveState();
 }
 
@@ -1902,6 +1959,9 @@ function updateActivityBubble() {
 
 function stopActivity(e) {
   if (e) e.stopPropagation();
+  clearGamingWarningTimer();
+  hideGamingWarning();
+  _gamingStayWeakCount = 0;
   if (!_activityStart) return;
   const dur  = Math.floor((Date.now() - _activityStart) / 1000);
   const mins = Math.floor(dur / 60);
@@ -2449,6 +2509,87 @@ function _foodAdd() {
 }
 
 // ─────────────────────────────────────────────
+//  GAMING WARNING
+// ─────────────────────────────────────────────
+const GAMING_MSGS = [
+  { icon:'⚡', title:"This isn't you.",                     body:"You know exactly what you should be doing right now. This isn't it. Every hour here is an hour your future self is going to hate you for." },
+  { icon:'🔥', title:"Someone is outworking you right now.", body:"While you're here, someone with less talent and fewer resources is grinding. They'll have what you want. And you'll wonder what happened." },
+  { icon:'💀', title:"You've done this before.",             body:"You always regret it. You always say 'just one more'. You always look back wishing you'd stopped sooner. Stop now." },
+  { icon:'👁️', title:"This is the gap.",                   body:"Not lack of talent. Not bad luck. This moment — choosing to waste time when you know what you're capable of. This is why it hasn't happened yet." },
+  { icon:'⚔️', title:"You're not tired. You're avoiding.",  body:"The version of you that wins doesn't do this. Not today. Not when there's work to be done." },
+  { icon:'⏳', title:"Time is the one thing you can't get back.", body:"Money can be earned again. Energy comes back. But this hour? Gone forever. What are you actually doing right now?" },
+  { icon:'🎯', title:"You already know.",                   body:"You don't need to be told. Deep down you know this isn't moving the needle. You know what would. Go do that." },
+  { icon:'🧠', title:"This is a choice.",                   body:"Every minute here is a conscious decision to stay exactly where you are. Is that what you want? Because the results will reflect the choices." },
+  { icon:'💸', title:"Your goals don't care how you feel.", body:"They don't care if you're bored, tired, or just wanted to relax for a bit. They're either getting done or they're not." },
+  { icon:'🏆', title:"The life you want is built right now.", body:"Not in some future perfect scenario. In the gap between comfort and effort. What are you choosing?" },
+];
+
+let _gamingWarningTimer = null;
+let _gamingStayWeakCount = 0;
+
+function scheduleGamingWarning(delayMs) {
+  clearGamingWarningTimer();
+  _gamingWarningTimer = setTimeout(showGamingWarning, delayMs ?? 3 * 60 * 1000);
+}
+
+function clearGamingWarningTimer() {
+  if (_gamingWarningTimer) { clearTimeout(_gamingWarningTimer); _gamingWarningTimer = null; }
+}
+
+function hideGamingWarning() {
+  document.getElementById('gaming-warn')?.classList.remove('show');
+}
+
+function showGamingWarning() {
+  const msg = GAMING_MSGS[Math.floor(Math.random() * GAMING_MSGS.length)];
+  document.getElementById('gwarn-icon').textContent  = msg.icon;
+  document.getElementById('gwarn-title').textContent = msg.title;
+  document.getElementById('gwarn-body').textContent  = msg.body;
+  document.getElementById('gaming-warn').classList.add('show');
+  // If they ignore it, pulse the warning again after 2 min
+  clearGamingWarningTimer();
+  _gamingWarningTimer = setTimeout(() => {
+    hideGamingWarning();
+    _gamingWarningTimer = setTimeout(showGamingWarning, 90 * 1000);
+  }, 25 * 1000); // auto-hide after 25s, come back in 90s
+}
+
+function gamingBeBetter() {
+  hideGamingWarning();
+  clearGamingWarningTimer();
+  _gamingStayWeakCount = 0;
+  // Stop gaming activity (handles timer, char reset, center move)
+  stopActivity(null);
+  // Turn off PC
+  _pcOn = false;
+  updateDevices();
+  saveState();
+  // Show redemption suggestions after brief pause
+  setTimeout(() => {
+    const bubble = document.getElementById('char-bubble');
+    if (bubble) { bubble.innerHTML = '⚡ Let\'s get it.'; bubble.style.borderColor = 'var(--gold)'; }
+    showActivityMenu([
+      { icon:'💻', label:'Mac Mini — real work', action:() => {
+        _miniOn = true; _lastDevice = 'mac'; updateDevices(); saveState();
+        selectActivity({ icon:'⚡', label:'Productive work', status:'⚡ Locked in' });
+      }},
+      { icon:'🏋️', label:'Go to the gym',     action:() => goLoc('outside') },
+      { icon:'💰', label:'Online hustle',      status:'💰 On the grind'   },
+      { icon:'🎬', label:'Record content',     status:'🎬 Recording'      },
+    ], { top: 228, left: 160 }, 'up');
+  }, 350);
+}
+
+function gamingStayWeak() {
+  hideGamingWarning();
+  _gamingStayWeakCount++;
+  // Gets more frequent the more you ignore it: 3min → 2min → 1min → 30s → 15s → stays at 15s
+  const delays = [3*60*1000, 2*60*1000, 60*1000, 30*1000, 15*1000];
+  const delay = delays[Math.min(_gamingStayWeakCount, delays.length - 1)];
+  scheduleGamingWarning(delay);
+}
+
+// ─────────────────────────────────────────────
 //  STATE PERSISTENCE (survives tab close/reopen)
 // ─────────────────────────────────────────────
 function saveState() {
@@ -2549,7 +2690,19 @@ render();
 updateRoomPoster();
 loadState(); // restore character position + active activity after tab reopen
 setInterval(render, 30000);
+setInterval(saveState, 5000); // auto-save every 5s so tab-close always captures exact state
 window.addEventListener('focus', render);
 </script>
+
+<!-- ── GAMING WARNING OVERLAY ── -->
+<div id="gaming-warn">
+  <div class="gwarn-box">
+    <div class="gwarn-icon" id="gwarn-icon">⚡</div>
+    <div class="gwarn-title" id="gwarn-title"></div>
+    <div class="gwarn-body"  id="gwarn-body"></div>
+    <button class="gwarn-btn-better" onclick="gamingBeBetter()">⚡ Be Better</button>
+    <button class="gwarn-btn-weak"   onclick="gamingStayWeak()">Stay Weak</button>
+  </div>
+</div>
 </body>
 </html>

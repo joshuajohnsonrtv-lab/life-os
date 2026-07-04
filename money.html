@@ -983,13 +983,10 @@
   <div class="mob-grid">
     <div class="mob-section-label">📊 Overview</div>
     <button class="mob-grid-card" onclick="showPage('dashboard');updateMobTitle('dashboard');closeMobMenu()"><span class="mob-grid-emoji">📊</span><span class="mob-grid-label">Dashboard</span></button>
-    <button class="mob-grid-card" onclick="showPage('runway');updateMobTitle('runway');closeMobMenu()"><span class="mob-grid-emoji">🛟</span><span class="mob-grid-label">Runway</span></button>
-
     <div class="mob-section-label">💵 Track</div>
     <button class="mob-grid-card" onclick="showPage('income');updateMobTitle('income');closeMobMenu()"><span class="mob-grid-emoji">💵</span><span class="mob-grid-label">Income</span></button>
     <button class="mob-grid-card" onclick="showPage('expenses');updateMobTitle('expenses');closeMobMenu()"><span class="mob-grid-emoji">💸</span><span class="mob-grid-label">Expenses</span></button>
     <button class="mob-grid-card" onclick="showPage('subscriptions');updateMobTitle('subscriptions');closeMobMenu()"><span class="mob-grid-emoji">🔄</span><span class="mob-grid-label">Subscriptions</span></button>
-    <button class="mob-grid-card" onclick="showPage('essentials');updateMobTitle('essentials');closeMobMenu()"><span class="mob-grid-emoji">🏡</span><span class="mob-grid-label">Bare Minimum</span></button>
 
     <div class="mob-section-label">🎯 Goals</div>
     <button class="mob-grid-card" onclick="showPage('goals');updateMobTitle('goals');closeMobMenu()"><span class="mob-grid-emoji">🎯</span><span class="mob-grid-label">Goals</span></button>
@@ -1037,16 +1034,9 @@
     <span class="icon">🎯</span><span>Goals</span>
   </div>
 
-  <div class="nav-item" onclick="showPage('essentials')" id="nav-essentials">
-    <span class="icon">🏡</span><span>Bare Minimum</span>
-  </div>
-
   <div class="nav-section">Analyse</div>
   <div class="nav-item" onclick="showPage('savings')" id="nav-savings">
     <span class="icon">🏦</span><span>Savings</span>
-  </div>
-  <div class="nav-item" onclick="showPage('runway')" id="nav-runway">
-    <span class="icon">🛟</span><span>Runway</span>
   </div>
   <div class="nav-item" onclick="showPage('milestones')" id="nav-milestones">
     <span class="icon">🗓️</span><span>Milestones</span>
@@ -1379,85 +1369,6 @@
           oninput="saveSavingsSettings()"></textarea>
       </div>
     </div>
-  </div>
-
-  <!-- ═══ RUNWAY ═══ -->
-  <div class="page" id="page-runway">
-    <div class="page-header">
-      <h2>🛟 Runway</h2>
-      <p>How long you can survive if income stopped today</p>
-    </div>
-    <div id="runway-display" style="margin-bottom:24px"></div>
-    <div class="grid-2" style="margin-bottom:20px">
-      <div class="card">
-        <div class="card-title">💰 Safety Net</div>
-        <div class="form-group" style="margin-bottom:0">
-          <label>Savings / Emergency Fund (£)</label>
-          <input type="number" id="runway-savings" placeholder="5000" min="0" oninput="saveRunwayData();renderRunway()">
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">🔥 Monthly Burn Rate</div>
-        <div id="runway-burn-source" style="font-size:12px;color:var(--muted);margin-bottom:10px"></div>
-        <div class="form-group" style="margin-bottom:0">
-          <label>Manual Override (£/mo) — leave blank to auto-calculate from expenses</label>
-          <input type="number" id="runway-manual-burn" placeholder="Auto-calculated" min="0" oninput="saveRunwayData();renderRunway()">
-        </div>
-      </div>
-    </div>
-    <div class="grid-3" style="margin-bottom:20px" id="runway-metrics"></div>
-    <div class="card" id="runway-passive-card"></div>
-  </div>
-
-  <!-- ═══ ESSENTIALS / BARE MINIMUM ═══ -->
-  <div class="page" id="page-essentials">
-    <div class="page-header">
-      <h2>🏡 What Do I Actually Need?</h2>
-      <p>Your true cost of being alive. Everything above this is wealth-building.</p>
-    </div>
-
-    <!-- Big number -->
-    <div id="essentials-total" style="margin-bottom:24px"></div>
-
-    <!-- Core fixed costs -->
-    <div class="grid-2" style="margin-bottom:20px">
-      <div class="card">
-        <div class="card-title">🏠 Rent</div>
-        <div class="form-group" style="margin-bottom:0">
-          <label>Monthly rent (£)</label>
-          <input type="number" id="ess-rent" placeholder="400" min="0" oninput="saveEssentials();renderEssentials()">
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">🍔 Food</div>
-        <div class="form-group" style="margin-bottom:0">
-          <label>Weekly food budget (£)</label>
-          <input type="number" id="ess-food" placeholder="100" min="0" oninput="saveEssentials();renderEssentials()">
-        </div>
-        <div id="ess-food-monthly" style="font-size:12px;color:var(--muted);margin-top:8px"></div>
-      </div>
-    </div>
-
-    <!-- Subscriptions pull-through -->
-    <div class="card" style="margin-bottom:20px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div class="card-title" style="margin-bottom:0">🔄 Subscriptions</div>
-        <span style="font-size:12px;color:var(--muted)">Auto-pulled from your Subscriptions page</span>
-      </div>
-      <div id="ess-subs-list"></div>
-    </div>
-
-    <!-- Any other essentials -->
-    <div class="card" style="margin-bottom:20px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div class="card-title" style="margin-bottom:0">➕ Anything Else?</div>
-        <button class="btn btn-sm btn-ghost" onclick="openEssentialModal()">+ Add</button>
-      </div>
-      <div id="ess-extras-list"></div>
-    </div>
-
-    <!-- Income vs bare minimum -->
-    <div class="card" id="ess-vs-income"></div>
   </div>
 
   <!-- ═══ MILESTONES ═══ -->
@@ -2094,10 +2005,8 @@ function renderPage(page) {
     income:        renderIncome,
     expenses:      renderExpenses,
     subscriptions: renderSubscriptions,
-    essentials:    renderEssentials,
     goals:         renderGoals,
     savings:       renderSavings,
-    runway:        renderRunway,
     milestones:    renderMilestones,
     hustles:       renderHustles,
     delusion:      renderDelusion,
@@ -3791,13 +3700,6 @@ function renderSavings() {
   const sv = data.savings || { pots: [], monthlyTarget: '', savingsGoal: '', notes: '' };
   const pots = sv.pots || [];
   const total = pots.reduce((s, p) => s + (parseFloat(p.amount) || 0), 0);
-
-  // Sync total to runway savings field so runway page stays accurate
-  if (!data.runway) data.runway = {};
-  if (total > 0) {
-    data.runway.savings = String(total);
-    saveData(data);
-  }
 
   // ── Hero ──
   const goal = parseFloat(sv.savingsGoal) || 0;
