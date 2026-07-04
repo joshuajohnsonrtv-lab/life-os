@@ -2551,7 +2551,7 @@ let _gamingStayWeakCount = 0;
 
 function scheduleGamingWarning(delayMs) {
   clearGamingWarningTimer();
-  _gamingWarningTimer = setTimeout(showGamingWarning, delayMs ?? 3 * 60 * 1000);
+  _gamingWarningTimer = setTimeout(showGamingWarning, delayMs ?? 60 * 1000);
 }
 
 function clearGamingWarningTimer() {
@@ -2605,8 +2605,8 @@ function gamingBeBetter() {
 function gamingStayWeak() {
   hideGamingWarning();
   _gamingStayWeakCount++;
-  // Gets more frequent the more you ignore it: 3min → 2min → 1min → 30s → 15s → stays at 15s
-  const delays = [3*60*1000, 2*60*1000, 60*1000, 30*1000, 15*1000];
+  // Gets more frequent the more you ignore it: 1min → 30s → 20s → 15s → stays at 15s
+  const delays = [60*1000, 30*1000, 20*1000, 15*1000];
   const delay = delays[Math.min(_gamingStayWeakCount, delays.length - 1)];
   scheduleGamingWarning(delay);
 }
