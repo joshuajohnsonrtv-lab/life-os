@@ -709,7 +709,8 @@
   /* Full-screen grid menu */
   #mob-menu {
     display:none; position:fixed; inset:0; background:var(--bg);
-    z-index:300; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    z-index:300; overflow-y:scroll; -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
   }
   .mob-menu-header {
     display:flex; align-items:center; justify-content:space-between;
@@ -4349,9 +4350,11 @@ renderDashboard();
 // ── MOBILE MENU ──
 function openMobMenu() {
   document.getElementById('mob-menu').style.display = 'block';
+  document.body.style.overflow = 'hidden';
 }
 function closeMobMenu() {
   document.getElementById('mob-menu').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 // Update mobile topbar title
