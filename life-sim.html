@@ -587,43 +587,59 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   25%,75%{transform:translateY(-1px);}
   50%    {transform:translateY(0);}
 }
+
+/* ── SEATED IDLE (in chair, no activity) ── */
+.char-figure.seated-idle{
+  animation:none; /* no bob while sitting still */
+}
+.char-figure.seated-idle .char-body{
+  /* Shorter bottom half — legs hidden by chair seat */
+  clip-path:polygon(0% 0%,100% 0%,82% 52%,82% 76%,18% 76%,18% 52%);
+}
+
+/* ── AT-DESK WORKING (seated, bird's-eye facing UP toward desk) ──
+   Character sits in chair facing the desk (which is above in screen space).
+   We see: back of head → wide shoulders → arms reaching forward (upward). */
 .char-figure.at-desk{
-  position:relative;gap:0;
+  position:relative;gap:2px;
   animation:char-desk-type 0.9s ease-in-out infinite;
 }
-/* head = small oval (top-down view) */
+/* Back of head — slightly wider oval from above */
 .char-figure.at-desk .char-head{
   width:13px;height:11px;border-radius:50%;
-  flex-shrink:0;margin-bottom:1px;
+  flex-shrink:0;
+  position:relative;z-index:2; /* head renders over the arms behind it */
 }
-/* neck hidden from above */
+/* Neck hidden — body connects directly */
 .char-figure.at-desk .char-neck{display:none;}
-/* body = wide oval shoulders from above; clip-path cleared so arms show */
+/* Upper back / shoulders from above — wider than head */
 .char-figure.at-desk .char-body{
-  width:24px;height:9px;
+  width:22px;height:9px;
   clip-path:none;
   background:linear-gradient(180deg,#111 0%,#1a1a1a 100%);
   border-radius:50%;
   overflow:visible;
+  position:relative;z-index:1;
   margin-top:0;
 }
-/* left arm stretching forward */
+/* Left arm reaches UPWARD (toward desk, which is above in screen space).
+   Bottom of arm is anchored near top of body; arm extends up past the head. */
 .char-figure.at-desk .char-body::before{
   content:'';position:absolute;
-  top:1px;left:-10px;
-  width:11px;height:5px;
-  background:#111;border-radius:3px;
-  transform:rotate(-22deg);transform-origin:right center;
+  bottom:4px;left:1px;      /* start near top of 9px-tall body */
+  width:6px;height:22px;    /* tall enough to extend past the head */
+  background:#111;border-radius:3px 3px 2px 2px;
+  transform:rotate(-9deg);transform-origin:bottom center;
 }
-/* right arm stretching forward */
+/* Right arm — mirror */
 .char-figure.at-desk .char-body::after{
   content:'';position:absolute;
-  top:1px;right:-10px;
-  width:11px;height:5px;
-  background:#111;border-radius:3px;
-  transform:rotate(22deg);transform-origin:left center;
+  bottom:4px;right:1px;
+  width:6px;height:22px;
+  background:#111;border-radius:3px 3px 2px 2px;
+  transform:rotate(9deg);transform-origin:bottom center;
 }
-/* chair flipped to face desk when working at it */
+/* Chair rotated so back faces viewer (into working position) */
 .chair.at-desk{
   transform:scaleY(-1);
   transform-origin:center center;
@@ -1825,26 +1841,27 @@ function showFutonMenu(e) {
 
 function showDeskMenu(e) {
   e.stopPropagation();
-  const opts = [
+  // Must be seated to use the desk — auto-sit if not already
+  if (!_sittingOnChair) {
+    moveChar('chair');
+    _sittingOnChair = true;
+    const chairEl = document.getElementById('chair');
+    if (chairEl) chairEl.classList.add('seated');
+    const figure = document.getElementById('char-figure');
+    if (figure) figure.classList.add('seated-idle');
+    document.querySelector('.desk')?.classList.add('active-zone');
+    const bubble = document.getElementById('char-bubble');
+    if (bubble) { bubble.innerHTML = '🪑 Sitting'; bubble.style.borderColor = 'var(--muted)'; }
+    _manualStatus     = '🪑 Sitting';
+    _manualStatusTime = Date.now();
+    saveState();
+  }
+  showActivityMenu([
     { icon:'💰', label:'Online hustle',       status:'💰 On the grind'    },
     { icon:'🎬', label:'Recording content',   status:'🎬 Recording'       },
     { icon:'🎮', label:'Gaming / doom scroll',status:'🎮 Wasting time...' },
     { icon:'⚡', label:'Productive work',     status:'⚡ Locked in'       },
-  ];
-  // If already seated in chair — stay in chair, just glow desk too
-  if (_sittingOnChair) {
-    document.querySelector('.desk')?.classList.add('active-zone');
-    showActivityMenu(opts, { top: 116, left: 234 }, 'down');
-    return;
-  }
-  // Second click on desk while standing → go back to center
-  if (_currentZone === 'desk') {
-    closeActivityMenu(); clearActivityTimer();
-    moveChar('center'); _manualStatus = null; render();
-    return;
-  }
-  moveChar('desk');
-  showActivityMenu(opts, { top: 116, left: 234 }, 'down');
+  ], { top: 116, left: 234 }, 'down');
 }
 
 function showActivityMenu(options, pos, dir, container) {
@@ -1918,11 +1935,11 @@ function applyActivityVisual(opt) {
     if (head)   head.className   = 'char-head meditating';
     if (figure) figure.className = 'char-figure meditating';
   } else {
-    // desk activities — bird's-eye seated working view
-    moveChar('desk');
+    // desk activities — char stays in chair (seated), bird's-eye working view
+    _sittingOnChair = true;  // ensure seated state is preserved
+    moveChar('chair');       // stay at chair position, not standing by desk
     if (head)   head.className   = 'char-head';
     if (figure) figure.className = 'char-figure at-desk';
-    // Flip chair so its back faces toward viewer (working position)
     const chairEl = document.getElementById('chair');
     if (chairEl) { chairEl.classList.add('seated'); chairEl.classList.add('at-desk'); }
   }
@@ -2001,16 +2018,21 @@ function toggleChair(e) {
   e.stopPropagation();
   _sittingOnChair = !_sittingOnChair;
   const chairEl = document.getElementById('chair');
+  const figure  = document.getElementById('char-figure');
   if (_sittingOnChair) {
     resetCharVisual();
     moveChar('chair');
     if (chairEl) chairEl.classList.add('seated');
+    // Seated-idle visual — shorter body, no idle bob
+    if (figure) figure.classList.add('seated-idle');
     const bubble = document.getElementById('char-bubble');
     if (bubble) { bubble.innerHTML = '🪑 Sitting'; bubble.style.borderColor = 'var(--muted)'; }
     _manualStatus     = '🪑 Sitting';
     _manualStatusTime = Date.now();
     saveState();
   } else {
+    // Standing up: stop any running desk activity first
+    if (_activityStart) stopActivity(null);
     document.querySelector('.desk')?.classList.remove('active-zone');
     moveChar('center');
     if (chairEl) chairEl.classList.remove('seated');
@@ -2643,6 +2665,9 @@ function loadState() {
       _sittingOnChair = true;
       document.getElementById('chair')?.classList.add('seated');
       document.querySelector('.desk')?.classList.add('active-zone');
+      // Restore seated-idle visual (no activity running, just sitting)
+      const figEl = document.getElementById('char-figure');
+      if (figEl) figEl.classList.add('seated-idle');
     }
     // Restore active activity (keep timer running)
     if (s.activityStart && s.activityName && s.status) {
@@ -2659,12 +2684,13 @@ function loadState() {
       } else if (s.status === '🧘 Meditating') {
         if (head)   head.className   = 'char-head meditating';
         if (figure) figure.className = 'char-figure meditating';
-      } else if (s.zone === 'desk') {
-        // desk activity — restore bird's-eye working view
+      } else {
+        // desk activity — restore bird's-eye working view (zone = 'chair')
         if (head)   head.className   = 'char-head';
         if (figure) figure.className = 'char-figure at-desk';
         const chairEl = document.getElementById('chair');
         if (chairEl) { chairEl.classList.add('seated'); chairEl.classList.add('at-desk'); }
+        _sittingOnChair = true;
       }
       clearActivityTimer();
       updateActivityBubble();
