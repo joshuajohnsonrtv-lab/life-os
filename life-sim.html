@@ -34,15 +34,21 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .refresh-btn:hover{border-color:var(--gold);color:var(--gold);}
 
 /* ── LOC BAR ── */
-.loc-bar{display:flex;align-items:center;gap:0;padding:8px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.loc-bar{
+  display:flex;align-items:center;gap:0;
+  padding:8px 18px;border-bottom:1px solid var(--border);flex-shrink:0;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.loc-bar::-webkit-scrollbar{display:none;}
 .loc-group{display:flex;gap:0;flex-shrink:0;}
 .loc-btn{padding:7px 18px;border:1px solid var(--border);background:transparent;
-  color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
+  color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
 .loc-group .loc-btn:first-child{border-radius:8px 0 0 8px;}
 .loc-group .loc-btn:last-child{border-radius:0 8px 8px 0;border-left:none;}
 .loc-btn.active{background:var(--gold);color:#000;border-color:var(--gold);}
 .save-btn{
-  margin-left:auto;padding:6px 14px;
+  margin-left:12px;flex-shrink:0;padding:6px 14px;
   background:transparent;border:1px solid var(--border);border-radius:8px;
   color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;
   transition:border-color .2s,color .2s;white-space:nowrap;
@@ -1086,6 +1092,13 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   cursor:pointer;font-size:11px;letter-spacing:2px;text-transform:uppercase;
   transition:all .2s;font-family:inherit;white-space:nowrap;}
 .k-back:hover{border-color:rgba(255,255,255,.28);color:rgba(255,255,255,.65);}
+.k-save{position:absolute;bottom:68px;right:16px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.45);padding:8px 16px;border-radius:22px;
+  cursor:pointer;font-size:11px;letter-spacing:1px;
+  transition:border-color .2s,color .2s;font-family:inherit;white-space:nowrap;}
+.k-save:hover,.k-save.saved{border-color:var(--gold);color:var(--gold);}
+.k-save.saved{color:var(--gold);}
 
 /* fridge inventory modal */
 .k-fridge-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;
@@ -1288,6 +1301,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
         </div>
       </div>
       <button class="k-back" onclick="goLoc('room')">← Back to Room</button>
+      <button class="k-save" id="k-save-btn" onclick="event.stopPropagation();manualSave()">💾 Save</button>
     </div>
     </div>
   </div>
@@ -2801,13 +2815,15 @@ function loadState() {
 
 function manualSave() {
   saveState();
-  const btn = document.getElementById('save-btn');
-  if (btn) {
-    const orig = btn.innerHTML;
-    btn.innerHTML = '✓ Saved';
-    btn.classList.add('saved');
-    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('saved'); }, 1600);
-  }
+  // Flash both the nav save button and the kitchen save button
+  [document.getElementById('save-btn'), document.getElementById('k-save-btn')]
+    .forEach(btn => {
+      if (!btn) return;
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✓ Saved';
+      btn.classList.add('saved');
+      setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('saved'); }, 1600);
+    });
 }
 
 // ─────────────────────────────────────────────
