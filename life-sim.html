@@ -22,11 +22,35 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;
 }
 .hdr-title{font-size:16px;font-weight:900;letter-spacing:-0.5px;white-space:nowrap;}
-.out-wrap{display:flex;align-items:center;gap:10px;flex:1;min-width:160px;}
+.out-wrap{display:flex;align-items:center;gap:10px;flex:1;min-width:160px;cursor:pointer;padding:4px 6px;border-radius:8px;transition:background .15s;}
+.out-wrap:hover{background:rgba(255,255,255,.05);}
 .out-label{font-size:10px;color:var(--muted);white-space:nowrap;font-weight:700;text-transform:uppercase;}
 .out-track{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden;}
 .out-fill{height:100%;border-radius:4px;background:var(--gold);transition:width 1.2s ease,background 1s ease;}
 .out-pct{font-size:13px;font-weight:900;min-width:36px;text-align:right;transition:color 1s ease;}
+
+/* ── PROGRESS MODAL ── */
+.prog-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:900;
+  opacity:0;pointer-events:none;transition:opacity .25s;}
+.prog-overlay.open{opacity:1;pointer-events:auto;}
+.prog-sheet{
+  position:fixed;bottom:0;left:0;right:0;z-index:901;
+  background:#0e1016;border-top:1px solid rgba(255,255,255,.1);border-radius:18px 18px 0 0;
+  max-height:82vh;display:flex;flex-direction:column;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);
+}
+.prog-sheet.open{transform:translateY(0);}
+.prog-sheet-handle{width:36px;height:4px;background:rgba(255,255,255,.18);border-radius:2px;
+  margin:10px auto 0;}
+.prog-sheet-head{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.prog-sheet-title{font-size:13px;font-weight:900;letter-spacing:.3px;}
+.prog-sheet-close{background:none;border:none;color:var(--muted);font-size:18px;
+  cursor:pointer;padding:0 4px;line-height:1;}
+.prog-sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px 32px;
+  display:flex;flex-direction:column;gap:12px;}
+.prog-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:380px){.prog-grid{grid-template-columns:1fr;}}
 .pot-badge{font-size:10px;font-weight:700;white-space:nowrap;padding:3px 10px;
   border-radius:20px;border:1px solid rgba(168,85,247,.35);background:rgba(168,85,247,.07);color:var(--purple);}
 .refresh-btn{padding:4px 10px;border-radius:8px;border:1px solid var(--border);background:transparent;
@@ -1152,7 +1176,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <!-- HEADER -->
 <div class="hdr">
   <div class="hdr-title">🎮 The Sim</div>
-  <div class="out-wrap">
+  <div class="out-wrap" onclick="showProgressModal()" title="View progress breakdown">
     <span class="out-label">Output</span>
     <div class="out-track"><div class="out-fill" id="out-fill" style="width:0%"></div></div>
     <span class="out-pct" id="out-pct">0%</span>
@@ -1641,6 +1665,105 @@ function editTarget() {
     localStorage.setItem('life_sim_month_target', n);
     render();
   }
+}
+
+function showProgressModal() {
+  const s = calc();
+  const monthGap  = Math.max(0, s.monthTarget - s.monthIncome);
+  const monthProg = s.monthTarget > 0 ? Math.min(100, Math.round((s.monthIncome / s.monthTarget) * 100)) : 0;
+
+  const hustleHTML = s.actHustles.length > 0
+    ? s.actHustles.map(h => `
+        <div class="hustle-row">
+          <div class="hustle-n">${h.name || 'Unnamed hustle'}</div>
+          <div class="hustle-r">${h.revenue ? fmt(h.revenue)+' target' : 'No target set'}</div>
+        </div>`).join('')
+    : `<div style="font-size:10px;color:var(--muted)">None active — add one in Money → Hustles.</div>`;
+
+  // Output score factors
+  const factors = [
+    { label:'Gym sessions (7d)', val: s.gymSess7, max: 5, unit:'', good: s.gymSess7>=3 },
+    { label:'Avg sleep',         val: s.sleepAvg > 0 ? s.sleepAvg.toFixed(1)+'h' : '—', pct: s.sleepAvg > 0 ? Math.min(100, Math.round((s.sleepAvg/8)*100)) : 0, good: s.sleepAvg>=7 },
+    { label:'Water days (7d)',   val: s.hydDays, max: 7, unit:'d', good: s.hydDays>=5 },
+    { label:'Meals today',       val: s.mealCount, max: 3, unit:'', good: s.mealCount>=2 },
+    { label:'Active hustles',    val: s.actHustles.length, max: null, good: s.actHustles.length>0 },
+    { label:'Month income',      val: fmt(s.monthIncome), pct: monthProg, good: monthProg>=50 },
+  ];
+
+  const factorHTML = factors.map(f => {
+    const barPct = f.pct !== undefined ? f.pct : (f.max ? Math.min(100, Math.round((parseFloat(f.val)/f.max)*100)) : null);
+    const col = f.good ? 'var(--green)' : 'var(--gold)';
+    return `
+      <div style="display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;font-size:11px">
+          <span style="color:var(--muted)">${f.label}</span>
+          <span style="font-weight:800;color:${col}">${f.val}${f.unit||''}</span>
+        </div>
+        ${barPct !== null ? `<div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${barPct}%;background:${col};border-radius:2px;transition:width 1s ease"></div>
+        </div>` : ''}
+      </div>`;
+  }).join('');
+
+  document.getElementById('prog-sheet-body').innerHTML = `
+    <!-- Overall score -->
+    <div class="sblock" style="text-align:center">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.6px;font-weight:700">Overall Output</div>
+      <div style="font-size:52px;font-weight:900;color:${s.col};line-height:1">${s.outputPct}%</div>
+      <div class="mood-pill" style="background:${s.col}1a;color:${s.col};margin-top:8px">${s.emoji} ${s.text}</div>
+    </div>
+
+    <!-- Score factors -->
+    <div class="sblock">
+      <div class="sblock-title">What builds your score</div>
+      ${factorHTML}
+    </div>
+
+    <!-- Money -->
+    <div class="prog-grid">
+      <div class="sblock">
+        <div class="sblock-title">💰 Income</div>
+        <div class="srow"><span>This month</span><span class="sval" style="color:var(--gold)">${fmt(s.monthIncome)}</span></div>
+        <div class="srow"><span>This year</span><span class="sval" style="color:var(--gold)">${fmt(s.yearIncome)}</span></div>
+        <div style="margin-top:8px">
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-bottom:4px">
+            <span>Monthly target</span>
+            <span style="cursor:pointer;text-decoration:underline" onclick="closeProgressModal();editTarget()">${fmt(s.monthTarget)} ✏️</span>
+          </div>
+          <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden">
+            <div style="height:100%;width:${monthProg}%;background:var(--green);border-radius:3px;transition:width 1s ease"></div>
+          </div>
+          <div style="font-size:10px;font-weight:700;color:${monthGap===0?'var(--green)':'var(--red)'};margin-top:4px">
+            ${monthGap===0 ? '✅ TARGET HIT' : fmt(monthGap)+' to go'}
+          </div>
+        </div>
+      </div>
+
+      <div class="sblock">
+        <div class="sblock-title">💪 Body</div>
+        <div class="srow"><span>Gym (7d)</span><span class="sval" style="color:${s.gymSess7>=3?'var(--green)':s.gymSess7>0?'var(--gold)':'var(--muted)'}">${s.gymSess7}/7</span></div>
+        <div class="srow"><span>Avg sleep</span><span class="sval" style="color:${s.sleepAvg>=7?'var(--green)':s.sleepAvg>0?'var(--orange)':'var(--muted)'}">${s.sleepAvg>0?s.sleepAvg.toFixed(1)+'h':'—'}</span></div>
+        <div class="srow"><span>Water (7d)</span><span class="sval">${s.hydDays}/7</span></div>
+        <div class="srow"><span>Meals today</span><span class="sval">${s.mealCount}</span></div>
+      </div>
+    </div>
+
+    <!-- Hustles -->
+    <div class="sblock">
+      <div class="sblock-title">🚀 Active Hustles</div>
+      ${hustleHTML}
+    </div>
+  `;
+
+  document.getElementById('prog-overlay').classList.add('open');
+  document.getElementById('prog-sheet').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeProgressModal() {
+  document.getElementById('prog-overlay').classList.remove('open');
+  document.getElementById('prog-sheet').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 // ─────────────────────────────────────────────
@@ -2917,6 +3040,17 @@ window.addEventListener('pageshow', function(e) {
   }
 });
 </script>
+
+<!-- ── PROGRESS MODAL ── -->
+<div class="prog-overlay" id="prog-overlay" onclick="closeProgressModal()"></div>
+<div class="prog-sheet" id="prog-sheet">
+  <div class="prog-sheet-handle"></div>
+  <div class="prog-sheet-head">
+    <span class="prog-sheet-title">📊 Progress Breakdown</span>
+    <button class="prog-sheet-close" onclick="closeProgressModal()">✕</button>
+  </div>
+  <div class="prog-sheet-body" id="prog-sheet-body"></div>
+</div>
 
 <!-- ── GAMING WARNING OVERLAY ── -->
 <div id="gaming-warn">
