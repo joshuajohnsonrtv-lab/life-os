@@ -111,9 +111,8 @@
     justify-content: center;
     gap: 14px;
     pointer-events: none;
-    transition: opacity 0.4s;
   }
-  .panel-loading.hidden { opacity: 0; }
+  .panel-loading.hidden { display: none; }
   .panel-loading .spin {
     width: 28px; height: 28px;
     border: 2px solid rgba(255,255,255,0.08);
@@ -205,12 +204,9 @@
   }
 
   function onFrameLoad(name) {
-    // Hide loading overlay
+    // Remove loading overlay instantly — no fade
     const overlay = document.getElementById('load-' + name);
-    if (overlay) {
-      overlay.classList.add('hidden');
-      setTimeout(() => overlay.remove(), 500);
-    }
+    if (overlay) overlay.remove();
     // Mark tab as ready (shows subtle dot)
     document.getElementById('tab-' + name).classList.add('ready');
   }
