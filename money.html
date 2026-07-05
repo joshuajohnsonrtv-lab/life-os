@@ -4162,13 +4162,10 @@ function disconnectFirebase() {
 updateSaveStatus();
 (function(){ if(getFbConfig()) initFirebase(); else updateCloudStatus('off'); })();
 
-// Render dashboard immediately — one rAF tick ensures Chart.js canvas dims are computed.
-requestAnimationFrame(function() {
-  requestAnimationFrame(function() {
-    showPage('dashboard');
-    updateMobTitle('dashboard');
-  });
-});
+// Render dashboard synchronously so data is populated before the iframe onload fires.
+// page-dashboard already has class="page active" in HTML so no showPage needed.
+renderDashboard();
+updateMobTitle('dashboard');
 
 // One-time hustle cleanup — keep only Jet Washing + Personal Brands
 (function() {
