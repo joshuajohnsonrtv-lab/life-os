@@ -22,11 +22,52 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;
 }
 .hdr-title{font-size:16px;font-weight:900;letter-spacing:-0.5px;white-space:nowrap;}
-.out-wrap{display:flex;align-items:center;gap:10px;flex:1;min-width:160px;}
+.out-wrap{display:flex;align-items:center;gap:10px;flex:1;min-width:160px;cursor:pointer;padding:4px 6px;border-radius:8px;transition:background .15s;}
+.out-wrap:hover{background:rgba(255,255,255,.05);}
 .out-label{font-size:10px;color:var(--muted);white-space:nowrap;font-weight:700;text-transform:uppercase;}
 .out-track{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden;}
 .out-fill{height:100%;border-radius:4px;background:var(--gold);transition:width 1.2s ease,background 1s ease;}
 .out-pct{font-size:13px;font-weight:900;min-width:36px;text-align:right;transition:color 1s ease;}
+
+/* ── FACIAL EXERCISE MODAL ── */
+.face-check-item{display:flex;align-items:center;gap:10px;padding:9px 0;
+  border-bottom:1px solid var(--border);cursor:pointer;user-select:none;}
+.face-check-item:last-child{border-bottom:none;}
+.face-check-box{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+  flex-shrink:0;transition:all .15s;}
+.face-check-item.done .face-check-box{background:var(--green);border-color:var(--green);color:#000;}
+.face-check-label{font-size:12px;font-weight:600;flex:1;}
+.face-check-item.done .face-check-label{text-decoration:line-through;color:var(--muted);}
+.face-start-btn{width:100%;padding:13px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,rgba(245,197,66,.18),rgba(245,197,66,.08));
+  border:1px solid rgba(245,197,66,.35);color:var(--gold);
+  font-size:13px;font-weight:800;cursor:pointer;transition:all .15s;font-family:inherit;}
+.face-start-btn:hover{background:rgba(245,197,66,.22);}
+.face-start-btn.active{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:#ef4444;}
+
+/* ── PROGRESS MODAL ── */
+.prog-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:900;
+  opacity:0;pointer-events:none;transition:opacity .25s;}
+.prog-overlay.open{opacity:1;pointer-events:auto;}
+.prog-sheet{
+  position:fixed;bottom:0;left:0;right:0;z-index:901;
+  background:#0e1016;border-top:1px solid rgba(255,255,255,.1);border-radius:18px 18px 0 0;
+  max-height:82vh;display:flex;flex-direction:column;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);
+}
+.prog-sheet.open{transform:translateY(0);}
+.prog-sheet-handle{width:36px;height:4px;background:rgba(255,255,255,.18);border-radius:2px;
+  margin:10px auto 0;}
+.prog-sheet-head{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.prog-sheet-title{font-size:13px;font-weight:900;letter-spacing:.3px;}
+.prog-sheet-close{background:none;border:none;color:var(--muted);font-size:18px;
+  cursor:pointer;padding:0 4px;line-height:1;}
+.prog-sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px 32px;
+  display:flex;flex-direction:column;gap:12px;}
+.prog-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:380px){.prog-grid{grid-template-columns:1fr;}}
 .pot-badge{font-size:10px;font-weight:700;white-space:nowrap;padding:3px 10px;
   border-radius:20px;border:1px solid rgba(168,85,247,.35);background:rgba(168,85,247,.07);color:var(--purple);}
 .refresh-btn{padding:4px 10px;border-radius:8px;border:1px solid var(--border);background:transparent;
@@ -34,12 +75,27 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .refresh-btn:hover{border-color:var(--gold);color:var(--gold);}
 
 /* ── LOC BAR ── */
-.loc-bar{display:flex;gap:0;padding:8px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.loc-bar{
+  display:flex;align-items:center;gap:0;
+  padding:8px 18px;border-bottom:1px solid var(--border);flex-shrink:0;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.loc-bar::-webkit-scrollbar{display:none;}
+.loc-group{display:flex;gap:0;flex-shrink:0;}
 .loc-btn{padding:7px 18px;border:1px solid var(--border);background:transparent;
-  color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
-.loc-btn:first-child{border-radius:8px 0 0 8px;}
-.loc-btn:last-child{border-radius:0 8px 8px 0;border-left:none;}
+  color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.loc-group .loc-btn:first-child{border-radius:8px 0 0 8px;}
+.loc-group .loc-btn:last-child{border-radius:0 8px 8px 0;border-left:none;}
 .loc-btn.active{background:var(--gold);color:#000;border-color:var(--gold);}
+.save-btn{
+  margin-left:12px;flex-shrink:0;padding:6px 14px;
+  background:transparent;border:1px solid var(--border);border-radius:8px;
+  color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;
+  transition:border-color .2s,color .2s;white-space:nowrap;
+}
+.save-btn:hover{border-color:var(--gold);color:var(--gold);}
+.save-btn.saved{border-color:var(--gold);color:var(--gold);}
 
 /* ── BODY ── */
 .sim-body{display:flex;flex:1;overflow:hidden;}
@@ -355,10 +411,61 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   border:1px dashed rgba(100,140,255,.12);border-radius:4px;
 }
 .pillow{
-  position:absolute;top:380px;left:28px;width:22px;height:38px;z-index:5;
-  background:linear-gradient(135deg,#304070,#202e58);
-  border:1px solid #405080;border-radius:4px;
+  position:absolute;top:380px;left:21px;width:20px;height:44px;z-index:6;
+  background:linear-gradient(180deg,#304070,#202e58);
+  border:1px solid #405080;border-radius:5px;
   box-shadow:0 2px 6px rgba(0,0,0,.5);
+}
+
+/* ── SLEEPING CAT ── */
+.room-cat{
+  position:absolute;top:389px;left:186px;
+  width:38px;height:22px;
+  z-index:5;pointer-events:none;
+}
+.cat-body{
+  position:relative;width:30px;height:14px;
+  background:#2f2f2f;border-radius:50%;
+  box-shadow:0 1px 5px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.04);
+  animation:cat-breathe 4.1s ease-in-out infinite;
+  transform-origin:center;
+}
+/* head with ear nubs via clip-path */
+.cat-body::before{
+  content:'';position:absolute;
+  width:14px;height:11px;
+  background:#2f2f2f;
+  clip-path:polygon(0% 45%,18% 0%,32% 38%,68% 38%,82% 0%,100% 45%,100% 100%,0% 100%);
+  top:-8px;left:0;
+}
+/* tail: sweeps right then curls up at the tip */
+.cat-body::after{
+  content:'';position:absolute;
+  width:13px;height:18px;
+  border:2.5px solid #505050;
+  border-left:none;border-bottom:none;
+  border-radius:0 50% 0 0;
+  right:-12px;top:-10px;
+  transform:rotate(12deg);
+  transform-origin:left bottom;
+}
+@keyframes cat-breathe{
+  0%,100%{transform:scaleY(1);}
+  50%{transform:scaleY(1.12);}
+}
+/* cat ZZZ — offset from character's ZZZ so they don't sync */
+@keyframes cat-zzz{
+  0%{opacity:0;transform:translate(0,0) scale(.6);}
+  30%{opacity:1;}
+  100%{opacity:0;transform:translate(4px,-13px) scale(1);}
+}
+.room-cat::after{
+  content:'z z';position:absolute;
+  top:-9px;right:1px;
+  font-size:7px;font-weight:700;letter-spacing:2px;
+  color:#7aa8d8;pointer-events:none;
+  animation:cat-zzz 2.7s ease-out infinite;
+  animation-delay:1.3s;
 }
 
 /* ── FAN — mid-right, clear of window ── */
@@ -367,8 +474,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   border-radius:50%;border:2px solid #383838;background:radial-gradient(circle,#1a1a1a,#0a0a0a);
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 2px 8px rgba(0,0,0,.6);
-  transition:box-shadow .4s;
+  transition:box-shadow .4s;cursor:pointer;
 }
+.fan:hover{box-shadow:0 0 8px rgba(245,197,66,.25),0 2px 8px rgba(0,0,0,.6);}
 .fan.on{box-shadow:0 0 14px rgba(180,220,255,.3),0 2px 8px rgba(0,0,0,.6);}
 .fan-blade{
   width:24px;height:24px;border-radius:50%;
@@ -524,6 +632,143 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 
 
+/* ── CHARACTER ANIMATIONS ── */
+
+/* IDLE — gentle breathing bob on every standing state */
+@keyframes char-idle-bob {
+  0%,100%{transform:translateY(0);}
+  50%     {transform:translateY(-1.5px);}
+}
+.char-figure{animation:char-idle-bob 2.8s ease-in-out infinite;}
+
+/* SLEEPING — slow whole-body pulse while laying */
+@keyframes char-sleep-breathe {
+  0%,100%{transform:scale(1);}
+  45%    {transform:scale(1.045);}
+}
+.char-figure.laying{animation:char-sleep-breathe 3.6s ease-in-out infinite;}
+
+/* ZZZ — floats up above the bubble when sleeping */
+@keyframes char-zzz-float {
+  0%  {opacity:0;transform:translate(0,0)   scale(.7);}
+  35% {opacity:1;}
+  100%{opacity:0;transform:translate(8px,-16px) scale(1.2);}
+}
+.char-bubble.zzz::before{
+  content:'z z z';
+  position:absolute;top:-18px;right:2px;
+  font-size:8px;letter-spacing:3px;font-weight:700;
+  color:#90b4ee;pointer-events:none;
+  animation:char-zzz-float 2.2s ease-out infinite;
+}
+
+/* MEDITATING — float up + purple aura glow on head */
+@keyframes char-med-float {
+  0%,100%{transform:translateY(0);}
+  50%    {transform:translateY(-3px);}
+}
+@keyframes char-med-aura {
+  0%,100%{box-shadow:0 0 0 0 rgba(167,139,250,0);}
+  50%    {box-shadow:0 0 10px 4px rgba(167,139,250,.38);}
+}
+.char-figure.meditating{animation:char-med-float 3s ease-in-out infinite;}
+.char-head.meditating  {animation:char-med-aura  3s ease-in-out infinite;}
+
+/* COOKING — side-to-side stir sway */
+@keyframes char-cook {
+  0%,100%{transform:translateY(0)   rotate(0deg);}
+  30%    {transform:translateY(-1.5px) rotate(2.5deg);}
+  70%    {transform:translateY(-1.5px) rotate(-2.5deg);}
+}
+.char-figure.cooking{animation:char-cook 1s ease-in-out infinite;}
+
+/* FRIDGE CHECK — lean-in peek */
+@keyframes char-fridge-check {
+  0%,65%,100%{transform:translateX(0);}
+  32%        {transform:translateX(4px);}
+}
+.char-figure.fridge-check{animation:char-fridge-check 2.4s ease-in-out infinite;}
+
+/* FACIAL EXERCISES — head rapidly wobbles side-to-side (jaw/cheek work) */
+@keyframes char-face-ex-head {
+  0%  {transform:rotate(-7deg) scaleX(1.06);}
+  25% {transform:rotate(7deg)  scaleX(0.94);}
+  50% {transform:rotate(-5deg) scaleX(1.04);}
+  75% {transform:rotate(5deg)  scaleX(0.96);}
+  100%{transform:rotate(-7deg) scaleX(1.06);}
+}
+@keyframes char-face-ex-body {
+  0%,100%{transform:translateY(0);}
+  50%    {transform:translateY(-2px);}
+}
+.char-figure.face-ex{animation:char-face-ex-body .6s ease-in-out infinite;}
+.char-head.face-ex  {animation:char-face-ex-head .35s ease-in-out infinite;}
+
+/* AT-DESK WORKING — bird's-eye view, typing micro-bounce */
+@keyframes char-desk-type {
+  0%,100%{transform:translateY(0);}
+  25%,75%{transform:translateY(-1px);}
+  50%    {transform:translateY(0);}
+}
+
+/* ── SEATED IDLE (in chair, no activity) ── */
+.char-figure.seated-idle{
+  animation:none; /* no bob while sitting still */
+}
+.char-figure.seated-idle .char-body{
+  /* Shorter bottom half — legs hidden by chair seat */
+  clip-path:polygon(0% 0%,100% 0%,82% 52%,82% 76%,18% 76%,18% 52%);
+}
+
+/* ── AT-DESK WORKING (seated, bird's-eye facing UP toward desk) ──
+   Character sits in chair facing the desk (which is above in screen space).
+   We see: back of head → wide shoulders → arms reaching forward (upward). */
+.char-figure.at-desk{
+  position:relative;gap:2px;
+  animation:char-desk-type 0.9s ease-in-out infinite;
+}
+/* Back of head — slightly wider oval from above */
+.char-figure.at-desk .char-head{
+  width:13px;height:11px;border-radius:50%;
+  flex-shrink:0;
+  position:relative;z-index:2; /* head renders over the arms behind it */
+}
+/* Neck hidden — body connects directly */
+.char-figure.at-desk .char-neck{display:none;}
+/* Upper back / shoulders from above — wider than head */
+.char-figure.at-desk .char-body{
+  width:22px;height:9px;
+  clip-path:none;
+  background:linear-gradient(180deg,#111 0%,#1a1a1a 100%);
+  border-radius:50%;
+  overflow:visible;
+  position:relative;z-index:1;
+  margin-top:0;
+}
+/* Left arm reaches UPWARD (toward desk, which is above in screen space).
+   Bottom of arm is anchored near top of body; arm extends up past the head. */
+.char-figure.at-desk .char-body::before{
+  content:'';position:absolute;
+  bottom:4px;left:1px;      /* start near top of 9px-tall body */
+  width:6px;height:22px;    /* tall enough to extend past the head */
+  background:#111;border-radius:3px 3px 2px 2px;
+  transform:rotate(-9deg);transform-origin:bottom center;
+}
+/* Right arm — mirror */
+.char-figure.at-desk .char-body::after{
+  content:'';position:absolute;
+  bottom:4px;right:1px;
+  width:6px;height:22px;
+  background:#111;border-radius:3px 3px 2px 2px;
+  transform:rotate(9deg);transform-origin:bottom center;
+}
+/* Chair rotated so back faces viewer (into working position) */
+.chair.at-desk{
+  transform:scaleY(-1);
+  transform-origin:center center;
+}
+.chair.at-desk .chair-back,.chair.at-desk .chair-seat{border-color:var(--gold);}
+
 /* ── OUTSIDE ── */
 .outside-wrap{flex:1;padding:20px;overflow-y:auto;display:none;}
 .outside-wrap.show{display:block;}
@@ -577,6 +822,23 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .dot-track{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px;}
 .dot{width:13px;height:13px;border-radius:3px;border:1px solid #222;}
 
+/* ── ZONE ACTION BUTTONS ── */
+.zone-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.zone-btn{
+  flex:1;min-width:90px;padding:9px 10px;border-radius:10px;
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--muted2);font-size:11px;font-weight:700;cursor:pointer;
+  transition:border-color .15s,background .15s,color .15s;text-align:center;font-family:inherit;
+}
+.zone-btn:hover{border-color:var(--gold);background:rgba(245,197,66,.07);color:var(--gold);}
+.zone-btn.zb-gold{background:rgba(245,197,66,.1);border-color:rgba(245,197,66,.35);color:var(--gold);}
+.zone-btn.zb-gold:hover{background:rgba(245,197,66,.18);}
+.walk-log-row{display:flex;gap:8px;align-items:center;margin-top:12px;}
+.walk-log-row select{
+  flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;cursor:pointer;
+}
+
 /* ── ACTIVITY MENU ── */
 .act-menu{
   position:absolute;z-index:30;
@@ -595,6 +857,51 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 }
 .act-bubble:hover{background:rgba(245,197,66,.1);border-color:var(--gold);color:var(--gold);}
 @keyframes bubblePop{to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* ── GAMING WARNING OVERLAY ── */
+#gaming-warn{
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,.93);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s;
+}
+#gaming-warn.show{opacity:1;pointer-events:auto;}
+.gwarn-box{
+  background:#0b0b14;
+  border:1px solid rgba(220,38,38,.3);
+  border-radius:20px;padding:34px 28px 28px;
+  max-width:320px;width:90%;text-align:center;
+  box-shadow:0 0 80px rgba(220,38,38,.12);
+}
+.gwarn-icon{font-size:38px;margin-bottom:14px;}
+.gwarn-title{
+  font-size:17px;font-weight:800;color:#fff;
+  margin-bottom:10px;line-height:1.35;
+}
+.gwarn-body{
+  font-size:12.5px;color:rgba(255,255,255,.55);
+  line-height:1.75;margin-bottom:26px;
+}
+.gwarn-btn-better{
+  width:100%;background:linear-gradient(135deg,#6d28d9,#a855f7);
+  border:none;border-radius:13px;color:#fff;
+  font-size:14px;font-weight:800;padding:15px;cursor:pointer;
+  letter-spacing:.4px;margin-bottom:10px;
+  transition:transform .1s,box-shadow .15s;
+}
+.gwarn-btn-better:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(139,92,246,.5);}
+.gwarn-btn-weak{
+  width:100%;background:transparent;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:13px;color:rgba(255,255,255,.28);
+  font-size:11px;font-weight:600;padding:10px;cursor:pointer;
+  transition:border-color .15s,color .15s;
+}
+.gwarn-btn-weak:hover{border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.45);}
+.gwarn-suggestions{
+  display:flex;flex-direction:column;gap:7px;margin-top:10px;
+}
 
 /* PC tower tooltip */
 .tower-tip{
@@ -673,362 +980,253 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   .room-wrap { padding:4px; }
 }
 
-/* ════════════════════════════════════════════════
-   KITCHEN ROOM
-   ════════════════════════════════════════════════ */
+/* ── DUMBBELL ── */
+.dumbbell{position:absolute;top:142px;right:36px;display:flex;align-items:center;
+  z-index:4;cursor:pointer;opacity:.6;transition:opacity .2s;}
+.dumbbell:hover{opacity:1;}
+.db-w{width:8px;height:15px;background:#282830;border:1px solid #363640;border-radius:2px;flex-shrink:0;}
+.db-b{width:18px;height:5px;background:#1e1e26;border-top:1px solid #2c2c38;border-bottom:1px solid #2c2c38;}
 
-/* fix triple-button border join */
-.loc-btn + .loc-btn { border-left: none; }
+/* ── JOURNAL (on desk) ── */
+.journal{position:absolute;top:58px;left:40px;width:18px;height:26px;z-index:7;
+  background:linear-gradient(135deg,#3d2a18,#2a1c10);
+  border:1px solid #604028;border-radius:2px;cursor:pointer;
+  box-shadow:1px 2px 5px rgba(0,0,0,.6);transition:border-color .2s;}
+.journal:hover{border-color:#a06840;}
+.journal::after{content:'';position:absolute;right:2px;top:2px;bottom:2px;width:1px;
+  background:rgba(255,240,200,.15);}
 
-.kitchen-wrap { flex:1; display:flex; align-items:center; justify-content:center; padding:16px; overflow:hidden; }
-.kitchen-wrap.hidden { display:none; }
-.kitchen-container { position:relative; width:430px; height:510px; flex-shrink:0; }
+/* ── JOURNAL MODAL ── */
+.journal-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;
+  display:flex;align-items:center;justify-content:center;padding:16px;}
+.journal-inner{width:min(340px,92vw);max-height:82vh;background:#0d0d1a;
+  border:1px solid #2a2840;border-radius:14px;display:flex;flex-direction:column;overflow:hidden;}
+.j-hdr{padding:14px 18px 10px;border-bottom:1px solid #1e1e30;
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.j-title{font-size:14px;font-weight:800;color:#e8e0d0;letter-spacing:.5px;}
+.j-x{background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:22px;line-height:1;}
+.j-body{overflow-y:auto;flex:1;padding:10px 16px;}
+.todo-row{display:flex;align-items:center;gap:10px;padding:7px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);}
+.todo-row input[type=checkbox]{width:16px;height:16px;flex-shrink:0;accent-color:#a855f7;cursor:pointer;}
+.todo-row .t-txt{flex:1;font-size:13px;color:rgba(255,255,255,.82);line-height:1.4;}
+.todo-row.t-done .t-txt{text-decoration:line-through;opacity:.36;}
+.todo-row .t-del{background:none;border:none;color:rgba(255,255,255,.18);cursor:pointer;
+  font-size:17px;padding:0 2px;line-height:1;}
+.todo-row .t-del:hover{color:#ef4444;}
+.j-add{display:flex;gap:8px;padding:10px 16px;border-top:1px solid #1e1e30;flex-shrink:0;}
+.j-add input{flex:1;background:#141420;border:1px solid #2a2840;color:rgba(255,255,255,.88);
+  padding:8px 12px;border-radius:8px;font-size:13px;outline:none;font-family:inherit;}
+.j-add input:focus{border-color:#a855f7;}
+.j-add input::placeholder{color:rgba(255,255,255,.22);}
+.j-add-btn{background:#a855f7;border:none;color:white;padding:8px 14px;
+  border-radius:8px;cursor:pointer;font-size:17px;font-weight:700;transition:background .15s;}
+.j-add-btn:hover{background:#9333ea;}
+.j-foot{display:flex;gap:8px;padding:8px 16px 12px;border-top:1px solid #1e1e30;flex-shrink:0;}
+.j-foot button{flex:1;background:transparent;border:1px solid #2a2840;color:rgba(255,255,255,.42);
+  padding:7px;border-radius:8px;cursor:pointer;font-size:11px;letter-spacing:.5px;
+  transition:all .18s;font-family:inherit;}
+.j-foot button:hover{border-color:#a855f7;color:#c084fc;}
+.tmpl-list{padding:6px 0;}
+.tmpl-row{display:flex;align-items:center;gap:8px;padding:7px 8px;
+  background:#141420;border:1px solid #1e1e30;border-radius:6px;margin-bottom:6px;}
+.tmpl-row .tmpl-nm{flex:1;font-size:12px;color:rgba(255,255,255,.65);}
+.tmpl-load{background:rgba(168,85,247,.14);border:1px solid rgba(168,85,247,.4);
+  color:#c084fc;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .15s;}
+.tmpl-load:hover{background:rgba(168,85,247,.28);}
+.tmpl-del{background:transparent;border:1px solid #2a2840;color:rgba(255,255,255,.2);
+  padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px;}
+.tmpl-del:hover{border-color:#ef4444;color:#ef4444;}
+.j-empty{font-size:12px;color:rgba(255,255,255,.22);padding:10px 2px;}
+.j-tabs{display:flex;gap:0;border-bottom:1px solid #1e1e30;flex-shrink:0;}
+.j-tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;
+  color:rgba(255,255,255,.35);font-size:12px;font-weight:700;padding:10px 6px;cursor:pointer;
+  letter-spacing:.3px;transition:color .15s,border-color .15s;font-family:inherit;}
+.j-tab-btn.active{color:#a855f7;border-bottom-color:#a855f7;}
+.j-tab-btn:hover{color:rgba(255,255,255,.65);}
+.j-journal-body{overflow-y:auto;flex:1;padding:10px 16px;display:flex;flex-direction:column;gap:8px;}
+.j-journal-txt{width:100%;background:#141420;border:1px solid #2a2840;color:rgba(255,255,255,.88);
+  padding:10px 12px;border-radius:8px;font-size:13px;resize:none;outline:none;
+  font-family:inherit;line-height:1.5;min-height:100px;}
+.j-journal-txt:focus{border-color:#a855f7;}
+.j-journal-txt::placeholder{color:rgba(255,255,255,.22);}
+.j-moods{display:flex;gap:6px;flex-wrap:wrap;}
+.j-mood-btn{background:none;border:1px solid #2a2840;border-radius:6px;padding:5px 9px;
+  font-size:16px;cursor:pointer;transition:all .15s;}
+.j-mood-btn.active{border-color:#a855f7;background:rgba(168,85,247,.18);}
+.j-journal-entry{padding:8px 10px;background:#141420;border:1px solid #1e1e30;
+  border-radius:8px;cursor:pointer;}
+.j-journal-entry:hover{border-color:#2a2840;}
+.j-entry-hdr{display:flex;align-items:center;gap:8px;margin-bottom:3px;}
+.j-entry-date{font-size:11px;font-weight:600;color:rgba(255,255,255,.4);}
+.j-entry-text{font-size:12px;color:rgba(255,255,255,.65);line-height:1.45;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 
-/* room shell — identical floor to bedroom */
-.k-room {
-  position:absolute; inset:0;
-  background:var(--floor); border:3px solid #2a2a1a; border-radius:4px; overflow:hidden;
-}
-.k-room::before {
-  content:''; position:absolute; inset:0; z-index:0;
-  background-image:
-    repeating-linear-gradient(90deg, transparent 0px, transparent 38px, rgba(0,0,0,.18) 38px, rgba(0,0,0,.18) 39px),
-    repeating-linear-gradient(0deg, transparent 0px, transparent 27px, rgba(255,255,255,.022) 27px, rgba(255,255,255,.022) 28px);
-  background-size:39px 28px;
-}
-/* walls — same colours as bedroom */
-.k-wt { position:absolute; top:0; left:0; right:0; height:16px; background:linear-gradient(180deg,#1a192c,#13121e); border-bottom:2px solid #2d2b40; z-index:2; }
-.k-wl { position:absolute; top:0; left:0; bottom:0; width:16px; background:linear-gradient(90deg,#1a192c,#13121e); border-right:2px solid #2d2b40; z-index:2; }
-.k-wr { position:absolute; top:0; right:0; bottom:0; width:16px; background:linear-gradient(270deg,#1a192c,#13121e); border-left:2px solid #2d2b40; z-index:2; }
-.k-wb { position:absolute; bottom:0; left:0; right:0; height:16px; background:linear-gradient(0deg,#1a192c,#13121e); border-top:2px solid #2d2b40; z-index:2; }
+/* ── KITCHEN VIEW ── */
+.kitchen-wrap{flex:1;display:none;align-items:center;justify-content:center;
+  overflow:hidden;padding:16px;}
+.kitchen-wrap.show{display:flex;}
+.kitch{position:absolute;inset:0;
+  background:linear-gradient(180deg,#0d0f16 0%,#0f1218 55%,#111420 100%);overflow:hidden;}
 
-/* ─ UPPER CABINETS ─ */
-.k-cab {
-  position:absolute; top:16px; left:18px; width:252px; height:52px; z-index:3;
-  background:linear-gradient(180deg,#2c2040 0%,#1e1430 100%);
-  border:2px solid #3e2d55; border-top:none; border-radius:0 0 3px 3px;
-  box-shadow: inset 0 -1px 0 rgba(200,160,255,.05), 0 4px 12px rgba(0,0,0,.55);
-}
-/* three panel lines */
-.k-cab::before {
-  content:''; position:absolute; top:7px; bottom:7px; left:33.3%; right:33.3%;
-  border-left:1px solid rgba(255,255,255,.07); border-right:1px solid rgba(255,255,255,.07);
-}
-/* handles */
-.k-cab::after {
-  content:''; position:absolute; bottom:10px; left:14%;
-  width:34px; height:4px; border-radius:2px;
-  background:rgba(100,80,130,.5); border:1px solid rgba(140,110,170,.4);
-  box-shadow: 83px 0 0 rgba(100,80,130,.5), 83px 0 0 1px rgba(140,110,170,.4),
-              166px 0 0 rgba(100,80,130,.5), 166px 0 0 1px rgba(140,110,170,.4);
-}
+/* upper cabinet strip — top wall, ends at right counter */
+.k-ucab{position:absolute;top:0;left:0;width:358px;height:16px;background:#16140f;
+  border-bottom:1px solid #2e2a22;}
+.k-ucab::after{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent,transparent 58px,#242018 58px,#242018 60px);}
 
-/* ─ COUNTER SURFACE ─ */
-.k-counter {
-  position:absolute; top:68px; left:18px; width:252px; height:42px; z-index:3;
-  background:linear-gradient(180deg,#ede0cc 0%,#ddd0b4 100%);
-  border:2px solid #c0a87e; border-top:1px solid #f5e8d0;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 4px 14px rgba(0,0,0,.65);
-}
-/* drop shadow edge */
-.k-counter::after {
-  content:''; position:absolute; bottom:-7px; left:0; right:0; height:7px;
-  background:linear-gradient(180deg,rgba(0,0,0,.38),transparent); pointer-events:none;
-}
+/* top counter — horizontal (left:0 to right counter) */
+.k-ct{position:absolute;top:16px;left:0;width:358px;height:74px;
+  background:linear-gradient(180deg,#1c1a16,#161410);
+  border-right:2px solid #38342e;border-bottom:2px solid #38342e;}
+.k-ct::after{content:'';position:absolute;bottom:-3px;left:0;width:100%;height:10px;
+  background:linear-gradient(90deg,#9a8c6a,#c4b080,#9a8c6a);}
 
-/* ─ STOVE — dark inset, 4 burner rings ─ */
-.k-stove {
-  position:absolute; top:70px; left:26px; width:88px; height:37px; z-index:4;
-  background:#141414; border:2px solid #2a2a2a; border-radius:2px;
-  box-shadow: inset 0 0 12px rgba(0,0,0,.85);
-}
-/* 4 burner circles (front-left anchor, 3 more via box-shadow) */
-.k-stove::before {
-  content:''; position:absolute; top:5px; left:8px;
-  width:19px; height:19px; border-radius:50%;
-  background:#0a0a0a; border:2px solid #282828;
-  box-shadow:
-    27px 0   0 #0a0a0a, 27px 0   0 2px #282828,
-    0   16px 0 #0a0a0a, 0   16px 0 2px #282828,
-    27px 16px 0 #0a0a0a, 27px 16px 0 2px #282828;
-}
-/* glowing inner rings on the two lit front burners */
-.k-stove::after {
-  content:''; position:absolute; top:5px; left:8px;
-  width:19px; height:19px; border-radius:50%;
-  box-shadow:
-    0 0 5px 3px rgba(255,110,20,.55),
-    27px 0 5px 3px rgba(255,110,20,.35),
-    0 16px 2px 1px rgba(255,80,10,.12),
-    27px 16px 2px 1px rgba(255,80,10,.08);
-  animation:kBurner 1.9s ease-in-out infinite;
-}
-@keyframes kBurner{0%,100%{opacity:.65;}50%{opacity:1;}}
+/* lower cabinet fronts — starts right of left counter */
+.k-lcab{position:absolute;top:90px;left:70px;width:288px;height:22px;
+  background:#131008;border-bottom:1px solid #28241c;}
+.k-lcab::after{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent,transparent 54px,#201e16 54px,#201e16 56px);}
 
-/* stove orange glow pool */
-.k-stove-glow {
-  position:absolute; top:18px; left:16px; width:200px; height:170px; z-index:1; pointer-events:none;
-  background:
-    radial-gradient(ellipse 75px 85px at 62px 100px, rgba(255,100,20,.30) 0%, rgba(255,70,10,.16) 42%, transparent 78%),
-    radial-gradient(ellipse 40px 50px at 95px 100px, rgba(255,130,30,.18) 0%, transparent 65%);
-  animation:kStoveFlicker 1.9s ease-in-out infinite;
-}
-@keyframes kStoveFlicker{0%,100%{opacity:.7;}45%{opacity:1;}72%{opacity:.82;}}
+/* LEFT COUNTER — goes down left wall to island depth */
+.k-lc{position:absolute;top:90px;left:0;width:70px;height:168px;
+  background:linear-gradient(90deg,#1c1a16,#161410);
+  border-right:2px solid #38342e;border-bottom:2px solid #38342e;}
+.k-lc::before{content:'';position:absolute;top:-2px;left:0;right:-2px;height:10px;
+  background:linear-gradient(180deg,#c4b080,#9a8c6a);}
+.k-lc::after{content:'';position:absolute;top:10px;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(180deg,transparent,transparent 52px,#28241c 52px,#28241c 54px);}
 
-/* ─ SINK ─ */
-.k-sink {
-  position:absolute; top:71px; left:148px; width:68px; height:33px; z-index:4;
-  background:linear-gradient(160deg,#6e8e9e 0%,#486a7a 100%);
-  border:2px solid #587a8a; border-radius:2px;
-  box-shadow: inset 0 2px 8px rgba(0,0,0,.55), inset 0 0 14px rgba(0,30,60,.38);
-}
-.k-sink::after {
-  content:''; position:absolute; bottom:4px; left:50%; transform:translateX(-50%);
-  width:12px; height:12px; border-radius:50%;
-  background:#3e5e6e; border:1px solid #2e4e5e;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,.6);
-}
+/* LEFT FRIDGE — on left counter, door faces into kitchen */
+.k-fridge-l{position:absolute;top:110px;left:2px;width:66px;height:80px;
+  background:linear-gradient(90deg,#20222e,#1c1e2c);
+  border:1px solid #2e3040;border-radius:2px;cursor:pointer;z-index:5;
+  transition:border-color .2s,box-shadow .2s;}
+.k-fridge-l:hover{border-color:#4d9eff;box-shadow:0 0 8px rgba(77,158,255,.25);}
+.k-fridge-l::after{content:'';position:absolute;top:42px;left:0;right:0;height:1px;background:#2c3040;}
+.k-fridge-l-h{position:absolute;top:12px;right:5px;width:3px;height:18px;
+  background:#3a4058;border-radius:2px;pointer-events:none;}
+.k-fridge-l-lbl{position:absolute;bottom:5px;left:0;right:0;text-align:center;
+  font-size:8px;color:rgba(255,255,255,.25);pointer-events:none;letter-spacing:.5px;}
 
-/* faucet stem + spout arm */
-.k-faucet {
-  position:absolute; top:59px; left:176px; width:7px; height:14px; z-index:5;
-  background:linear-gradient(90deg,#b0b0b0,#e8e8e8,#b0b0b0);
-  border:1px solid #888; border-radius:3px 3px 0 0;
-}
-.k-faucet::before {
-  content:''; position:absolute; bottom:100%; left:50%; transform:translateX(-50%);
-  width:25px; height:6px; border-radius:3px 3px 0 0;
-  background:linear-gradient(180deg,#d0d0d0,#a0a0a0);
-  border:1px solid #888; border-bottom:none;
-}
-/* water drip glow */
-.k-faucet::after {
-  content:''; position:absolute; bottom:-6px; left:50%; transform:translateX(-50%);
-  width:5px; height:5px; border-radius:50%;
-  background:rgba(140,220,255,.5);
-  box-shadow: 0 0 8px rgba(120,210,255,.9), 0 0 18px rgba(100,190,255,.35);
-  animation:kDrip 3s ease-in-out infinite;
-}
-@keyframes kDrip{0%,100%{opacity:0;transform:translateX(-50%) scale(.35);}48%,52%{opacity:1;transform:translateX(-50%) scale(1);}}
+/* right counter — extends to island bottom (y=330) */
+.k-cr{position:absolute;top:16px;right:0;width:72px;height:314px;
+  background:linear-gradient(180deg,#1c1a16,#161410);
+  border-left:2px solid #38342e;border-bottom:2px solid #38342e;}
+.k-cr::before{content:'';position:absolute;top:-2px;left:-2px;right:0;height:10px;
+  background:linear-gradient(90deg,#c4b080,#9a8c6a);}
+.k-cr::after{content:'';position:absolute;top:12px;left:4px;right:0;bottom:0;
+  background:repeating-linear-gradient(180deg,transparent,transparent 52px,#28241c 52px,#28241c 54px);}
 
-/* sink / water cyan glow */
-.k-sink-glow {
-  position:absolute; top:38px; left:108px; width:190px; height:130px; z-index:1; pointer-events:none;
-  background:radial-gradient(ellipse 65px 55px at 88px 72px,
-    rgba(60,200,240,.15) 0%, rgba(40,180,220,.08) 45%, transparent 78%);
-}
+/* island — right edge touches right counter */
+.k-island{position:absolute;top:258px;left:143px;width:215px;height:72px;
+  background:linear-gradient(180deg,#201e18,#1a1814);
+  border-top:2px solid #38342e;border-left:2px solid #38342e;border-bottom:2px solid #38342e;
+  border-radius:4px 0 0 4px;}
+.k-island::after{content:'';position:absolute;top:-3px;left:0;right:0;height:10px;
+  background:linear-gradient(90deg,#9a8c6a,#c4b080,#9a8c6a);border-radius:4px 0 0 0;}
 
-/* ─ KETTLE ─ */
-.k-kettle {
-  position:absolute; top:68px; left:231px; width:22px; height:28px; z-index:5;
-  background:linear-gradient(160deg,#d43a10 0%,#8a1800 100%);
-  border:1.5px solid #e04820; border-radius:4px 4px 3px 3px;
-}
-.k-kettle::before { /* lid */
-  content:''; position:absolute; top:-5px; left:2px; right:2px; height:6px;
-  background:linear-gradient(180deg,#e05020,#aa2200);
-  border:1px solid #f06030; border-bottom:none; border-radius:3px 3px 0 0;
-}
-.k-kettle::after { /* handle */
-  content:''; position:absolute; right:-7px; top:4px;
-  width:7px; height:14px; border-radius:0 5px 5px 0;
-  border:2px solid #c03010; border-left:none; background:transparent;
-}
-/* kettle warm glow */
-.k-kettle-glow {
-  position:absolute; top:28px; left:200px; width:100px; height:95px; z-index:2; pointer-events:none;
-  background:radial-gradient(ellipse 38px 48px at 43px 62px,
-    rgba(255,140,40,.22) 0%, rgba(255,100,20,.11) 48%, transparent 78%);
-  animation:kKettleGlow 2.1s ease-in-out infinite;
-}
-@keyframes kKettleGlow{0%,100%{opacity:.55;}50%{opacity:1;}}
+/* SINK — center of top counter */
+.k-sink{position:absolute;top:26px;left:152px;width:54px;height:46px;
+  background:#0c1018;border:2px solid #182030;border-radius:3px;
+  box-shadow:inset 0 3px 8px rgba(0,0,0,.6);cursor:pointer;transition:border-color .2s;}
+.k-sink:hover{border-color:#4a6080;}
+.k-sink.saved{border-color:var(--gold);}
+.k-tap{position:absolute;top:18px;left:171px;width:4px;height:14px;
+  background:#2a3040;border-radius:2px;}
+.k-tap::after{content:'';position:absolute;top:0;left:-5px;width:14px;height:3px;
+  background:#2a3040;border-radius:2px;}
 
-/* ─ MICROWAVE — wall-mounted, right of cabinets ─ */
-.k-microwave {
-  position:absolute; top:20px; left:272px; width:74px; height:46px; z-index:4;
-  background:linear-gradient(180deg,#111 0%,#0a0a0a 100%);
-  border:2px solid #1e1e1e; border-radius:3px;
-  box-shadow: 0 3px 10px rgba(0,0,0,.7);
-}
-/* viewing window */
-.k-microwave::before {
-  content:''; position:absolute; top:6px; left:6px; bottom:6px; right:20px;
-  background:#060810; border:1px solid #151520; border-radius:2px;
-  box-shadow: inset 0 0 8px rgba(0,100,50,.3);
-}
-/* control panel */
-.k-microwave::after {
-  content:''; position:absolute; top:6px; right:4px; bottom:6px; width:13px;
-  background:repeating-linear-gradient(0deg,#0a120a 0px,#0a120a 4px,#050a05 4px,#050a05 5px);
-  border-radius:2px;
-}
-/* microwave green LED */
-.k-mw-led {
-  position:absolute; top:28px; right:41px; width:4px; height:4px; border-radius:50%; z-index:5;
-  background:#00dd44;
-  box-shadow: 0 0 5px rgba(0,220,60,.95), 0 0 12px rgba(0,200,60,.45);
-  animation:kMwBlink 2.6s ease-in-out infinite;
-}
-@keyframes kMwBlink{0%,38%,100%{opacity:1;}18%,55%{opacity:.2;}}
-/* microwave green glow spill */
-.k-mw-glow {
-  position:absolute; top:16px; left:254px; width:130px; height:90px; z-index:1; pointer-events:none;
-  background:radial-gradient(ellipse 52px 38px at 60px 28px,
-    rgba(0,220,80,.10) 0%, rgba(0,180,60,.05) 52%, transparent 78%);
-}
+/* COOKER — middle of right counter, burners face left into kitchen */
+.k-cooker{position:absolute;top:160px;right:0;width:72px;height:72px;
+  background:#141418;border:1px solid #222228;border-left:2px solid #38342e;
+  cursor:pointer;transition:border-color .2s,box-shadow .2s;}
+.k-cooker:hover{border-color:#f97316;box-shadow:0 0 8px rgba(249,115,22,.3);}
+.k-cooker-br{position:absolute;width:16px;height:16px;border-radius:50%;
+  border:2px solid #303038;background:#1a1a20;}
 
-/* ─ FRIDGE — right side, tall ─ */
-.k-fridge {
-  position:absolute; top:16px; right:18px; width:64px; height:154px; z-index:3;
-  background:linear-gradient(180deg,#d6d6d6 0%,#bebebe 100%);
-  border:2px solid #999; border-radius:3px 3px 0 0;
-  box-shadow: inset 3px 0 0 rgba(255,255,255,.45), inset -2px 0 0 rgba(0,0,0,.15), 0 3px 14px rgba(0,0,0,.65);
-}
-/* freezer / fridge divider */
-.k-fridge::before {
-  content:''; position:absolute; left:0; right:0; top:40%;
-  height:3px; background:#999; box-shadow:0 0 4px rgba(0,0,0,.3);
-}
-/* two door handles */
-.k-fridge::after {
-  content:''; position:absolute; left:7px; top:12px;
-  width:6px; height:22px; border-radius:3px;
-  background:#888; border:1px solid #666;
-  box-shadow: 0 52px 0 #888, 0 52px 0 1px #666;
-}
-/* fridge cool blue glow */
-.k-fridge-glow {
-  position:absolute; top:16px; right:16px; width:230px; height:240px; z-index:1; pointer-events:none;
-  background:radial-gradient(ellipse at 100% 25%,
-    rgba(180,222,255,.22) 0%, rgba(180,220,255,.13) 22%, rgba(180,218,255,.05) 46%, transparent 68%);
-}
+/* MICROWAVE — mounted on right counter, top area */
+.k-micro{position:absolute;top:16px;right:0;width:72px;height:38px;
+  background:linear-gradient(180deg,#262630,#1e1e28);
+  border:1px solid #323240;border-left:2px solid #38342e;z-index:4;}
+.k-micro-scr{position:absolute;top:7px;left:8px;width:28px;height:24px;
+  background:#040c04;border:1px solid #0e1a0e;border-radius:2px;}
+.k-micro-btn{position:absolute;top:11px;right:8px;width:11px;height:11px;
+  border-radius:50%;background:#141420;border:1px solid #2c2c3c;}
+.k-micro-btn2{position:absolute;top:26px;right:8px;width:11px;height:11px;
+  border-radius:50%;background:#141420;border:1px solid #2c2c3c;}
 
-/* ─ CEILING LIGHT STRIP ─ */
-.k-ceiling-strip {
-  position:absolute; top:17px; left:75px; width:200px; height:3px; z-index:6;
-  background:linear-gradient(90deg,transparent,rgba(255,245,200,.65),rgba(255,248,215,.92),rgba(255,245,200,.65),transparent);
-  border-radius:2px;
-  box-shadow: 0 0 12px rgba(255,240,175,.55), 0 0 28px rgba(255,235,155,.25);
-}
-/* warm ceiling wash */
-.k-ceiling-glow {
-  position:absolute; top:16px; left:28px; width:278px; height:320px; z-index:1; pointer-events:none;
-  background:radial-gradient(ellipse at 50% 0%,
-    rgba(255,240,168,.11) 0%, rgba(255,232,148,.06) 30%, rgba(255,225,130,.02) 58%, transparent 75%);
-}
+/* DRAINING BOARD — left of sink */
+.k-drain{position:absolute;top:28px;left:88px;width:58px;height:42px;
+  background:#141210;border:1px solid #222018;border-radius:2px;}
+.k-drain::after{content:'';position:absolute;inset:4px 3px;
+  background:repeating-linear-gradient(0deg,transparent,transparent 5px,rgba(255,255,255,.06) 5px,rgba(255,255,255,.06) 6px);}
 
-/* ─ WINDOW — right wall ─ */
-.k-window {
-  position:absolute; right:0; top:182px; width:16px; height:70px; z-index:3;
-  background:rgba(180,220,255,.55); border-left:2px solid rgba(160,210,255,.9);
-  box-shadow: inset -1px 0 10px rgba(160,210,255,.35);
-}
-.k-window::after { content:''; position:absolute; top:50%; left:0; right:0; height:1px; background:rgba(160,210,255,.6); }
-/* daylight spill */
-.k-win-light {
-  position:absolute; right:8px; top:162px; width:160px; height:145px; z-index:1; pointer-events:none;
-  background:radial-gradient(ellipse at 100% 50%,
-    rgba(180,220,255,.18) 0%, rgba(180,220,255,.09) 35%, rgba(180,220,255,.03) 62%, transparent 78%);
-}
+/* window above sink */
+.k-win{position:absolute;top:0;left:152px;width:54px;height:16px;
+  background:rgba(80,120,200,.06);border:1px solid #1a2030;border-radius:0 0 2px 2px;}
 
-/* ─ DOOR — top wall, right (back to bedroom) ─ */
-.k-door {
-  position:absolute; top:0; right:36px; width:50px; height:60px; z-index:5;
-  background:rgba(255,255,255,.03); border:2px solid #2a2a2a; border-top:none;
-  border-radius:0 0 3px 3px; cursor:pointer;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
-  transition:all .2s;
-}
-.k-door:hover { background:rgba(245,197,66,.06); border-color:var(--gold); }
-.k-door-knob { position:absolute; left:6px; bottom:14px; width:5px; height:5px; border-radius:50%; background:#555; }
+/* (knife block and plant removed) */
 
-/* ─ KITCHEN TABLE ─ */
-.k-table {
-  position:absolute; top:248px; left:148px; width:134px; height:76px; z-index:3;
-  background:linear-gradient(180deg,#3e2810 0%,#2e1c08 100%);
-  border:2px solid #6b4520; border-radius:4px;
-  box-shadow: inset 0 1px 0 rgba(255,200,100,.07), 0 3px 12px rgba(0,0,0,.55);
-}
-.k-table::before {
-  content:''; position:absolute; inset:4px;
-  background-image:repeating-linear-gradient(90deg,transparent,transparent 16px,rgba(0,0,0,.10) 16px,rgba(0,0,0,.10) 17px);
-}
+/* island stools */
+.k-stool{position:absolute;width:22px;height:15px;
+  background:#181620;border:1px solid #2a2838;border-radius:2px 2px 0 0;
+  cursor:pointer;transition:border-color .15s,background .15s;}
+.k-stool:hover{background:#221e2c;border-color:#4a3878;}
+.k-stool.occupied{background:#2a2040;border-color:#6644aa;}
+.k-stool::after{content:'';position:absolute;bottom:-13px;left:50%;
+  transform:translateX(-50%);width:2px;height:13px;background:#1c1a24;}
 
-/* ─ CHAIRS ─ */
-.k-ch { position:absolute; z-index:4; display:flex; flex-direction:column; align-items:center; }
-.k-ch-back { width:32px; height:7px; background:linear-gradient(180deg,#5a5a68,#42424e); border:1.5px solid #6e6e7e; border-radius:3px 3px 0 0; }
-.k-ch-seat { width:32px; height:22px; background:linear-gradient(180deg,#4c4c5a,#38383e); border:1.5px solid #6a6a7a; border-bottom-width:2px; border-radius:0 0 4px 4px; box-shadow:0 3px 6px rgba(0,0,0,.5); }
+/* fridge delete button */
+.f-del{color:#ef4444 !important;border-color:rgba(239,68,68,.28) !important;}
+.f-del:hover{background:rgba(239,68,68,.18) !important;border-color:#ef4444 !important;}
 
-/* ─ PLANT — bottom-left corner ─ */
-.k-plant { position:absolute; bottom:22px; left:22px; width:30px; height:52px; z-index:4; }
-.k-plant-pot {
-  position:absolute; bottom:0; left:5px; width:20px; height:16px;
-  background:linear-gradient(180deg,#8b4513,#5c2d0a);
-  border:1px solid #a0520d; border-radius:2px 2px 4px 4px;
-}
-.k-plant-stem {
-  position:absolute; bottom:14px; left:14px; width:2px; height:20px;
-  background:#1a5c1a; border-radius:1px;
-}
-.k-plant-stem::before {
-  content:''; position:absolute; top:4px; left:-10px;
-  width:14px; height:9px; border-radius:50% 0 50% 0;
-  background:#1e7a1e; transform:rotate(-28deg);
-}
-.k-plant-stem::after {
-  content:''; position:absolute; top:9px; left:2px;
-  width:14px; height:9px; border-radius:0 50% 0 50%;
-  background:#24aa24; transform:rotate(22deg);
-}
-/* plant glow */
-.k-plant-glow {
-  position:absolute; bottom:10px; left:8px; width:65px; height:65px; z-index:1; pointer-events:none;
-  background:radial-gradient(ellipse at 28% 80%, rgba(30,180,30,.12) 0%, transparent 62%);
-}
+/* floor tile hint */
+.k-floor{position:absolute;bottom:0;left:0;right:0;height:185px;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.007),rgba(255,255,255,.007) 1px,transparent 1px,transparent 60px),
+  repeating-linear-gradient(0deg,rgba(255,255,255,.007),rgba(255,255,255,.007) 1px,transparent 1px,transparent 60px);}
 
-/* ── OUTPUT BREAKDOWN MODAL ── */
-.ob-modal {
-  position:fixed; inset:0; background:rgba(0,0,0,.82); z-index:3000;
-  display:none; align-items:center; justify-content:center; padding:20px;
-}
-.ob-modal.show { display:flex; }
-.ob-card {
-  background:#141418; border:1px solid var(--border); border-radius:16px;
-  padding:22px 24px; width:min(360px,95vw); position:relative;
-}
-.ob-close {
-  position:absolute; top:12px; right:14px;
-  background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer;
-}
-.ob-title { font-size:13px; font-weight:900; letter-spacing:.5px; margin-bottom:18px; }
-.ob-row {
-  display:flex; align-items:center; gap:10px; padding:10px 0;
-  border-bottom:1px solid var(--border);
-}
-.ob-row:last-child { border-bottom:none; }
-.ob-icon { font-size:18px; flex-shrink:0; width:24px; text-align:center; }
-.ob-info { flex:1; }
-.ob-label { font-size:12px; font-weight:700; color:var(--text); }
-.ob-sub { font-size:10px; color:var(--muted); margin-top:1px; }
-.ob-pts { font-size:13px; font-weight:900; min-width:52px; text-align:right; }
-.ob-bar-wrap { height:3px; background:var(--border); border-radius:2px; margin-top:5px; overflow:hidden; }
-.ob-bar-fill { height:100%; border-radius:2px; transition:width .6s ease; }
-.ob-total {
-  margin-top:14px; padding-top:14px; border-top:1px solid var(--border);
-  display:flex; justify-content:space-between; align-items:center;
-  font-size:15px; font-weight:900;
-}
+/* back button */
+.k-back{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.45);padding:9px 28px;border-radius:22px;
+  cursor:pointer;font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  transition:all .2s;font-family:inherit;white-space:nowrap;}
+.k-back:hover{border-color:rgba(255,255,255,.28);color:rgba(255,255,255,.65);}
+.k-save.saved{color:var(--gold);}
 
-/* ─ BIN — bottom-right ─ */
-.k-bin {
-  position:absolute; bottom:22px; right:24px; width:18px; height:26px; z-index:4;
-  background:linear-gradient(180deg,#2a2a2a,#1a1a1a);
-  border:1px solid #383838; border-radius:2px 2px 3px 3px;
-}
-.k-bin::before { /* lid */
-  content:''; position:absolute; top:-5px; left:-2px; right:-2px; height:6px;
-  background:#333; border:1px solid #444; border-radius:2px;
-}
+/* fridge inventory modal */
+.k-fridge-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;
+  display:flex;align-items:center;justify-content:center;padding:16px;}
+.k-fridge-inner{width:min(300px,90vw);max-height:78vh;background:#0d0d1a;
+  border:1px solid #2a3048;border-radius:14px;display:flex;flex-direction:column;overflow:hidden;}
+.kf-hdr{padding:13px 16px 9px;border-bottom:1px solid #1e2038;
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.kf-title{font-size:13px;font-weight:800;color:#e0e8ff;letter-spacing:.5px;}
+.kf-x{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;font-size:22px;line-height:1;padding:0;}
+.kf-body{overflow-y:auto;flex:1;padding:6px 14px;}
+.food-row{display:flex;align-items:center;gap:7px;padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);}
+.food-row:last-child{border-bottom:none;}
+.f-name{flex:1;font-size:12px;color:rgba(255,255,255,.78);}
+.f-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.6);width:22px;height:22px;border-radius:4px;
+  cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;flex-shrink:0;line-height:1;}
+.f-btn:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);}
+.f-qty{font-size:12px;color:rgba(255,255,255,.65);min-width:22px;text-align:center;}
+.f-unit{font-size:10px;color:rgba(255,255,255,.3);min-width:38px;}
+.kf-add{display:flex;gap:5px;padding:8px 14px;border-top:1px solid #1e2038;flex-shrink:0;}
+.kf-add input{flex:1;background:#141420;border:1px solid #2a3048;color:rgba(255,255,255,.85);
+  padding:6px 9px;border-radius:7px;font-size:11px;outline:none;font-family:inherit;}
+.kf-add input:focus{border-color:#4d9eff;}
+.kf-add input::placeholder{color:rgba(255,255,255,.18);}
+.kf-add-btn{background:#4d9eff;border:none;color:white;padding:6px 11px;
+  border-radius:7px;cursor:pointer;font-weight:700;font-size:13px;transition:background .15s;}
+.kf-add-btn:hover{background:#3b8ae8;}
+
+/* kitchen loc btn color */
+.loc-btn.kitchen.active{color:#f97316;border-color:#f97316;}
 </style>
 </head>
 <body>
@@ -1036,7 +1234,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <!-- HEADER -->
 <div class="hdr">
   <div class="hdr-title">🎮 The Sim</div>
-  <div class="out-wrap" onclick="showOutputBreakdown()" title="Click to see score breakdown" style="cursor:pointer">
+  <div class="out-wrap" onclick="showProgressModal()" title="View progress breakdown">
     <span class="out-label">Output</span>
     <div class="out-track"><div class="out-fill" id="out-fill" style="width:0%"></div></div>
     <span class="out-pct" id="out-pct">0%</span>
@@ -1047,9 +1245,12 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 <!-- LOCATION BAR -->
 <div class="loc-bar">
-  <button class="loc-btn active" id="btn-room" onclick="goLoc('room')">🏠 Your Room</button>
-  <button class="loc-btn" id="btn-kitchen" onclick="goLoc('kitchen')">🍳 Kitchen</button>
-  <button class="loc-btn" id="btn-out" onclick="goLoc('outside')">🌍 Outside</button>
+  <div class="loc-group">
+    <button class="loc-btn active" id="btn-room" onclick="goLoc('room')">🏠 Your Room</button>
+    <button class="loc-btn" id="btn-out" onclick="goLoc('outside')">🌍 Outside</button>
+    <button class="loc-btn kitchen" id="btn-kitchen" onclick="goLoc('kitchen')">🍳 Kitchen</button>
+  </div>
+  <button class="save-btn" id="save-btn" onclick="manualSave()">💾 Save</button>
 </div>
 
 <!-- BODY -->
@@ -1058,7 +1259,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   <!-- ROOM VIEW -->
   <div class="room-wrap" id="view-room">
     <div class="room-container">
-    <div class="room dim" id="the-room">
+    <div class="room dim" id="the-room" onclick="roomClick()">
 
       <div class="win-light" id="win-light"></div>
 
@@ -1089,6 +1290,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
         <div class="d-kbd d-kbd2"></div>
         <div class="d-mouse"></div>
       </div>
+      <!-- Journal — sibling of desk, own z-index above it -->
+      <div class="journal" onclick="showJournal(event)" title="To-do list"></div>
 
       <!-- PC tower -->
       <div class="tower" id="pc-tower" onclick="togglePC(event)" title="Click to turn PC on/off" style="cursor:pointer">
@@ -1105,12 +1308,18 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <!-- Futon -->
       <div class="futon" onclick="showFutonMenu(event)" title="Rest on futon"></div>
       <div class="pillow"></div>
+      <div class="room-cat"><div class="cat-body"></div></div>
 
-      <!-- Fan -->
-      <div class="fan" id="fan"><div class="fan-blade" id="fan-blade"></div></div>
+      <!-- Dumbbell — between door and fan -->
+      <div class="dumbbell" onclick="showDumbbellMenu(event)" title="Train">
+        <div class="db-w"></div><div class="db-b"></div><div class="db-w"></div>
+      </div>
+
+      <!-- Fan — click to save state (stopPropagation so room click doesn't fire) -->
+      <div class="fan" id="fan" onclick="event.stopPropagation();manualSave();" title="Save state"><div class="fan-blade" id="fan-blade"></div></div>
 
       <!-- Door -->
-      <div class="door" onclick="goLoc('outside')" title="Go outside">
+      <div class="door" onclick="showDoorMenu(event)" title="Leave room">
         <div class="door-icon">🚪</div>
         <div class="door-txt">Out</div>
         <div class="door-knob"></div>
@@ -1130,6 +1339,65 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
     <!-- Glow is a sibling of .room so room filter never dims it -->
     <div class="room-glow" id="room-glow"></div>
     </div><!-- /room-container -->
+  </div>
+
+  <!-- KITCHEN VIEW -->
+  <div class="kitchen-wrap" id="view-kitchen">
+    <div class="room-container">
+    <div class="kitch" id="the-kitchen" onclick="kitchenClick()">
+      <div class="k-floor"></div>
+      <!-- Top wall upper cabinets + window above sink -->
+      <div class="k-ucab"></div>
+      <div class="k-win"></div>
+      <!-- Top counter (horizontal) -->
+      <div class="k-ct"></div>
+      <div class="k-lcab"></div>
+      <!-- DRAINING BOARD — left of sink -->
+      <div class="k-drain"></div>
+      <!-- Sink — center of top counter -->
+      <div class="k-sink" id="k-sink" onclick="event.stopPropagation();manualSave()" title="Save"></div>
+      <div class="k-tap"></div>
+      <!-- LEFT counter going down left wall -->
+      <div class="k-lc"></div>
+      <!-- Left FRIDGE — faces into kitchen, clickable -->
+      <div class="k-fridge-l" onclick="kGoToFridge(event)" title="Fridge — check food stock">
+        <div class="k-fridge-l-h"></div>
+        <div class="k-fridge-l-lbl">FRIDGE</div>
+      </div>
+      <!-- Right counter -->
+      <div class="k-cr"></div>
+      <!-- MICROWAVE — top of right counter -->
+      <div class="k-micro">
+        <div class="k-micro-scr"></div>
+        <div class="k-micro-btn"></div>
+        <div class="k-micro-btn2"></div>
+      </div>
+      <!-- COOKER — middle of right counter, clickable -->
+      <div class="k-cooker" onclick="kGoToCooker(event)" title="Cooker">
+        <div class="k-cooker-br" style="top:10px;left:8px"></div>
+        <div class="k-cooker-br" style="top:10px;right:8px"></div>
+        <div class="k-cooker-br" style="bottom:10px;left:8px"></div>
+        <div class="k-cooker-br" style="bottom:10px;right:8px"></div>
+      </div>
+      <!-- Island connects to right counter -->
+      <div class="k-island"></div>
+      <!-- Stools at island — clickable -->
+      <div class="k-stool" id="kstool-0" style="top:342px;left:162px" onclick="kSitStool(0,event)"></div>
+      <div class="k-stool" id="kstool-1" style="top:342px;left:194px" onclick="kSitStool(1,event)"></div>
+      <div class="k-stool" id="kstool-2" style="top:342px;left:226px" onclick="kSitStool(2,event)"></div>
+      <div class="k-stool" id="kstool-3" style="top:342px;left:258px" onclick="kSitStool(3,event)"></div>
+      <!-- Kitchen character (reuses room char styles) -->
+      <div class="char" id="k-char" style="top:290px;left:165px;display:none">
+        <div class="char-bubble" id="k-bubble">🍳 In the kitchen</div>
+        <div class="char-figure">
+          <div class="char-head" id="k-head"></div>
+          <div class="char-neck"></div>
+          <div class="char-body" id="k-body"></div>
+        </div>
+      </div>
+      <button class="k-back" onclick="goLoc('room')">← Back to Room</button>
+    </div>
+    </div>
   </div>
 
   <!-- OUTSIDE VIEW -->
@@ -1164,98 +1432,10 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
     <button class="back-btn" onclick="goLoc('room')">← Back to your room</button>
   </div>
 
-  <!-- KITCHEN VIEW -->
-  <div class="kitchen-wrap hidden" id="view-kitchen">
-    <div class="kitchen-container">
-    <div class="k-room" id="the-kitchen">
-
-      <!-- Glows (z-index 1, behind furniture) -->
-      <div class="k-ceiling-glow"></div>
-      <div class="k-stove-glow"></div>
-      <div class="k-sink-glow"></div>
-      <div class="k-kettle-glow"></div>
-      <div class="k-fridge-glow"></div>
-      <div class="k-mw-glow"></div>
-      <div class="k-win-light"></div>
-      <div class="k-plant-glow"></div>
-
-      <!-- Walls -->
-      <div class="k-wt"></div><div class="k-wl"></div><div class="k-wr"></div><div class="k-wb"></div>
-
-      <!-- Ceiling light strip -->
-      <div class="k-ceiling-strip"></div>
-
-      <!-- Window (right wall, mid-height) -->
-      <div class="k-window"></div>
-
-      <!-- Door (top wall, right — back to bedroom) -->
-      <div class="k-door" onclick="goLoc('room')" title="Back to your room">
-        <div class="door-icon">🚪</div>
-        <div class="door-txt" style="font-size:8px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase">Room</div>
-        <div class="k-door-knob"></div>
-      </div>
-
-      <!-- Upper cabinets flush to top wall -->
-      <div class="k-cab"></div>
-
-      <!-- Counter surface below cabinets -->
-      <div class="k-counter"></div>
-
-      <!-- Stove / hob (left of counter) -->
-      <div class="k-stove"></div>
-
-      <!-- Sink (centre of counter) -->
-      <div class="k-sink"></div>
-      <!-- Faucet -->
-      <div class="k-faucet"></div>
-
-      <!-- Kettle (right of sink, on counter) -->
-      <div class="k-kettle"></div>
-
-      <!-- Microwave (wall-mounted, right of cabinets) -->
-      <div class="k-microwave"></div>
-      <div class="k-mw-led"></div>
-
-      <!-- Fridge (against right wall) -->
-      <div class="k-fridge"></div>
-
-      <!-- Kitchen table (centre floor) -->
-      <div class="k-table"></div>
-
-      <!-- Two chairs flanking table -->
-      <div class="k-ch" style="top:232px;left:152px"><div class="k-ch-back"></div><div class="k-ch-seat"></div></div>
-      <div class="k-ch" style="top:232px;left:246px"><div class="k-ch-back"></div><div class="k-ch-seat"></div></div>
-
-      <!-- Plant (bottom-left corner) -->
-      <div class="k-plant">
-        <div class="k-plant-stem"></div>
-        <div class="k-plant-pot"></div>
-      </div>
-
-      <!-- Bin (bottom-right corner) -->
-      <div class="k-bin"></div>
-
-    </div>
-    </div><!-- /kitchen-container -->
-  </div>
-
   <!-- STATS PANEL -->
   <div class="stats-panel" id="stats-panel"></div>
 
 </div><!-- /sim-body -->
-
-<!-- OUTPUT BREAKDOWN MODAL -->
-<div class="ob-modal" id="ob-modal" onclick="if(event.target===this)closeOutputBreakdown()">
-  <div class="ob-card">
-    <button class="ob-close" onclick="closeOutputBreakdown()">✕</button>
-    <div class="ob-title" id="ob-title">📊 OUTPUT BREAKDOWN</div>
-    <div id="ob-rows"></div>
-    <div class="ob-total">
-      <span>Total Output</span>
-      <span id="ob-total-val" style="color:var(--gold)">—</span>
-    </div>
-  </div>
-</div>
 
 <script>
 // ─────────────────────────────────────────────
@@ -1287,8 +1467,8 @@ function simSleepHours(sl) {
   if (!sl) return 0;
   if (typeof sl === 'object') {
     if (sl.bedtime && sl.wakeTime) {
-      const [bh,bm] = (sl.bedtime).split(':').map(Number);
-      const [wh,wm] = (sl.wakeTime).split(':').map(Number);
+      const [bh,bm] = sl.bedtime.split(':').map(Number);
+      const [wh,wm] = sl.wakeTime.split(':').map(Number);
       let mins = (wh*60+wm) - (bh*60+bm);
       if (mins < 0) mins += 1440;
       return Math.round(mins/60*10)/10;
@@ -1333,20 +1513,21 @@ function calc() {
   const sleepLog = W.sleep?.log || {};
   const hydLog   = W.hydration?.log || {};
   const dietLog  = W.diet?.log  || {};
+  const hydGoal  = W.hydration?.goal || 8;
 
   let gymSess7=0, sleepTotal=0, sleepDays=0, hydDays=0;
   for (let i=0;i<7;i++) {
     const d = daysAgo(i);
-    // Gym: count only days with at least one exercise logged
+    // Gym: only count days with at least one exercise actually logged
     const gl = gymLog[d];
     if (gl && (typeof gl === 'object' ? (gl.exercises?.length > 0) : true)) gymSess7++;
-    // Sleep: entry is {bedtime, wakeTime, ...}
+    // Sleep: stored as {bedtime, wakeTime} — use helper to get hours
     const sl = sleepLog[d];
     if (sl !== undefined && sl !== null) {
       const hrs = simSleepHours(sl);
       if (hrs > 0) { sleepTotal += hrs; sleepDays++; }
     }
-    // Hydration: any logged amount (≥1 glass) counts as a day
+    // Hydration: any logged glass (≥1) counts as a day
     const hy = hydLog[d];
     if (hy !== undefined && hy !== null) {
       const cups = typeof hy === 'object' ? parseFloat(hy.cups||hy.count||hy.value||0) : parseFloat(hy)||0;
@@ -1363,7 +1544,7 @@ function calc() {
   // ── Score components ──────────────────────
   // Income (max 35) — £1,000 = 35 pts, linear
   const incomeScore = Math.min(35, Math.round((monthIncome / 1000) * 35));
-  // Hustles (max 25) — based on total hustle revenue, £1,000/month = 25 pts
+  // Hustles (max 25) — based on hustle revenue, £1,000/month = 25 pts
   const hustleScore = Math.min(25, Math.round((hustleRev / 1000) * 25));
   // Gym (max 22) — 7 sessions = max
   const gymScore    = clamp(gymSess7 * Math.ceil(22/7), 0, 22);
@@ -1437,12 +1618,14 @@ function moveChar(zone, instant) {
   el.style.top  = p.top  + 'px';
   el.style.left = p.left + 'px';
   if (instant) requestAnimationFrame(() => el.style.transition = '');
+  saveState();
 }
 
 // ─────────────────────────────────────────────
 //  RENDER
 // ─────────────────────────────────────────────
 let _firstRender = true;
+let _initDone    = false; // blocks saveState() during init so it can't stomp saved localStorage
 
 function render() {
   const s = calc();
@@ -1467,10 +1650,10 @@ function render() {
   // Fan
   document.getElementById('fan').className = 'fan' + (s.gymToday || s.gymSess7 >= 4 ? ' on' : '');
 
-  // Status bubble — respect manual activity for 20 mins
+  // Status bubble — respect manual activity for 20 mins, and motiv phrases while showing
   const bubble = document.getElementById('char-bubble');
   const manualActive = _manualStatus && (Date.now() - _manualStatusTime < 20 * 60 * 1000);
-  if (!manualActive) {
+  if (!manualActive && !_motivActive) {
     _manualStatus = null;
     bubble.innerHTML      = s.emoji + ' ' + s.text;
     bubble.style.borderColor = s.col;
@@ -1562,70 +1745,131 @@ function editTarget() {
   }
 }
 
-// ─────────────────────────────────────────────
-//  OUTPUT BREAKDOWN MODAL
-// ─────────────────────────────────────────────
-function showOutputBreakdown() {
+function showProgressModal() {
   const s = calc();
-  const rows = [
-    {
-      icon:'💰', label:'Income', pts:s.incomeScore, max:35,
-      sub: s.monthIncome > 0
-        ? `${fmt(s.monthIncome)} this month → ${s.incomeScore}/35 pts`
-        : 'No income logged yet',
-      detail:'£1,000/month = max 35 pts (linear)',
-      col:'var(--gold)'
-    },
-    {
-      icon:'🚀', label:'Hustles', pts:s.hustleScore, max:25,
-      sub: s.hustleRev > 0
-        ? `${fmt(s.hustleRev)}/month → ${s.hustleScore}/25 pts`
-        : '£0 earned from hustles yet',
-      detail:'£1,000/month hustle revenue = max 25 pts',
-      col:'var(--purple)'
-    },
-    {
-      icon:'🏋️', label:'Gym', pts:s.gymScore, max:22,
-      sub:`${s.gymSess7} session${s.gymSess7!==1?'s':''} this week → ${s.gymScore}/22 pts`,
-      detail:'7 sessions/week = max 22 pts',
-      col:'var(--green)'
-    },
-    {
-      icon:'😴', label:'Sleep', pts:s.sleepScore, max:10,
-      sub: s.sleepAvg > 0
-        ? `avg ${s.sleepAvg.toFixed(1)}h this week → ${s.sleepScore}/10 pts`
-        : 'No sleep logged',
-      detail:'7–9 hours/night = max 10 pts',
-      col:'var(--blue)'
-    },
-    {
-      icon:'💧', label:'Hydration', pts:s.hydScore, max:8,
-      sub:`${s.hydDays}/7 days logged this week → ${s.hydScore}/8 pts`,
-      detail:'Log water daily = max 8 pts',
-      col:'var(--cyan)'
-    }
+  const monthGap  = Math.max(0, s.monthTarget - s.monthIncome);
+  const monthProg = s.monthTarget > 0 ? Math.min(100, Math.round((s.monthIncome / s.monthTarget) * 100)) : 0;
+
+  const hustleHTML = s.actHustles.length > 0
+    ? s.actHustles.map(h => `
+        <div class="hustle-row">
+          <div class="hustle-n">${h.name || 'Unnamed hustle'}</div>
+          <div class="hustle-r">${h.revenue ? fmt(h.revenue)+' target' : 'No target set'}</div>
+        </div>`).join('')
+    : `<div style="font-size:10px;color:var(--muted)">None active — add one in Money → Hustles.</div>`;
+
+  // Score per category — use values already computed in calc()
+  const incomePts = s.incomeScore;
+  const hustlePts = s.hustleScore;
+  const gymPts    = s.gymScore;
+  const sleepPts  = s.sleepScore;
+  const hydroPts  = s.hydScore;
+
+  const cats = [
+    { emoji:'💰', label:'Income',     pts:incomePts, max:35,
+      detail: s.monthIncome > 0 ? fmt(s.monthIncome)+' this month → '+incomePts+' pts' : 'No income logged yet',
+      next: incomePts < 35 ? 'Earn more — £1,000/month = max 35 pts (linear)' : 'Max reached ✓' },
+    { emoji:'🚀', label:'Hustles',    pts:hustlePts, max:25,
+      detail: s.hustleRev > 0 ? fmt(s.hustleRev)+'/month → '+hustlePts+' pts' : '£0 earned from hustles yet',
+      next: hustlePts < 25 ? 'Hustle revenue: £1,000/month = max 25 pts' : 'Max reached ✓' },
+    { emoji:'🏋️', label:'Gym',       pts:gymPts,    max:22,
+      detail: s.gymSess7 + '/7 sessions this week',
+      next: gymPts < 22 ? (7 - s.gymSess7) + ' more session' + (7-s.gymSess7!==1?'s':'') + ' this week' : 'Max reached ✓' },
+    { emoji:'😴', label:'Sleep',      pts:sleepPts,  max:10,
+      detail: s.sleepAvg > 0 ? s.sleepAvg.toFixed(1)+'h avg this week' : 'No sleep logged',
+      next: sleepPts < 10 ? (s.sleepAvg < 6 ? 'Log sleep to start earning pts' : 'Aim for 7–9h for max 10 pts') : 'Max reached ✓' },
+    { emoji:'💧', label:'Hydration',  pts:hydroPts,  max:8,
+      detail: s.hydDays + '/7 days logged this week',
+      next: hydroPts < 8 ? 'Log water daily in Wellness Dashboard' : 'Max reached ✓' },
   ];
 
-  document.getElementById('ob-rows').innerHTML = rows.map(r => `
-    <div class="ob-row">
-      <div class="ob-icon">${r.icon}</div>
-      <div class="ob-info">
-        <div class="ob-label">${r.label}</div>
-        <div class="ob-sub">${r.sub}</div>
-        <div class="ob-sub" style="color:rgba(255,255,255,.28);margin-top:1px">${r.detail}</div>
-        <div class="ob-bar-wrap" style="margin-top:5px">
-          <div class="ob-bar-fill" style="width:${Math.round((r.pts/r.max)*100)}%;background:${r.col}"></div>
+  const factorHTML = cats.map(c => {
+    const barPct = Math.round((c.pts / c.max) * 100);
+    const col = c.pts >= c.max ? 'var(--green)' : c.pts > 0 ? 'var(--gold)' : 'var(--muted)';
+    return `
+      <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="font-size:15px">${c.emoji}</span>
+            <span style="font-size:12px;font-weight:700;color:var(--text)">${c.label}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:10px;color:var(--muted)">${c.pts}/${c.max} pts</span>
+            <span style="font-size:14px;font-weight:900;color:${col};min-width:32px;text-align:right">${c.pts}%</span>
+          </div>
+        </div>
+        <div style="height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;margin-bottom:5px">
+          <div style="height:100%;width:${barPct}%;background:${col};border-radius:3px;transition:width 1s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted)">
+          <span>${c.detail}</span>
+          <span style="color:${c.pts>=c.max?'var(--green)':'rgba(255,255,255,0.3)'};font-style:italic">${c.next}</span>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('prog-sheet-body').innerHTML = `
+    <!-- Overall score -->
+    <div class="sblock" style="text-align:center">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.6px;font-weight:700">Overall Output</div>
+      <div style="font-size:52px;font-weight:900;color:${s.col};line-height:1">${s.outputPct}%</div>
+      <div class="mood-pill" style="background:${s.col}1a;color:${s.col};margin-top:8px">${s.emoji} ${s.text}</div>
+    </div>
+
+    <!-- Score factors -->
+    <div class="sblock">
+      <div class="sblock-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Score Breakdown</span>
+        <span style="font-size:9px;color:var(--muted);font-weight:400">each % = 1 point out of 100</span>
+      </div>
+      ${factorHTML}
+    </div>
+
+    <!-- Money -->
+    <div class="prog-grid">
+      <div class="sblock">
+        <div class="sblock-title">💰 Income</div>
+        <div class="srow"><span>This month</span><span class="sval" style="color:var(--gold)">${fmt(s.monthIncome)}</span></div>
+        <div class="srow"><span>This year</span><span class="sval" style="color:var(--gold)">${fmt(s.yearIncome)}</span></div>
+        <div style="margin-top:8px">
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-bottom:4px">
+            <span>Monthly target</span>
+            <span style="cursor:pointer;text-decoration:underline" onclick="closeProgressModal();editTarget()">${fmt(s.monthTarget)} ✏️</span>
+          </div>
+          <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden">
+            <div style="height:100%;width:${monthProg}%;background:var(--green);border-radius:3px;transition:width 1s ease"></div>
+          </div>
+          <div style="font-size:10px;font-weight:700;color:${monthGap===0?'var(--green)':'var(--red)'};margin-top:4px">
+            ${monthGap===0 ? '✅ TARGET HIT' : fmt(monthGap)+' to go'}
+          </div>
         </div>
       </div>
-      <div class="ob-pts" style="color:${r.col}">${r.pts}<span style="font-size:9px;opacity:.5">/${r.max}</span></div>
-    </div>`).join('');
 
-  document.getElementById('ob-total-val').textContent = s.outputPct + '/100';
-  document.getElementById('ob-total-val').style.color = s.col;
-  document.getElementById('ob-modal').classList.add('show');
+      <div class="sblock">
+        <div class="sblock-title">💪 Body</div>
+        <div class="srow"><span>Gym (7d)</span><span class="sval" style="color:${s.gymSess7>=3?'var(--green)':s.gymSess7>0?'var(--gold)':'var(--muted)'}">${s.gymSess7}/7</span></div>
+        <div class="srow"><span>Avg sleep</span><span class="sval" style="color:${s.sleepAvg>=7?'var(--green)':s.sleepAvg>0?'var(--orange)':'var(--muted)'}">${s.sleepAvg>0?s.sleepAvg.toFixed(1)+'h':'—'}</span></div>
+        <div class="srow"><span>Water (7d)</span><span class="sval">${s.hydDays}/7</span></div>
+        <div class="srow"><span>Meals today</span><span class="sval">${s.mealCount}</span></div>
+      </div>
+    </div>
+
+    <!-- Hustles -->
+    <div class="sblock">
+      <div class="sblock-title">🚀 Active Hustles</div>
+      ${hustleHTML}
+    </div>
+  `;
+
+  document.getElementById('prog-overlay').classList.add('open');
+  document.getElementById('prog-sheet').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
-function closeOutputBreakdown() {
-  document.getElementById('ob-modal').classList.remove('show');
+
+function closeProgressModal() {
+  document.getElementById('prog-overlay').classList.remove('open');
+  document.getElementById('prog-sheet').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 // ─────────────────────────────────────────────
@@ -1638,17 +1882,60 @@ function goLoc(loc) {
   const br = document.getElementById('btn-room');
   const bo = document.getElementById('btn-out');
   const bk = document.getElementById('btn-kitchen');
-  // room: show room, hide others
-  rv.classList.toggle('hidden', loc !== 'room');
-  // outside: show outside, hide others
-  ov.classList.toggle('show', loc === 'outside');
-  // kitchen: show kitchen, hide others
-  if (kv) kv.classList.toggle('hidden', loc !== 'kitchen');
-  // nav buttons
-  br.classList.toggle('active', loc === 'room');
-  bo.classList.toggle('active', loc === 'outside');
-  if (bk) bk.classList.toggle('active', loc === 'kitchen');
-  if (loc !== 'outside') closeZone();
+  // hide all
+  rv.classList.add('hidden');
+  ov.classList.remove('show');
+  kv?.classList.remove('show');
+  [br, bo, bk].forEach(b => b?.classList.remove('active'));
+  // hide kitchen char by default
+  const kChar = document.getElementById('k-char');
+  if (kChar) kChar.style.display = 'none';
+  closeActivityMenu();
+
+  if (loc === 'room') {
+    rv.classList.remove('hidden'); br.classList.add('active');
+  } else if (loc === 'outside') {
+    ov.classList.add('show'); bo.classList.add('active'); closeZone();
+  } else if (loc === 'kitchen') {
+    kv?.classList.add('show'); bk?.classList.add('active');
+    // Show kitchen char and sync skin/body color from room char
+    if (kChar) {
+      const roomHead = document.getElementById('char-head');
+      const roomBody = document.getElementById('char-body');
+      const kHead = document.getElementById('k-head');
+      const kBody = document.getElementById('k-body');
+      if (roomHead && kHead) kHead.style.background = roomHead.style.background;
+      if (roomBody && kBody) kBody.style.background = roomBody.style.background;
+      kChar.style.display = 'flex';
+    }
+    kMoveChar('entry');
+    const kb = document.getElementById('k-bubble');
+    if (kb) kb.textContent = '🍳 In the kitchen';
+  }
+}
+
+function showDoorMenu(e) {
+  e.stopPropagation();
+  moveChar('door');
+  showActivityMenu([
+    { icon:'🌍', label:'Go outside', action: () => goLoc('outside') },
+    { icon:'🍳', label:'Kitchen',    action: () => goLoc('kitchen') },
+  ], { top: 130, left: 195 }, 'down');
+}
+
+function roomClick() {
+  // Clicking empty room floor → dismiss activity menu and walk back to center
+  if (_sittingOnChair) return; // stay seated if in chair
+  if (_currentZone === 'center') return; // already there
+  closeActivityMenu();
+  clearActivityTimer();
+  clearGamingWarningTimer();
+  hideGamingWarning();
+  _gamingStayWeakCount = 0;
+  resetCharVisual();
+  moveChar('center');
+  _manualStatus = null;
+  render();
 }
 
 // ─────────────────────────────────────────────
@@ -1677,6 +1964,18 @@ function closeZone() {
   ['gym','hustle','walk','kitchen'].forEach(id => document.getElementById('zc-'+id)?.classList.remove('active'));
 }
 
+function _getWalkLog() {
+  try { return JSON.parse(localStorage.getItem('life_sim_walks') || '[]'); } catch(e) { return []; }
+}
+function logWalk(mins) {
+  mins = parseInt(mins) || 0;
+  if (!mins) return;
+  const log = _getWalkLog();
+  log.unshift({ date: today(), mins, ts: Date.now() });
+  localStorage.setItem('life_sim_walks', JSON.stringify(log.slice(0, 200)));
+  openZone('walk'); // refresh panel
+}
+
 function buildZoneHTML(z, s) {
   if (z === 'gym') {
     const dots = Array.from({length:14},(_,i) => {
@@ -1692,46 +1991,76 @@ function buildZoneHTML(z, s) {
         <span>This week: <strong style="color:${s.gymSess7>=3?'var(--green)':'var(--gold)'}">${s.gymSess7} sessions</strong></span>
         <span>Streak: <strong style="color:var(--orange)">${streak} days</strong></span>
       </div>
-      <div style="margin-top:8px;font-size:10px;color:var(--muted)">Log gym sessions in the Wellness Dashboard. They show up here automatically.</div>`;
+      <div class="zone-btns">
+        <button class="zone-btn zb-gold" onclick="window.parent.postMessage({action:'openWellnessGym'},'*')">💪 Log Workout</button>
+        <button class="zone-btn" onclick="window.parent.postMessage({action:'openWellnessMeals'},'*')">🥗 Log Meals</button>
+      </div>`;
   }
 
   if (z === 'hustle') {
-    if (s.actHustles.length === 0) return `
-      <div style="font-size:12px;color:var(--muted);line-height:1.7">
-        No active hustles yet.<br><br>
-        Head to the <strong style="color:var(--gold)">Money Dashboard → Hustles</strong> to add one.
-        That's where real money starts. The 9-5 is a tool — not the destination.
+    const cards = s.actHustles.length === 0
+      ? `<div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:4px">
+           No active hustles yet. Add one in the Money Dashboard and it'll show here.
+         </div>`
+      : s.actHustles.map(h => `
+          <div style="background:var(--bg2);border-radius:10px;padding:10px;margin-bottom:8px">
+            <div style="font-weight:700;font-size:13px">${h.name||'Unnamed'}</div>
+            ${h.desc?`<div style="font-size:10px;color:var(--muted);margin-top:2px">${h.desc}</div>`:''}
+            <div style="font-size:12px;color:var(--green);margin-top:4px;font-weight:700">${h.revenue?fmt(h.revenue)+' revenue':'No revenue logged yet'}</div>
+            ${h.action?`<div style="font-size:10px;color:var(--gold);margin-top:4px">▶ Next: ${h.action}</div>`:''}
+          </div>`).join('');
+    return cards + `
+      <div class="zone-btns">
+        <button class="zone-btn zb-gold" onclick="window.parent.postMessage({action:'openMoneyHustles'},'*')">🚀 My Hustles</button>
+        <button class="zone-btn" onclick="window.parent.postMessage({action:'openMoneyIncome'},'*')">💵 Log Income</button>
       </div>`;
-    return s.actHustles.map(h => `
-      <div style="background:var(--bg2);border-radius:10px;padding:10px;margin-bottom:8px">
-        <div style="font-weight:700;font-size:13px">${h.name||'Unnamed'}</div>
-        ${h.desc?`<div style="font-size:10px;color:var(--muted);margin-top:2px">${h.desc}</div>`:''}
-        <div style="font-size:12px;color:var(--green);margin-top:4px;font-weight:700">${h.revenue?fmt(h.revenue)+' revenue':'No revenue logged yet'}</div>
-        ${h.action?`<div style="font-size:10px;color:var(--gold);margin-top:4px">▶ Next step: ${h.action}</div>`:''}
-      </div>`).join('');
   }
 
-  if (z === 'walk') return `
-    <div style="font-size:12px;color:var(--muted);line-height:1.8">
-      No tracking needed. Just go.<br><br>
-      <strong style="color:var(--text)">20 minutes outside changes your brain chemistry.</strong>
-      Cortisol drops. Ideas arrive. Problems shrink.<br><br>
-      Every serious builder has a walking habit. It's not wasted time — it's processing time.
-    </div>`;
+  if (z === 'walk') {
+    const walks    = _getWalkLog();
+    const todayW   = walks.filter(w => w.date === today());
+    const totalMin = todayW.reduce((a,w) => a + (w.mins||0), 0);
+    const recent   = walks.slice(0, 6);
+    const recentHTML = recent.length ? recent.map(w => `
+      <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="color:var(--muted)">${w.date === today() ? 'Today' : w.date}</span>
+        <strong style="color:var(--green)">${w.mins} min</strong>
+      </div>`).join('') : '';
+    return `
+      <div style="margin-bottom:10px">
+        ${totalMin > 0
+          ? `<div style="font-size:13px;font-weight:800;color:var(--green)">${totalMin} min walked today</div>`
+          : `<div style="font-size:12px;color:var(--muted)">No walks logged today.</div>`}
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">20 minutes outside rewires your brain. Cortisol drops. Ideas arrive.</div>
+      </div>
+      ${recentHTML}
+      <div class="walk-log-row">
+        <select id="walk-dur">
+          <option value="15">15 min</option>
+          <option value="20" selected>20 min</option>
+          <option value="30">30 min</option>
+          <option value="45">45 min</option>
+          <option value="60">60 min</option>
+          <option value="90">90 min</option>
+        </select>
+        <button class="zone-btn zb-gold" style="flex:1" onclick="logWalk(document.getElementById('walk-dur').value)">✓ Log Walk</button>
+      </div>`;
+  }
 
   if (z === 'kitchen') {
     const todayLog = s.dietLog[today()];
     const meals = todayLog
       ? (Array.isArray(todayLog) ? todayLog : Object.values(todayLog))
       : [];
-    if (meals.length === 0) return `
-      <div style="font-size:12px;color:var(--muted)">
-        No meals logged today.<br>
-        Track meals in the <strong style="color:var(--gold)">Wellness Dashboard</strong> and they'll appear here.
+    const mealsHTML = meals.length === 0
+      ? `<div style="font-size:12px;color:var(--muted);margin-bottom:4px">No meals logged today.</div>`
+      : `<div style="font-size:10px;color:var(--muted);margin-bottom:8px">Today — ${meals.length} meal${meals.length!==1?'s':''}</div>
+         ${meals.map(m=>`<div style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">${typeof m==='string'?m:(m.name||m.goal||JSON.stringify(m))}</div>`).join('')}`;
+    return mealsHTML + `
+      <div class="zone-btns">
+        <button class="zone-btn zb-gold" onclick="closeZone();goLoc('kitchen')">🍳 Go to Kitchen</button>
+        <button class="zone-btn" onclick="window.parent.postMessage({action:'openWellnessMeals'},'*')">🥗 Log a Meal</button>
       </div>`;
-    return `
-      <div style="font-size:10px;color:var(--muted);margin-bottom:8px">Today — ${meals.length} meal${meals.length!==1?'s':''}</div>
-      ${meals.map(m=>`<div style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">${typeof m==='string'?m:(m.name||m.goal||JSON.stringify(m))}</div>`).join('')}`;
   }
 
   return '';
@@ -1778,6 +2107,7 @@ function toggleCurtains() {
     win.className = 'window' + (_curtainsDrawn ? ' curtains' : isNight ? ' night' : '');
   }
   updateRoom();
+  saveState();
 }
 
 function toggleLight() {
@@ -1785,6 +2115,7 @@ function toggleLight() {
   const sw = document.getElementById('light-switch');
   if (sw) sw.className = 'light-switch' + (_lightOn ? ' on' : '');
   updateRoom();
+  saveState();
 }
 
 function updateDevices() {
@@ -1827,6 +2158,7 @@ function togglePC(e) {
   _pcOn = !_pcOn;
   if (_pcOn) _lastDevice = 'pc';
   updateDevices();
+  saveState();
 }
 
 function toggleMini(e) {
@@ -1834,6 +2166,7 @@ function toggleMini(e) {
   _miniOn = !_miniOn;
   if (_miniOn) _lastDevice = 'mac';
   updateDevices();
+  saveState();
 }
 
 // ─────────────────────────────────────────────
@@ -1868,27 +2201,32 @@ function showFutonMenu(e) {
 
 function showDeskMenu(e) {
   e.stopPropagation();
-  // Second click on desk while already there → back to center
-  if (_currentZone === 'desk') {
-    closeActivityMenu();
-    clearActivityTimer();
-    moveChar('center');
-    _manualStatus = null;
-    render();
-    return;
+  // Must be seated to use the desk — auto-sit if not already
+  if (!_sittingOnChair) {
+    moveChar('chair');
+    _sittingOnChair = true;
+    const chairEl = document.getElementById('chair');
+    if (chairEl) chairEl.classList.add('seated');
+    const figure = document.getElementById('char-figure');
+    if (figure) figure.classList.add('seated-idle');
+    document.querySelector('.desk')?.classList.add('active-zone');
+    const bubble = document.getElementById('char-bubble');
+    if (bubble) { bubble.innerHTML = '🪑 Sitting'; bubble.style.borderColor = 'var(--muted)'; }
+    _manualStatus     = '🪑 Sitting';
+    _manualStatusTime = Date.now();
+    saveState();
   }
-  moveChar('desk');
   showActivityMenu([
     { icon:'💰', label:'Online hustle',       status:'💰 On the grind'    },
     { icon:'🎬', label:'Recording content',   status:'🎬 Recording'       },
     { icon:'🎮', label:'Gaming / doom scroll',status:'🎮 Wasting time...' },
     { icon:'⚡', label:'Productive work',     status:'⚡ Locked in'       },
-  ], { top: 116, left: 50 }, 'down');
+  ], { top: 116, left: 234 }, 'down');
 }
 
-function showActivityMenu(options, pos, dir) {
+function showActivityMenu(options, pos, dir, container) {
   closeActivityMenu();
-  const room = document.getElementById('the-room');
+  const room = container || document.getElementById('the-room');
   const menu = document.createElement('div');
   menu.className = 'act-menu';
   menu.id = 'act-menu';
@@ -1903,7 +2241,7 @@ function showActivityMenu(options, pos, dir) {
     b.className = 'act-bubble';
     b.style.animationDelay = (i * 0.07) + 's';
     b.innerHTML = opt.icon + ' ' + opt.label;
-    b.onclick = ev => { ev.stopPropagation(); selectActivity(opt); };
+    b.onclick = ev => { ev.stopPropagation(); if (opt.action) { closeActivityMenu(); opt.action(); } else { selectActivity(opt); } };
     menu.appendChild(b);
   });
 
@@ -1930,6 +2268,16 @@ function selectActivity(opt) {
   applyActivityVisual(opt);
   updateActivityBubble();
   _activityInterval = setInterval(updateActivityBubble, 1000);
+  // Gaming warning — fires after 3 min if wasting time; clears for any real activity
+  if (opt.status === '🎮 Wasting time...') {
+    _gamingStayWeakCount = 0;
+    scheduleGamingWarning();
+  } else {
+    clearGamingWarningTimer();
+    hideGamingWarning();
+    _gamingStayWeakCount = 0;
+  }
+  saveState();
 }
 
 function applyActivityVisual(opt) {
@@ -1945,12 +2293,15 @@ function applyActivityVisual(opt) {
   } else if (isMed) {
     moveChar('futon');
     if (head)   head.className   = 'char-head meditating';
-    if (figure) figure.className = 'char-figure';
+    if (figure) figure.className = 'char-figure meditating';
   } else {
-    // desk activities — move to desk, normal eyes
-    moveChar('desk');
+    // desk activities — char stays in chair (seated), bird's-eye working view
+    _sittingOnChair = true;  // ensure seated state is preserved
+    moveChar('chair');       // stay at chair position, not standing by desk
     if (head)   head.className   = 'char-head';
-    if (figure) figure.className = 'char-figure';
+    if (figure) figure.className = 'char-figure at-desk';
+    const chairEl = document.getElementById('chair');
+    if (chairEl) { chairEl.classList.add('seated'); chairEl.classList.add('at-desk'); }
   }
 }
 
@@ -1959,6 +2310,10 @@ function resetCharVisual() {
   const figure = document.getElementById('char-figure');
   if (head)   head.className   = 'char-head';
   if (figure) figure.className = 'char-figure';
+  // Un-flip chair from desk-working mode
+  document.getElementById('chair')?.classList.remove('at-desk');
+  // Remove sleep Z's from bubble
+  document.getElementById('char-bubble')?.classList.remove('zzz');
 }
 
 function updateActivityBubble() {
@@ -1974,10 +2329,16 @@ function updateActivityBubble() {
     + '<span onclick="stopActivity(event)" style="cursor:pointer;color:#ef4444;font-size:9px;'
     + 'background:rgba(239,68,68,.18);padding:1px 6px;border-radius:8px;margin-left:4px;pointer-events:auto">■ stop</span>';
   bubble.style.borderColor = 'var(--gold)';
+  // Z's only while sleeping/napping
+  const isSleepStatus = _manualStatus === '😴 Sleeping' || _manualStatus === '💤 Napping';
+  bubble.classList.toggle('zzz', isSleepStatus);
 }
 
 function stopActivity(e) {
   if (e) e.stopPropagation();
+  clearGamingWarningTimer();
+  hideGamingWarning();
+  _gamingStayWeakCount = 0;
   if (!_activityStart) return;
   const dur  = Math.floor((Date.now() - _activityStart) / 1000);
   const mins = Math.floor(dur / 60);
@@ -1995,6 +2356,7 @@ function stopActivity(e) {
   _activityStart    = null;
   _manualStatus     = null;
   _activityName     = null;
+  saveState();
   const bubble = document.getElementById('char-bubble');
   if (bubble) {
     bubble.innerHTML = '✅ Done · ' + dStr;
@@ -2016,18 +2378,26 @@ function toggleChair(e) {
   e.stopPropagation();
   _sittingOnChair = !_sittingOnChair;
   const chairEl = document.getElementById('chair');
+  const figure  = document.getElementById('char-figure');
   if (_sittingOnChair) {
     resetCharVisual();
     moveChar('chair');
     if (chairEl) chairEl.classList.add('seated');
+    // Seated-idle visual — shorter body, no idle bob
+    if (figure) figure.classList.add('seated-idle');
     const bubble = document.getElementById('char-bubble');
     if (bubble) { bubble.innerHTML = '🪑 Sitting'; bubble.style.borderColor = 'var(--muted)'; }
     _manualStatus     = '🪑 Sitting';
     _manualStatusTime = Date.now();
+    saveState();
   } else {
+    // Standing up: stop any running desk activity first
+    if (_activityStart) stopActivity(null);
+    document.querySelector('.desk')?.classList.remove('active-zone');
     moveChar('center');
     if (chairEl) chairEl.classList.remove('seated');
     _manualStatus = null;
+    saveState();
     render();
   }
 }
@@ -2058,51 +2428,61 @@ const _GL = `<svg viewBox="0 0 300 440" xmlns="http://www.w3.org/2000/svg" style
   <line x1="222" y1="192" x2="234" y2="187" stroke="white" stroke-width="1.8" opacity=".44"/>
 </svg>`;
 
-// Fairy Tail background art — guild star + wings + sparkles
-const _FT = `<svg viewBox="0 0 300 440" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
-  <g fill="white" opacity=".32"><circle cx="58" cy="72" r="2.5"/><circle cx="242" cy="72" r="2.5"/><circle cx="32" cy="208" r="1.8"/><circle cx="268" cy="208" r="1.8"/><circle cx="78" cy="375" r="1.6"/><circle cx="222" cy="375" r="1.6"/><circle cx="150" cy="418" r="1.8"/><circle cx="105" cy="38" r="1.5"/><circle cx="195" cy="38" r="1.5"/></g>
-  <path d="M150,248 C118,208 64,193 17,216 C62,196 120,222 150,260Z" fill="white" opacity=".28"/>
-  <path d="M150,253 C107,197 46,174 5,206 C49,179 109,209 150,264Z" stroke="white" stroke-width="1.8" fill="none" opacity=".22"/>
-  <path d="M150,248 C182,208 236,193 283,216 C238,196 180,222 150,260Z" fill="white" opacity=".28"/>
-  <path d="M150,253 C193,197 254,174 295,206 C251,179 191,209 150,264Z" stroke="white" stroke-width="1.8" fill="none" opacity=".22"/>
-  <polygon points="150,70 161,104 196,104 168,124 179,158 150,138 121,158 132,124 104,104 139,104" fill="white" opacity=".6"/>
-  <ellipse cx="150" cy="256" rx="11" ry="15" fill="white" opacity=".25"/>
-  <path d="M147,270 Q144,298 147,324 M153,270 Q156,298 153,324" stroke="white" stroke-width="1.5" fill="none" opacity=".2"/>
+// Power / ki aura — energy rings + radial beams (DBZ, Bleach, AoT, etc.)
+const _PWR = `<svg viewBox="0 0 300 440" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+  <circle cx="150" cy="220" r="44" fill="none" stroke="white" stroke-width="2" opacity=".28"/>
+  <circle cx="150" cy="220" r="86" fill="none" stroke="white" stroke-width="1.4" opacity=".2"/>
+  <circle cx="150" cy="220" r="130" fill="none" stroke="white" stroke-width="1" opacity=".13"/>
+  <circle cx="150" cy="220" r="178" fill="none" stroke="white" stroke-width=".7" opacity=".08"/>
+  <g stroke="white" opacity=".17" stroke-width=".9">
+    <line x1="150" y1="220" x2="150" y2="0"/><line x1="150" y1="220" x2="286" y2="70"/>
+    <line x1="150" y1="220" x2="300" y2="220"/><line x1="150" y1="220" x2="286" y2="370"/>
+    <line x1="150" y1="220" x2="150" y2="440"/><line x1="150" y1="220" x2="14" y2="370"/>
+    <line x1="150" y1="220" x2="0" y2="220"/><line x1="150" y1="220" x2="14" y2="70"/>
+  </g>
+  <g stroke="white" opacity=".1" stroke-width=".7">
+    <line x1="150" y1="220" x2="222" y2="8"/><line x1="150" y1="220" x2="293" y2="148"/>
+    <line x1="150" y1="220" x2="293" y2="292"/><line x1="150" y1="220" x2="222" y2="432"/>
+    <line x1="150" y1="220" x2="78" y2="432"/><line x1="150" y1="220" x2="7" y2="292"/>
+    <line x1="150" y1="220" x2="7" y2="148"/><line x1="150" y1="220" x2="78" y2="8"/>
+  </g>
+  <circle cx="150" cy="220" r="10" fill="white" opacity=".16"/>
+  <circle cx="150" cy="220" r="4" fill="white" opacity=".3"/>
 </svg>`;
 
 const POSTERS = [
   { bg:'#100828', ac:'#9b7fff', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'Don\'t believe in yourself. Believe in me — believe in the Kamina who believes in you!' },
-  { bg:'#0d1e3a', ac:'#4d9eff', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'Who the hell do you think I am?!' },
+    q:'Don\'t believe in yourself. Believe in me! Believe in the Kamina who believes in you!' },
   { bg:'#0e2008', ac:'#5dca5d', art:_GL, src:'Gurren Lagann', by:'Kamina',
     q:'Your drill is the drill that will pierce the heavens!' },
-  { bg:'#220c0c', ac:'#ff6b6b', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'Kick logic out and do the impossible! That\'s the way Team Gurren rolls!' },
-  { bg:'#0b1e1e', ac:'#3dc9c9', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'If there\'s a wall in our way, we smash it down! If there\'s no path, we carve one ourselves!' },
-  { bg:'#201a08', ac:'#ffd56b', art:_GL, src:'Gurren Lagann', by:'Simon',
-    q:'My bro is dead. He\'s gone. But he lives on in my back and in my heart. He\'ll keep living as a part of me.' },
-  { bg:'#200c18', ac:'#ff6bab', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'Don\'t stop moving until your heart stops pumping!' },
-  { bg:'#080820', ac:'#7070ff', art:_GL, src:'Gurren Lagann', by:'Simon',
-    q:'Mark my words — this drill will open a hole in the universe. And that hole will be a path for those behind us.' },
-  { bg:'#0c2018', ac:'#6bcca0', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'A real man never dies, even when he\'s killed!' },
-  { bg:'#1e0c00', ac:'#ff9b6b', art:_GL, src:'Gurren Lagann', by:'Team Gurren',
-    q:'Row row, fight the power!' },
-  { bg:'#001a18', ac:'#6bddcc', art:_GL, src:'Gurren Lagann', by:'Nia Teppelin',
-    q:'Even if tomorrow never comes, I\'ll keep believing in the tomorrow I\'ll spend with you.' },
-  { bg:'#12001a', ac:'#c06bff', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'Go beyond the impossible and kick reason to the curb!' },
-  { bg:'#001a08', ac:'#6bff9b', art:_GL, src:'Gurren Lagann', by:'Simon',
-    q:'I\'m not afraid anymore. I know my drill will pierce the heavens!' },
-  { bg:'#1e0008', ac:'#ff6b88', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'The lights in the sky are stars. We won\'t stop — ever — until we\'ve reached every last one of them.' },
-  { bg:'#0a1600', ac:'#aaff6b', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'Don\'t be distracted by the what-ifs and should-haves. It was the best possible choice at that moment.' },
-  { bg:'#00121e', ac:'#6bbbff', art:_FT, src:'Fairy Tail', by:'Makarov Dreyar',
-    q:'There is no shame in being weak. The shame is in staying weak.' },
+  { bg:'#0d1e3a', ac:'#4d9eff', art:_GL, src:'Gurren Lagann', by:'Simon',
+    q:'Who the hell do you think I am?!' },
+  { bg:'#1a0800', ac:'#ff7722', art:_PWR, src:'Dragon Ball Z', by:'Vegeta',
+    q:'I do not fear this new challenge. I will rise to meet it.' },
+  { bg:'#200808', ac:'#ff4444', art:_PWR, src:'Dragon Ball Z', by:'Vegeta',
+    q:'Every time I reach a new level of power, a greater one appears.' },
+  { bg:'#080f1a', ac:'#4488ff', art:_PWR, src:'Dragon Ball Z', by:'Goku',
+    q:'Power comes in response to a need, not a desire.' },
+  { bg:'#0a1010', ac:'#f5c542', art:_PWR, src:'Dragon Ball Z', by:'Goku',
+    q:'I am the hope of the universe.' },
+  { bg:'#0e0814', ac:'#cc88ff', art:_PWR, src:'Dragon Ball Super', by:'Jiren',
+    q:'Power comes from resolve. Not emotion.' },
+  { bg:'#140a00', ac:'#ff8c00', art:_PWR, src:'Bleach', by:'Kenpachi Zaraki',
+    q:'If you don\'t risk your life, you can\'t find a way forward.' },
+  { bg:'#001214', ac:'#00ddcc', art:_PWR, src:'Black Clover', by:'Asta',
+    q:'My magic is never giving up!' },
+  { bg:'#0e0808', ac:'#cc3333', art:_PWR, src:'Berserk', by:'Guts',
+    q:'You\'re going to die someday… so live while you can.' },
+  { bg:'#080e14', ac:'#4488cc', art:_PWR, src:'Attack on Titan', by:'Erwin Smith',
+    q:'If you regret your decisions, you weaken your future choices.' },
+  { bg:'#0e0e08', ac:'#ccaa44', art:_PWR, src:'Attack on Titan', by:'Eren Yeager',
+    q:'If you win, you live. If you lose, you die. If you don\'t fight, you can\'t win.' },
+  { bg:'#060e0e', ac:'#44cccc', art:_PWR, src:'Attack on Titan', by:'Levi Ackerman',
+    q:'The only thing we\'re allowed to do is believe we won\'t regret our choice.' },
+  { bg:'#00081e', ac:'#3366ff', art:_PWR, src:'Kuroko no Basket', by:'Aomine Daiki',
+    q:'The only one who can beat me… is me.' },
+  { bg:'#081408', ac:'#66cc44', art:_PWR, src:'Hunter x Hunter', by:'Netero',
+    q:'You should appreciate the challenges that push you to grow.' },
 ];
 
 let _posterIdx = parseInt(localStorage.getItem('life_sim_poster') || '0');
@@ -2149,6 +2529,326 @@ function _navPoster(dir) {
 }
 
 // ─────────────────────────────────────────────
+//  DUMBBELL MENU
+// ─────────────────────────────────────────────
+// ─── FACIAL EXERCISE MODAL ───────────────────────────
+function _getFacialData() {
+  try {
+    const d = JSON.parse(localStorage.getItem('wellness_data') || 'null');
+    if (!d || !d.facialExercises) return { exercises: ['Chin tucks', 'Face curls', 'Jaw stretch', 'Cheek puff', 'Brow lift'], log: {} };
+    return d.facialExercises;
+  } catch(e) { return { exercises: ['Chin tucks', 'Face curls', 'Jaw stretch', 'Cheek puff', 'Brow lift'], log: {} }; }
+}
+function _saveFacialComplete(ex) {
+  try {
+    const raw = JSON.parse(localStorage.getItem('wellness_data') || '{}');
+    if (!raw.facialExercises) raw.facialExercises = { exercises: [], log: {} };
+    const t = new Date().toISOString().split('T')[0];
+    if (!raw.facialExercises.log[t]) raw.facialExercises.log[t] = { completed: [], notes: '' };
+    const arr = raw.facialExercises.log[t].completed;
+    const idx = arr.indexOf(ex);
+    if (idx >= 0) arr.splice(idx, 1); else arr.push(ex);
+    localStorage.setItem('wellness_data', JSON.stringify(raw));
+  } catch(e) {}
+}
+function _renderFaceModal() {
+  const fe = _getFacialData();
+  const t = new Date().toISOString().split('T')[0];
+  const completed = (fe.log[t] || {}).completed || [];
+  const isFaceActive = _activityName === '✨ Facial exercises';
+
+  const listHTML = fe.exercises.length ? fe.exercises.map(ex => {
+    const done = completed.includes(ex);
+    return `<div class="face-check-item ${done?'done':''}" onclick="event.stopPropagation();_toggleFaceEx('${ex.replace(/'/g,"\\'")}')">
+      <div class="face-check-box">${done?'✓':''}</div>
+      <span class="face-check-label">${ex}</span>
+    </div>`;
+  }).join('') : `<div style="font-size:11px;color:var(--muted);padding:8px 0">No exercises set — add some in Wellness → Facial & Mewing</div>`;
+
+  const done = completed.filter(ex => fe.exercises.includes(ex)).length;
+  const total = fe.exercises.length;
+  const pct = total ? Math.round((done/total)*100) : 0;
+
+  document.getElementById('face-modal-body').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:700">Today · ${done}/${total}</span>
+      <span style="font-size:13px;font-weight:900;color:var(--green)">${pct}%</span>
+    </div>
+    <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:14px">
+      <div style="height:100%;width:${pct}%;background:var(--green);border-radius:2px;transition:width .6s ease"></div>
+    </div>
+    ${listHTML}
+    <div style="margin-top:16px">
+      <button class="face-start-btn ${isFaceActive?'active':''}" onclick="event.stopPropagation();_toggleFaceSession()">
+        ${isFaceActive ? '■ Stop session' : '✨ Start facial exercise session'}
+      </button>
+    </div>
+    <div style="margin-top:10px;text-align:center">
+      <span style="font-size:10px;color:var(--muted);cursor:pointer;text-decoration:underline"
+        onclick="event.stopPropagation();closeFaceModal();window.parent.postMessage({action:'openWellnessFacial'},'*')">
+        Open in Wellness →
+      </span>
+    </div>
+  `;
+}
+function _toggleFaceEx(ex) {
+  _saveFacialComplete(ex);
+  _renderFaceModal();
+}
+function _toggleFaceSession() {
+  if (_activityName === '✨ Facial exercises') {
+    stopActivity({ stopPropagation:()=>{} });
+  } else {
+    closeFaceModal();
+    moveChar('center');
+    const figure = document.getElementById('char-figure');
+    const head   = document.getElementById('char-head');
+    if (figure) { figure.className = 'char-figure face-ex'; }
+    if (head)   { head.className   = 'char-head face-ex'; }
+    _sittingOnChair = false;
+    _activityStart    = Date.now();
+    _activityName     = '✨ Facial exercises';
+    _manualStatus     = '✨ Facial exercises';
+    _manualStatusTime = Date.now();
+    clearActivityTimer();
+    updateActivityBubble();
+    _activityInterval = setInterval(updateActivityBubble, 1000);
+    saveState();
+  }
+}
+function showDumbbellMenu(e) {
+  e.stopPropagation();
+  document.getElementById('face-overlay').classList.add('open');
+  document.getElementById('face-sheet').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  _renderFaceModal();
+}
+function closeFaceModal() {
+  document.getElementById('face-overlay').classList.remove('open');
+  document.getElementById('face-sheet').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ─────────────────────────────────────────────
+//  JOURNAL / TO-DO LIST
+// ─────────────────────────────────────────────
+let _jActiveTab = 'todo'; // 'todo' | 'journal'
+let _simJournalMood = '';
+
+function showJournal(e) {
+  e.stopPropagation();
+  const existing = document.getElementById('journal-modal');
+  if (existing) { existing.remove(); return; }
+  const modal = document.createElement('div');
+  modal.className = 'journal-modal';
+  modal.id = 'journal-modal';
+  modal.onclick = ev => { if (ev.target === modal) modal.remove(); };
+  _renderJournalModal(modal);
+  document.body.appendChild(modal);
+}
+
+function _switchJTab(tab) {
+  _jActiveTab = tab;
+  const m = document.getElementById('journal-modal');
+  if (m) _renderJournalModal(m);
+}
+
+function _renderJournalModal(modal) {
+  const inner = document.createElement('div');
+  inner.className = 'journal-inner';
+  inner.onclick = ev => ev.stopPropagation();
+  inner.innerHTML = `
+    <div class="j-hdr">
+      <div class="j-title">📓 Desk</div>
+      <button class="j-x" onclick="document.getElementById('journal-modal').remove()">×</button>
+    </div>
+    <div class="j-tabs">
+      <button class="j-tab-btn${_jActiveTab==='todo'?' active':''}" onclick="_switchJTab('todo')">📋 To-Do</button>
+      <button class="j-tab-btn${_jActiveTab==='journal'?' active':''}" onclick="_switchJTab('journal')">✍️ Journal</button>
+    </div>
+    <div id="j-tab-content" style="display:flex;flex-direction:column;flex:1;overflow:hidden;"></div>`;
+  modal.innerHTML = '';
+  modal.appendChild(inner);
+  if (_jActiveTab === 'todo') _renderTodoTab();
+  else _renderJournalTab();
+}
+
+function _jTodos()     { return JSON.parse(localStorage.getItem('life_sim_todos')     || '[]'); }
+function _jSaveTodos(t){ localStorage.setItem('life_sim_todos', JSON.stringify(t)); }
+function _jTmpls()     { return JSON.parse(localStorage.getItem('life_sim_todo_tmpls')|| '[]'); }
+function _jSaveTmpls(t){ localStorage.setItem('life_sim_todo_tmpls', JSON.stringify(t)); }
+
+function _renderTodoTab(showTmpls) {
+  const todos = _jTodos(), tmpls = _jTmpls();
+  const rows = todos.map((t, i) => `
+    <div class="todo-row${t.done?' t-done':''}">
+      <input type="checkbox"${t.done?' checked':''} onchange="_jToggle(${i})">
+      <span class="t-txt">${t.text.replace(/</g,'&lt;')}</span>
+      <button class="t-del" onclick="_jDel(${i})">×</button>
+    </div>`).join('');
+  const tmplSection = showTmpls ? `
+    <div class="tmpl-list">
+      <div style="font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.28);text-transform:uppercase;margin-bottom:8px;padding:0 2px">Saved Templates</div>
+      ${tmpls.length ? tmpls.map((t,i)=>`
+        <div class="tmpl-row">
+          <span class="tmpl-nm">${t.name.replace(/</g,'&lt;')}</span>
+          <button class="tmpl-load" onclick="_jLoadTmpl(${i})">Load</button>
+          <button class="tmpl-del"  onclick="_jDelTmpl(${i})">×</button>
+        </div>`).join('') : '<div class="j-empty">No templates saved yet.</div>'}
+    </div>` : '';
+  const content = document.getElementById('j-tab-content');
+  if (!content) return;
+  content.innerHTML = `
+    <div class="j-body">
+      ${todos.length ? rows : '<div class="j-empty">Nothing here yet — add a task below.</div>'}
+      ${tmplSection}
+    </div>
+    <div class="j-add">
+      <input id="j-inp" type="text" placeholder="Add a task…" onkeydown="if(event.key==='Enter')_jAdd()">
+      <button class="j-add-btn" onclick="_jAdd()">+</button>
+    </div>
+    <div class="j-foot">
+      <button onclick="_jSaveTmpl()">💾 Save as Template</button>
+      <button onclick="_jToggleTmpls()">${showTmpls?'📋 Hide':'📋 Templates'}</button>
+    </div>`;
+  setTimeout(()=>{ const inp=document.getElementById('j-inp'); if(inp)inp.focus(); },50);
+}
+
+function _simGetWellnessData() {
+  try { return JSON.parse(localStorage.getItem('wellness_data')) || {}; } catch(e) { return {}; }
+}
+function _simSaveWellnessData(d) {
+  try { localStorage.setItem('wellness_data', JSON.stringify(d)); } catch(e) {}
+}
+
+function _renderJournalTab(editDate) {
+  const today = new Date().toISOString().split('T')[0];
+  const date = editDate || today;
+  const wdata = _simGetWellnessData();
+  const jlog = (wdata.journal && wdata.journal.log) || {};
+  const entry = jlog[date] || {};
+  const moods = ['😊','😐','😞','😤','😴','🤩','😰','🙏'];
+  const content = document.getElementById('j-tab-content');
+  if (!content) return;
+
+  // Recent entries (exclude today if empty)
+  const recents = Object.entries(jlog).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,5);
+
+  content.innerHTML = `
+    <div class="j-journal-body">
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <input type="date" id="j-jdate" value="${date}" max="${today}"
+          style="background:#141420;border:1px solid #2a2840;color:rgba(255,255,255,.7);
+          padding:5px 8px;border-radius:6px;font-size:11px;font-family:inherit;outline:none;"
+          onchange="_renderJournalTab(this.value)">
+        <span style="font-size:11px;color:rgba(255,255,255,.28)">mood:</span>
+        <div class="j-moods" id="j-moods">
+          ${moods.map(m=>`<button class="j-mood-btn${entry.mood===m?' active':''}" onclick="_setSimMood('${m}')" title="${m}">${m}</button>`).join('')}
+        </div>
+      </div>
+      <textarea id="j-jtxt" class="j-journal-txt" placeholder="Write something…">${(entry.text||'').replace(/</g,'&lt;')}</textarea>
+      <button onclick="_saveSimJournal()" style="background:#a855f7;border:none;color:white;padding:9px;
+        border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;flex-shrink:0">
+        💾 Save Entry</button>
+      ${recents.length ? `
+        <div style="font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.22);text-transform:uppercase;padding-top:4px;flex-shrink:0">Recent Entries</div>
+        ${recents.map(([d,e])=>`
+          <div class="j-journal-entry" onclick="_renderJournalTab('${d}')">
+            <div class="j-entry-hdr">
+              <span class="j-entry-date">${d}</span>
+              ${e.mood?`<span style="font-size:14px">${e.mood}</span>`:''}
+            </div>
+            ${e.text?`<div class="j-entry-text">${e.text.replace(/</g,'&lt;')}</div>`:'<div class="j-entry-text" style="color:rgba(255,255,255,.3)">No text</div>'}
+          </div>`).join('')}` : ''}
+    </div>`;
+  _simJournalMood = entry.mood || '';
+  setTimeout(()=>{ const t=document.getElementById('j-jtxt'); if(t)t.focus(); },50);
+}
+
+function _setSimMood(m) {
+  _simJournalMood = (_simJournalMood === m) ? '' : m;
+  document.querySelectorAll('.j-mood-btn').forEach(b => b.classList.toggle('active', b.textContent === _simJournalMood));
+}
+
+function _saveSimJournal() {
+  const txt = (document.getElementById('j-jtxt')||{}).value||'';
+  const date = (document.getElementById('j-jdate')||{}).value || new Date().toISOString().split('T')[0];
+  const wdata = _simGetWellnessData();
+  if (!wdata.journal) wdata.journal = { log: {} };
+  if (!wdata.journal.log) wdata.journal.log = {};
+  wdata.journal.log[date] = { text: txt.trim(), mood: _simJournalMood, energy: 0, tags: [], timestamp: new Date().toISOString() };
+  _simSaveWellnessData(wdata);
+  // Flash the button
+  const btn = document.querySelector('.j-journal-body button');
+  if (btn) { btn.textContent = '✓ Saved!'; setTimeout(()=>{ btn.textContent = '💾 Save Entry'; },1400); }
+  _renderJournalTab(date);
+}
+
+function _jToggle(i){ const t=_jTodos(); t[i].done=!t[i].done; _jSaveTodos(t); _renderTodoTab(!!document.querySelector('.tmpl-list')); }
+function _jDel(i)   { const t=_jTodos(); t.splice(i,1); _jSaveTodos(t); _renderTodoTab(false); }
+function _jAdd()    {
+  const inp=document.getElementById('j-inp'); if(!inp)return;
+  const txt=inp.value.trim(); if(!txt)return;
+  const t=_jTodos(); t.push({text:txt,done:false}); _jSaveTodos(t);
+  _renderTodoTab(false);
+}
+function _jSaveTmpl(){
+  const todos=_jTodos(); if(!todos.length){alert('Add some tasks first!');return;}
+  const name=prompt('Template name:'); if(!name)return;
+  const tmpls=_jTmpls(); tmpls.push({name,items:todos.filter(t=>!t.done).map(t=>t.text)});
+  _jSaveTmpls(tmpls); _renderTodoTab(true);
+}
+function _jToggleTmpls(){
+  _renderTodoTab(!document.querySelector('.tmpl-list'));
+}
+function _jLoadTmpl(i){
+  const tmpls=_jTmpls(); const t=tmpls[i]; if(!t)return;
+  _jSaveTodos(t.items.map(text=>({text,done:false})));
+  _renderTodoTab(false);
+}
+function _jDelTmpl(i){
+  const tmpls=_jTmpls(); tmpls.splice(i,1); _jSaveTmpls(tmpls);
+  _renderTodoTab(true);
+}
+
+// ─────────────────────────────────────────────
+//  MOTIVATIONAL PHRASES — cycle every 15 secs
+// ─────────────────────────────────────────────
+const MOTIV = [
+  '💪 I\'m never giving up',
+  '🔥 I can do this',
+  '🏆 I will win',
+  '⚡ I don\'t lose',
+  '🚀 Failure is nothing',
+  '💥 Built different',
+  '🎯 Stay locked in',
+  '👊 No days off',
+  '🌟 I\'m that guy',
+  '💎 Pressure makes diamonds',
+  '🦾 I keep going',
+  '⚔️ I don\'t back down',
+  '🔱 Outwork everyone',
+  '🧠 Discipline over mood',
+];
+let _motivIdx = Math.floor(Math.random() * MOTIV.length);
+let _motivActive = false;
+
+function flashMotiv() {
+  if (_manualStatus) return; // never interrupt active activity tracking
+  const bubble = document.getElementById('char-bubble');
+  if (!bubble) return;
+  _motivIdx = (_motivIdx + 1) % MOTIV.length;
+  bubble.innerHTML = MOTIV[_motivIdx];
+  bubble.style.borderColor = '#a855f7';
+  _motivActive = true;
+  // Clear flag after 13s so render() can take back over between cycles
+  setTimeout(() => { _motivActive = false; }, 13000);
+}
+// Fire first one after 3 seconds so it's visible right away
+setTimeout(flashMotiv, 3000);
+setInterval(flashMotiv, 15 * 1000);
+
+// ─────────────────────────────────────────────
 //  ROOM SCALING
 //  Uses CSS transform:scale() so ALL interior
 //  positions, character coords and menus stay
@@ -2159,7 +2859,9 @@ function _navPoster(dir) {
 //  (which can return 0 before layout is painted).
 // ─────────────────────────────────────────────
 function scaleRoom() {
-  const container = document.querySelector('.room-container');
+  document.querySelectorAll('.room-container').forEach(container => _scaleContainer(container));
+}
+function _scaleContainer(container) {
   if (!container) return;
 
   const DESIGN_W = 430, DESIGN_H = 510;
@@ -2195,6 +2897,406 @@ function scaleRoom() {
 }
 
 // ─────────────────────────────────────────────
+//  KITCHEN CHARACTER + INTERACTIONS
+// ─────────────────────────────────────────────
+const K_POS = {
+  entry:  { top:418, left:22  }, // bottom-left spawn / home base
+  fridge: { top:140, left:76  }, // in front of left-wall fridge
+  cooker: { top:172, left:330 }, // in front of right-counter cooker
+  stool0: { top:326, left:156 },
+  stool1: { top:326, left:188 },
+  stool2: { top:326, left:220 },
+  stool3: { top:326, left:252 },
+};
+let _kZone   = 'entry';
+let _kSitting = false;
+
+function kMoveChar(zone) {
+  _kZone = zone;
+  const p = K_POS[zone] || K_POS.entry;
+  const el = document.getElementById('k-char');
+  if (!el) return;
+  el.style.top  = p.top  + 'px';
+  el.style.left = p.left + 'px';
+  // Apply activity-specific animation to kitchen char figure
+  const kFig = el.querySelector('.char-figure');
+  if (kFig) {
+    kFig.className = 'char-figure';
+    if (zone === 'fridge') kFig.classList.add('fridge-check');
+    if (zone === 'cooker') kFig.classList.add('cooking');
+  }
+}
+
+function kitchenClick() {
+  // Clicking empty kitchen floor → return to bottom-left home base
+  if (_kSitting) {
+    _kSitting = false;
+    // clear stool highlights
+    document.querySelectorAll('.k-stool').forEach(s => s.classList.remove('occupied'));
+  }
+  if (_kZone !== 'entry') {
+    closeActivityMenu();
+    kMoveChar('entry');
+    const kb = document.getElementById('k-bubble');
+    if (kb) kb.textContent = '🍳 In the kitchen';
+  }
+}
+
+function kSitStool(i, e) {
+  e.stopPropagation();
+  const stoolEl = document.getElementById('kstool-' + i);
+  const wasHere = _kSitting && _kZone === ('stool' + i);
+  // clear all stool highlights
+  document.querySelectorAll('.k-stool').forEach(s => s.classList.remove('occupied'));
+  if (wasHere) {
+    _kSitting = false;
+    kMoveChar('entry');
+    const kb = document.getElementById('k-bubble');
+    if (kb) kb.textContent = '🍳 In the kitchen';
+  } else {
+    _kSitting = true;
+    kMoveChar('stool' + i);
+    if (stoolEl) stoolEl.classList.add('occupied');
+    const kb = document.getElementById('k-bubble');
+    if (kb) kb.textContent = '🪑 Sat at island';
+  }
+}
+
+function kGoToFridge(e) {
+  e.stopPropagation();
+  _kSitting = false;
+  document.querySelectorAll('.k-stool').forEach(s => s.classList.remove('occupied'));
+  kMoveChar('fridge');
+  const kb = document.getElementById('k-bubble');
+  if (kb) kb.textContent = '🧊 Checking fridge…';
+  setTimeout(() => showFridgeInventory(), 450);
+}
+
+function kGoToCooker(e) {
+  e.stopPropagation();
+  _kSitting = false;
+  document.querySelectorAll('.k-stool').forEach(s => s.classList.remove('occupied'));
+  kMoveChar('cooker');
+  const kb = document.getElementById('k-bubble');
+  if (kb) kb.textContent = '🍳 Cooking…';
+  // Open wellness meals page in parent hub
+  window.parent.postMessage({ action: 'openWellnessMeals' }, '*');
+}
+
+// ── FRIDGE INVENTORY ──
+const _DEFAULT_FOOD = [
+  { name:'Chicken breast', qty:0, unit:'pieces'   },
+  { name:'Brown rice',     qty:0, unit:'cups'      },
+  { name:'Broccoli',       qty:0, unit:'portions'  },
+  { name:'Eggs',           qty:0, unit:'eggs'      },
+  { name:'Sweet potato',   qty:0, unit:'pieces'    },
+  { name:'Oats',           qty:0, unit:'servings'  },
+  { name:'Protein powder', qty:0, unit:'scoops'    },
+];
+
+function _getFood() {
+  try {
+    const s = localStorage.getItem('life_sim_food');
+    return s ? JSON.parse(s) : JSON.parse(JSON.stringify(_DEFAULT_FOOD));
+  } catch(e) { return JSON.parse(JSON.stringify(_DEFAULT_FOOD)); }
+}
+function _saveFood(f) {
+  try { localStorage.setItem('life_sim_food', JSON.stringify(f)); } catch(e) {}
+}
+
+function showFridgeInventory() {
+  document.getElementById('k-fridge-modal')?.remove();
+  const modal = document.createElement('div');
+  modal.className = 'k-fridge-modal';
+  modal.id = 'k-fridge-modal';
+  modal.onclick = ev => { if (ev.target === modal) modal.remove(); };
+  _renderFridgeModal(modal);
+  document.body.appendChild(modal);
+}
+
+function _renderFridgeModal(modal) {
+  const food = _getFood();
+  const rows = food.map((f,i) => `
+    <div class="food-row">
+      <span class="f-name">${f.name}</span>
+      <button class="f-btn" onclick="_foodAdj(${i},-1)">−</button>
+      <span class="f-qty">${f.qty}</span>
+      <span class="f-unit">${f.unit}</span>
+      <button class="f-btn" onclick="_foodAdj(${i},1)">+</button>
+      <button class="f-btn f-del" onclick="_foodDel(${i})" title="Remove">×</button>
+    </div>`).join('');
+  modal.innerHTML = `
+    <div class="k-fridge-inner" onclick="event.stopPropagation()">
+      <div class="kf-hdr">
+        <div class="kf-title">🧊 Food Stock</div>
+        <button class="kf-x" onclick="document.getElementById('k-fridge-modal').remove()">×</button>
+      </div>
+      <div class="kf-body">${rows || '<p style="color:rgba(255,255,255,.3);font-size:12px;padding:10px 0">Fridge is empty — add items below.</p>'}</div>
+      <div class="kf-add">
+        <input id="f-inp-name" placeholder="Item name…" onkeydown="if(event.key==='Enter')_foodAdd()">
+        <input id="f-inp-unit" placeholder="Unit" style="max-width:70px" onkeydown="if(event.key==='Enter')_foodAdd()">
+        <button class="kf-add-btn" onclick="_foodAdd()">+</button>
+      </div>
+    </div>`;
+}
+
+function _foodAdj(i, d) {
+  const f = _getFood();
+  if (!f[i]) return;
+  f[i].qty = Math.max(0, (f[i].qty || 0) + d);
+  _saveFood(f);
+  const m = document.getElementById('k-fridge-modal');
+  if (m) _renderFridgeModal(m);
+}
+
+function _foodDel(i) {
+  const f = _getFood();
+  f.splice(i, 1);
+  _saveFood(f);
+  const m = document.getElementById('k-fridge-modal');
+  if (m) _renderFridgeModal(m);
+}
+
+function _foodAdd() {
+  const nameEl = document.getElementById('f-inp-name');
+  const unitEl = document.getElementById('f-inp-unit');
+  const n = nameEl?.value.trim();
+  const u = unitEl?.value.trim() || 'units';
+  if (!n) return;
+  const f = _getFood();
+  f.push({ name:n, qty:0, unit:u });
+  _saveFood(f);
+  const m = document.getElementById('k-fridge-modal');
+  if (m) _renderFridgeModal(m);
+}
+
+// ─────────────────────────────────────────────
+//  GAMING WARNING
+// ─────────────────────────────────────────────
+const GAMING_MSGS = [
+  { icon:'⚡', title:"This isn't you.",                     body:"You know exactly what you should be doing right now. This isn't it. Every hour here is an hour your future self is going to hate you for." },
+  { icon:'🔥', title:"Someone is outworking you right now.", body:"While you're here, someone with less talent and fewer resources is grinding. They'll have what you want. And you'll wonder what happened." },
+  { icon:'💀', title:"You've done this before.",             body:"You always regret it. You always say 'just one more'. You always look back wishing you'd stopped sooner. Stop now." },
+  { icon:'👁️', title:"This is the gap.",                   body:"Not lack of talent. Not bad luck. This moment — choosing to waste time when you know what you're capable of. This is why it hasn't happened yet." },
+  { icon:'⚔️', title:"You're not tired. You're avoiding.",  body:"The version of you that wins doesn't do this. Not today. Not when there's work to be done." },
+  { icon:'⏳', title:"Time is the one thing you can't get back.", body:"Money can be earned again. Energy comes back. But this hour? Gone forever. What are you actually doing right now?" },
+  { icon:'🎯', title:"You already know.",                   body:"You don't need to be told. Deep down you know this isn't moving the needle. You know what would. Go do that." },
+  { icon:'🧠', title:"This is a choice.",                   body:"Every minute here is a conscious decision to stay exactly where you are. Is that what you want? Because the results will reflect the choices." },
+  { icon:'💸', title:"Your goals don't care how you feel.", body:"They don't care if you're bored, tired, or just wanted to relax for a bit. They're either getting done or they're not." },
+  { icon:'🏆', title:"The life you want is built right now.", body:"Not in some future perfect scenario. In the gap between comfort and effort. What are you choosing?" },
+];
+
+let _gamingWarningTimer = null;
+let _gamingStayWeakCount = 0;
+
+function scheduleGamingWarning(delayMs) {
+  clearGamingWarningTimer();
+  _gamingWarningTimer = setTimeout(showGamingWarning, delayMs ?? 60 * 1000);
+}
+
+function clearGamingWarningTimer() {
+  if (_gamingWarningTimer) { clearTimeout(_gamingWarningTimer); _gamingWarningTimer = null; }
+}
+
+function hideGamingWarning() {
+  document.getElementById('gaming-warn')?.classList.remove('show');
+}
+
+function showGamingWarning() {
+  const msg = GAMING_MSGS[Math.floor(Math.random() * GAMING_MSGS.length)];
+  document.getElementById('gwarn-icon').textContent  = msg.icon;
+  document.getElementById('gwarn-title').textContent = msg.title;
+  document.getElementById('gwarn-body').textContent  = msg.body;
+  document.getElementById('gaming-warn').classList.add('show');
+  // If they ignore it, pulse the warning again after 2 min
+  clearGamingWarningTimer();
+  _gamingWarningTimer = setTimeout(() => {
+    hideGamingWarning();
+    _gamingWarningTimer = setTimeout(showGamingWarning, 90 * 1000);
+  }, 25 * 1000); // auto-hide after 25s, come back in 90s
+}
+
+function gamingBeBetter() {
+  hideGamingWarning();
+  clearGamingWarningTimer();
+  _gamingStayWeakCount = 0;
+  // Stop gaming activity (handles timer, char reset, center move)
+  stopActivity(null);
+  // Turn off PC
+  _pcOn = false;
+  updateDevices();
+  saveState();
+  // Show redemption suggestions after brief pause
+  setTimeout(() => {
+    const bubble = document.getElementById('char-bubble');
+    if (bubble) { bubble.innerHTML = '⚡ Let\'s get it.'; bubble.style.borderColor = 'var(--gold)'; }
+    showActivityMenu([
+      { icon:'💻', label:'Mac Mini — real work', action:() => {
+        _miniOn = true; _lastDevice = 'mac'; updateDevices(); saveState();
+        selectActivity({ icon:'⚡', label:'Productive work', status:'⚡ Locked in' });
+      }},
+      { icon:'🏋️', label:'Go to the gym',     action:() => goLoc('outside') },
+      { icon:'💰', label:'Online hustle',      status:'💰 On the grind'   },
+      { icon:'🎬', label:'Record content',     status:'🎬 Recording'      },
+    ], { top: 228, left: 160 }, 'up');
+  }, 350);
+}
+
+function gamingStayWeak() {
+  hideGamingWarning();
+  _gamingStayWeakCount++;
+  // Gets more frequent the more you ignore it: 1min → 30s → 20s → 15s → stays at 15s
+  const delays = [60*1000, 30*1000, 20*1000, 15*1000];
+  const delay = delays[Math.min(_gamingStayWeakCount, delays.length - 1)];
+  scheduleGamingWarning(delay);
+}
+
+// ─────────────────────────────────────────────
+//  STATE PERSISTENCE (survives tab close/reopen)
+// ─────────────────────────────────────────────
+function saveState() {
+  if (!_initDone) return; // never stomp saved state during the init render pass
+  try {
+    // Which scene is currently visible?
+    const loc = document.getElementById('view-kitchen')?.classList.contains('show') ? 'kitchen'
+              : document.getElementById('view-outside')?.classList.contains('show') ? 'outside'
+              : 'room';
+    // Capture actual CSS classes so they restore exactly
+    const figEl   = document.getElementById('char-figure');
+    const headEl  = document.getElementById('char-head');
+    const chairEl = document.getElementById('chair');
+    localStorage.setItem('life_sim_runtime', JSON.stringify({
+      zone:          _currentZone,
+      sitting:       _sittingOnChair,
+      status:        _manualStatus,
+      activityName:  _activityName,
+      activityStart: _activityStart || null,
+      // Room / device state
+      pcOn:          _pcOn,
+      miniOn:        _miniOn,
+      lastDevice:    _lastDevice,
+      curtains:      _curtainsDrawn,
+      lightOn:       _lightOn,
+      // Scene + char visual (so kitchen/outside + any animation restores)
+      loc,
+      figClass:   figEl   ? figEl.className   : 'char-figure',
+      headClass:  headEl  ? headEl.className  : 'char-head',
+      chairClass: chairEl ? chairEl.className : 'chair',
+      // Kitchen state
+      kZone:    _kZone    || 'entry',
+      kSitting: _kSitting || false,
+    }));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('life_sim_runtime') || 'null');
+    if (!s) return;
+
+    // ── 1. Device / room state ──
+    if (s.pcOn      !== undefined) _pcOn          = s.pcOn;
+    if (s.miniOn    !== undefined) _miniOn        = s.miniOn;
+    if (s.lastDevice)              _lastDevice    = s.lastDevice;
+    if (s.curtains  !== undefined) _curtainsDrawn = s.curtains;
+    if (s.lightOn   !== undefined) _lightOn       = s.lightOn;
+    updateDevices();
+    updateRoom();
+    const sw = document.getElementById('light-switch');
+    if (sw) sw.className = 'light-switch' + (_lightOn ? ' on' : '');
+
+    // ── 2. Room character position ──
+    if (s.zone && POS[s.zone]) {
+      _currentZone = s.zone;
+      const charEl = document.getElementById('char');
+      if (charEl) {
+        charEl.style.top  = POS[s.zone].top  + 'px';
+        charEl.style.left = POS[s.zone].left + 'px';
+      }
+      if (s.zone === 'desk' || s.zone === 'chair')
+        document.querySelector('.desk')?.classList.add('active-zone');
+      if (s.zone === 'futon' || s.zone === 'futon_sleep')
+        document.querySelector('.futon')?.classList.add('active-zone');
+    }
+
+    // ── 3. Chair sitting ──
+    if (s.sitting) {
+      _sittingOnChair = true;
+      document.querySelector('.desk')?.classList.add('active-zone');
+    }
+
+    // ── 4. Character visual — restore saved className strings directly.
+    //       This handles every state: idle, laying, at-desk, cooking,
+    //       fridge-check, meditating, seated-idle — no more guessing.
+    const figure  = document.getElementById('char-figure');
+    const head    = document.getElementById('char-head');
+    const chairEl = document.getElementById('chair');
+    if (s.figClass   && figure)   figure.className   = s.figClass;
+    if (s.headClass  && head)     head.className     = s.headClass;
+    if (s.chairClass && chairEl)  chairEl.className  = s.chairClass;
+
+    // ── 5. Activity timer ──
+    if (s.activityStart && s.activityName && s.status) {
+      _activityStart    = s.activityStart;
+      _activityName     = s.activityName;
+      _manualStatus     = s.status;
+      _manualStatusTime = Date.now();
+      clearActivityTimer();
+      updateActivityBubble();
+      _activityInterval = setInterval(updateActivityBubble, 1000);
+      // Re-arm gaming warning for time already elapsed
+      if (_activityName && _activityName.includes('Gaming')) {
+        const elapsed   = Date.now() - _activityStart;
+        const remaining = 60 * 1000 - elapsed;
+        if (remaining > 0) scheduleGamingWarning(remaining);
+        else showGamingWarning();
+      }
+    } else if (s.status) {
+      _manualStatus     = s.status;
+      _manualStatusTime = Date.now();
+    }
+
+    // ── 6. Scene (kitchen / outside override room view) ──
+    if (s.loc === 'kitchen') {
+      goLoc('kitchen');
+      if (s.kZone && s.kZone !== 'entry') {
+        _kZone    = s.kZone;
+        _kSitting = !!s.kSitting;
+        kMoveChar(s.kZone);
+        if (s.kSitting && s.kZone.startsWith('stool')) {
+          document.getElementById('kstool-' + s.kZone.slice(-1))
+            ?.classList.add('occupied');
+        }
+      }
+      if (s.status) {
+        const kb = document.getElementById('k-bubble');
+        if (kb) kb.textContent = s.status;
+      }
+    } else if (s.loc === 'outside') {
+      goLoc('outside');
+    }
+  } catch(e) {}
+}
+
+function manualSave() {
+  saveState();
+  // Flash the nav save button (loc-bar)
+  const saveBtn = document.getElementById('save-btn');
+  if (saveBtn) {
+    const orig = saveBtn.innerHTML;
+    saveBtn.innerHTML = '✓ Saved';
+    saveBtn.classList.add('saved');
+    setTimeout(() => { saveBtn.innerHTML = orig; saveBtn.classList.remove('saved'); }, 1600);
+  }
+  // Flash the sink (kitchen save)
+  const sink = document.getElementById('k-sink');
+  if (sink) {
+    sink.classList.add('saved');
+    setTimeout(() => sink.classList.remove('saved'), 1600);
+  }
+}
+
+// ─────────────────────────────────────────────
 //  INIT
 // ─────────────────────────────────────────────
 // Call scaleRoom multiple times to survive iframe
@@ -2206,8 +3308,56 @@ setTimeout(scaleRoom, 250);
 window.addEventListener('resize', scaleRoom);
 render();
 updateRoomPoster();
+loadState(); // restore character position + active activity after tab reopen
+_initDone = true; // ← unlock saveState AFTER loadState so render()'s moveChar doesn't stomp saved data
+
 setInterval(render, 30000);
-window.addEventListener('focus', render);
+setInterval(saveState, 5000); // auto-save every 5s
+
+// Safari iOS: save before tab is frozen/closed (pagehide is more reliable than beforeunload on iOS)
+window.addEventListener('pagehide', saveState);
+
+// Safari iOS: restore state when page comes back from bfcache (back-forward cache)
+window.addEventListener('pageshow', function(e) {
+  if (e.persisted) {
+    // Page was restored from bfcache — re-apply state (timers resume but DOM needs refresh)
+    render();
+    loadState();
+  }
+});
 </script>
+
+<!-- ── FACIAL EXERCISE MODAL ── -->
+<div class="prog-overlay" id="face-overlay" onclick="closeFaceModal()"></div>
+<div class="prog-sheet" id="face-sheet">
+  <div class="prog-sheet-handle"></div>
+  <div class="prog-sheet-head">
+    <span class="prog-sheet-title">✨ Facial & Mewing</span>
+    <button class="prog-sheet-close" onclick="closeFaceModal()">✕</button>
+  </div>
+  <div class="prog-sheet-body" id="face-modal-body"></div>
+</div>
+
+<!-- ── PROGRESS MODAL ── -->
+<div class="prog-overlay" id="prog-overlay" onclick="closeProgressModal()"></div>
+<div class="prog-sheet" id="prog-sheet">
+  <div class="prog-sheet-handle"></div>
+  <div class="prog-sheet-head">
+    <span class="prog-sheet-title">📊 Progress Breakdown</span>
+    <button class="prog-sheet-close" onclick="closeProgressModal()">✕</button>
+  </div>
+  <div class="prog-sheet-body" id="prog-sheet-body"></div>
+</div>
+
+<!-- ── GAMING WARNING OVERLAY ── -->
+<div id="gaming-warn">
+  <div class="gwarn-box">
+    <div class="gwarn-icon" id="gwarn-icon">⚡</div>
+    <div class="gwarn-title" id="gwarn-title"></div>
+    <div class="gwarn-body"  id="gwarn-body"></div>
+    <button class="gwarn-btn-better" onclick="gamingBeBetter()">⚡ Be Better</button>
+    <button class="gwarn-btn-weak"   onclick="gamingStayWeak()">Stay Weak</button>
+  </div>
+</div>
 </body>
 </html>
