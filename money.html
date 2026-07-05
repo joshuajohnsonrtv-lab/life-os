@@ -876,7 +876,7 @@
   .ladder-card.ladder-lit .ladder-progress-fill { width:var(--progress, 0%); }
 </style>
 </head>
-<body onload="showPage('dashboard')">
+<body>
 
 <!-- ══ MOBILE TOPBAR ══ -->
 <div id="mob-topbar">
@@ -4098,7 +4098,10 @@ function disconnectFirebase() {
 // INIT
 // ══════════════════════════════════════════════════
 updateSaveStatus();
-// showPage('dashboard') is also called via body onload for reliability.
+// Double requestAnimationFrame: first frame runs before browser paint,
+// second frame runs after — by then CSS layout is done and Chart.js
+// canvas has real pixel dimensions. This fixes the blank-on-load issue.
+requestAnimationFrame(() => requestAnimationFrame(() => showPage('dashboard')));
 (function(){ if(getFbConfig()) initFirebase(); else updateCloudStatus('off'); })();
 
 // One-time hustle cleanup — keep only Jet Washing + Personal Brands
