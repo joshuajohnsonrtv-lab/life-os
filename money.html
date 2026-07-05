@@ -317,57 +317,6 @@
   hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
   canvas { max-width: 100%; }
 
-  /* ── INCOME WHEEL ── */
-  .wheel-outer {
-    position: relative;
-    width: 340px;
-    height: 680px;
-    overflow: visible; /* cards float left over content; viewport clips the right side */
-  }
-  .wheel-track {
-    position: absolute;
-    /* centre exactly at the right edge of the panel = right edge of viewport */
-    left: 100%; top: 50%;
-    width: 0; height: 0;
-    animation: wheelRotate 60s linear infinite;
-  }
-  .wheel-outer:hover .wheel-track,
-  .wheel-outer:hover .wheel-card-inner {
-    animation-play-state: paused;
-  }
-  .wheel-spoke {
-    position: absolute;
-    width: 0; height: 0;
-    top: 0; left: 0;
-  }
-  .wheel-card {
-    position: absolute;
-    width: 190px;
-    height: 100px;
-    background: var(--card2);
-    border: 1px solid;
-    border-radius: 14px;
-    padding: 12px 14px;
-    cursor: pointer;
-    transition: filter 0.15s, box-shadow 0.15s;
-  }
-  .wheel-card:hover {
-    filter: brightness(1.18);
-    z-index: 10;
-  }
-  .wheel-card-inner {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    pointer-events: none;
-    overflow: hidden;
-  }
-  @keyframes wheelRotate {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-  }
-
   /* ── HUSTLE BLUEPRINT MODAL ── */
   #modal-hustle-bp {
     position: fixed;
@@ -579,61 +528,9 @@
   .bp-block.bp-span2 { grid-column: span 2; }
   .bp-block.bp-span3 { grid-column: span 3; }
 
-  /* ── WHEEL EXPAND BUTTON ── */
-  #wheel-expand-btn {
-    position: fixed;
-    right: 140px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 202;
-    width: 64px; height: 64px;
-    border-radius: 50%;
-    background: var(--card2);
-    border: 2px solid var(--gold);
-    color: var(--gold);
-    font-size: 26px;
-    cursor: pointer;
+  /* ── IDEAS INLINE LIST ── */
+  #hustles-ideas-panel {
     display: none;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 28px rgba(245,197,66,0.45);
-    transition: background 0.15s, transform 0.15s;
-  }
-  #wheel-expand-btn:hover {
-    background: rgba(245,197,66,0.15);
-    transform: translateY(-50%) scale(1.1);
-  }
-
-  /* ── IDEAS EXPANDED MODAL ── */
-  #ideas-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 300;
-    background: rgba(0,0,0,0.75);
-    backdrop-filter: blur(6px);
-    display: none;
-    align-items: center;
-    justify-content: flex-end;
-  }
-  #ideas-modal-inner {
-    width: 55vw;
-    min-width: 480px;
-    height: 100vh;
-    background: var(--bg2);
-    border-left: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  #ideas-modal-header {
-    padding: 24px 28px 18px;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  #ideas-modal-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px 28px 28px;
   }
   .idea-card-big {
     background: var(--card);
@@ -1160,14 +1057,34 @@
         <button class="btn btn-gold" onclick="openHustleModal()">+ Add Hustle</button>
       </div>
     </div>
-    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap" id="hustle-filter-row">
-      <button class="btn btn-sm" id="hf-all" onclick="setHustleFilter('all')" style="border-color:var(--gold);color:var(--gold)">All</button>
-      <button class="btn btn-sm" id="hf-earning" onclick="setHustleFilter('earning')">💸 Earning</button>
-      <button class="btn btn-sm" id="hf-active" onclick="setHustleFilter('active')">🔥 Active</button>
-      <button class="btn btn-sm" id="hf-building" onclick="setHustleFilter('building')">🔨 Building</button>
-      <button class="btn btn-sm" id="hf-idea" onclick="setHustleFilter('idea')">💡 Idea</button>
+    <!-- Tab switcher -->
+    <div style="display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--border)">
+      <button id="h-tab-my" onclick="_hustlesView='my';renderHustles()" style="background:none;border:none;border-bottom:2px solid var(--gold);color:var(--gold);padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:-1px;letter-spacing:0.3px">📋 My Hustles</button>
+      <button id="h-tab-ideas" onclick="_hustlesView='ideas';renderHustles()" style="background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.45);padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:-1px;letter-spacing:0.3px;transition:color 0.15s">💡 Ideas</button>
     </div>
-    <div id="hustles-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding-right:260px"></div>
+    <!-- My Hustles panel -->
+    <div id="hustles-my-panel">
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap" id="hustle-filter-row">
+        <button class="btn btn-sm" id="hf-all" onclick="setHustleFilter('all')" style="border-color:var(--gold);color:var(--gold)">All</button>
+        <button class="btn btn-sm" id="hf-earning" onclick="setHustleFilter('earning')">💸 Earning</button>
+        <button class="btn btn-sm" id="hf-active" onclick="setHustleFilter('active')">🔥 Active</button>
+        <button class="btn btn-sm" id="hf-building" onclick="setHustleFilter('building')">🔨 Building</button>
+        <button class="btn btn-sm" id="hf-idea" onclick="setHustleFilter('idea')">💡 Idea</button>
+      </div>
+      <div id="hustles-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px"></div>
+    </div>
+    <!-- Ideas panel -->
+    <div id="hustles-ideas-panel" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+        <button class="btn btn-sm" id="itf-all"   onclick="setIdeasTier('all')"   style="border-color:var(--gold);color:var(--gold)">All</button>
+        <button class="btn btn-sm" id="itf-fav"   onclick="setIdeasTier('fav')"   >⭐ Favourites</button>
+        <button class="btn btn-sm" id="itf-entry" onclick="setIdeasTier('entry')" >🌱 Entry</button>
+        <button class="btn btn-sm" id="itf-mid"   onclick="setIdeasTier('mid')"   >⚡ Mid</button>
+        <button class="btn btn-sm" id="itf-high"  onclick="setIdeasTier('high')"  >🔥 High</button>
+        <button class="btn btn-sm" id="itf-elite" onclick="setIdeasTier('elite')" >👑 Elite</button>
+      </div>
+      <div id="hustles-ideas-body"></div>
+    </div>
   </div>
 
   <!-- ═══ PURE DELUSIONMENT ═══ -->
@@ -1794,15 +1711,6 @@ function showPage(page) {
 function renderPage(page) {
   if (page === 'income')   incomeMonthOffset  = 0;
   if (page === 'expenses') expenseMonthOffset = 0;
-  // Show wheel panel + title + expand button only on hustles page
-  const wheelPanel  = document.getElementById('wheel-panel');
-  const wheelTitle  = document.getElementById('wheel-title');
-  const expandBtn   = document.getElementById('wheel-expand-btn');
-  const show = page === 'hustles' ? 'block' : 'none';
-  const flexShow = page === 'hustles' ? 'flex' : 'none';
-  if (wheelPanel) wheelPanel.style.display = show;
-  if (wheelTitle) wheelTitle.style.display = show;
-  if (expandBtn)  expandBtn.style.display  = flexShow;
   const fns = {
     dashboard:     renderDashboard,
     income:        renderIncome,
@@ -2327,23 +2235,15 @@ function setHustleFilter(f) {
 // ══════════════════════════════════════════════════
 let ideasTierFilter = 'all';
 
-function openIdeasModal() {
-  document.getElementById('ideas-modal').style.display = 'flex';
-  renderIdeasModal();
-}
-function closeIdeasModal() {
-  document.getElementById('ideas-modal').style.display = 'none';
-}
 function setIdeasTier(tier) {
   ideasTierFilter = tier;
-  // update button styles
   ['all','fav','entry','mid','high','elite'].forEach(t => {
     const btn = document.getElementById('itf-' + t);
     if (!btn) return;
     btn.style.borderColor = t === tier ? 'var(--gold)' : '';
     btn.style.color       = t === tier ? 'var(--gold)' : '';
   });
-  renderIdeasModal();
+  renderIdeasInline();
 }
 function toggleIdeaFav(idx) {
   const data = getData();
@@ -2352,16 +2252,13 @@ function toggleIdeaFav(idx) {
   if (pos === -1) data.hustles.ideaFavs.push(idx);
   else data.hustles.ideaFavs.splice(pos, 1);
   saveData(data);
-  renderIdeasModal();
-  renderIncomeWheel(); // refresh stars on mini wheel
+  renderIdeasInline();
 }
-function renderIdeasModal() {
+function renderIdeasInline() {
   const data  = getData();
   const favs  = data.hustles.ideaFavs || [];
-  const body  = document.getElementById('ideas-modal-body');
+  const body  = document.getElementById('hustles-ideas-body');
   if (!body) return;
-
-  const tierColors = { entry:'#22c55e', mid:'#06b6d4', high:'#f5c542', elite:'#a855f7' };
 
   let ideas = INCOME_IDEAS.map((idea, i) => ({ ...idea, idx: i, isFav: favs.includes(i) }));
   if (ideasTierFilter === 'fav')         ideas = ideas.filter(x => x.isFav);
@@ -2376,7 +2273,7 @@ function renderIdeasModal() {
   body.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">` +
     ideas.map(idea => `
       <div class="idea-card-big ${idea.isFav ? 'is-fav' : ''}" style="border-color:${idea.color}30"
-           onclick="addHustleFromIdea(${idea.idx});closeIdeasModal()">
+           onclick="addHustleFromIdea(${idea.idx})">
         <button class="fav-btn ${idea.isFav ? 'active' : ''}"
                 onclick="event.stopPropagation();toggleIdeaFav(${idea.idx})"
                 title="${idea.isFav ? 'Remove from favourites' : 'Add to favourites'}"
@@ -2461,46 +2358,6 @@ const INCOME_IDEAS = [
   { emoji:'⚖️', name:'Litigation Finance',       tier:'elite', color:'#a855f7', range:'£50k–500k+/mo',desc:'Fund lawsuits in exchange for a cut of settlement proceeds' },
 ];
 
-function renderIncomeWheel() {
-  const outer = document.getElementById('income-wheel-outer');
-  if (!outer) return;
-
-  const data  = getData();
-  const favs  = data.hustles.ideaFavs || [];
-  const n        = INCOME_IDEAS.length;
-  const R        = 300;
-  const cardW    = 172, cardH = 112;
-  const angleStep = 360 / n;
-  const cardLeft  = R - cardW / 2;   // card centre sits at radius R along spoke
-  const cardTop   = -cardH / 2;
-
-  const spokes = INCOME_IDEAS.map((idea, i) => {
-    const angleDeg = i * angleStep;
-    const isFav = favs.includes(i);
-    return `
-      <div class="wheel-spoke" style="transform:rotate(${angleDeg}deg)">
-        <div class="wheel-card" style="
-          left:${cardLeft}px;top:${cardTop}px;
-          border-color:${isFav ? 'var(--gold)' : idea.color + '55'};
-          box-shadow:0 0 22px ${isFav ? 'rgba(245,197,66,0.4)' : idea.color + '30'}"
-          onclick="addHustleFromIdea(${i})" title="${idea.name}">
-          <div class="wheel-card-inner">
-            <div style="display:flex;align-items:center;gap:6px">
-              <span style="font-size:22px;flex-shrink:0">${idea.emoji}</span>
-              <div style="min-width:0">
-                <div style="font-size:11.5px;font-weight:800;color:${idea.color};line-height:1.25;letter-spacing:0.2px">${idea.name}${isFav ? ' ⭐' : ''}</div>
-                <div style="font-size:10px;font-weight:700;color:${idea.color};opacity:0.7;margin-top:1px">${idea.range}</div>
-              </div>
-            </div>
-            <div style="font-size:9.5px;color:rgba(180,210,240,0.8);line-height:1.45;margin-top:6px">${idea.desc.length > 68 ? idea.desc.substring(0,68)+'…' : idea.desc}</div>
-          </div>
-        </div>
-      </div>`;
-  }).join('');
-
-  outer.innerHTML = `<div class="wheel-track">${spokes}</div>`;
-}
-
 function addHustleFromIdea(idx) {
   const idea = INCOME_IDEAS[idx];
   if (!idea) return;
@@ -2516,8 +2373,30 @@ function addHustleFromIdea(idx) {
   setTimeout(() => document.getElementById('mh-name').focus(), 80);
 }
 
+let _hustlesView = 'my'; // 'my' | 'ideas'
+
 function renderHustles() {
-  renderIncomeWheel();
+  // Sync tab button + panel visibility
+  const myPanel    = document.getElementById('hustles-my-panel');
+  const ideasPanel = document.getElementById('hustles-ideas-panel');
+  const myBtn      = document.getElementById('h-tab-my');
+  const ideasBtn   = document.getElementById('h-tab-ideas');
+  if (myPanel)    myPanel.style.display    = _hustlesView === 'my'    ? '' : 'none';
+  if (ideasPanel) ideasPanel.style.display = _hustlesView === 'ideas' ? '' : 'none';
+  if (myBtn) {
+    myBtn.style.color             = _hustlesView === 'my' ? 'var(--gold)' : 'rgba(255,255,255,0.45)';
+    myBtn.style.borderBottomColor = _hustlesView === 'my' ? 'var(--gold)' : 'transparent';
+  }
+  if (ideasBtn) {
+    ideasBtn.style.color             = _hustlesView === 'ideas' ? 'var(--gold)' : 'rgba(255,255,255,0.45)';
+    ideasBtn.style.borderBottomColor = _hustlesView === 'ideas' ? 'var(--gold)' : 'transparent';
+  }
+
+  if (_hustlesView === 'ideas') {
+    renderIdeasInline();
+    return;
+  }
+
   const data = getData();
   let items = data.hustles.items || [];
   if (hustleFilter !== 'all') items = items.filter(h => h.status === hustleFilter);
@@ -2529,7 +2408,7 @@ function renderHustles() {
   const grid = document.getElementById('hustles-grid');
   if (!items.length) {
     grid.style.display = 'block';
-    grid.innerHTML = `<div class="empty"><div class="empty-icon">🚀</div><p>No hustles here yet — add one and get to work</p></div>`;
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🚀</div><p>No hustles here yet — add one, or check the 💡 Ideas tab for inspiration</p></div>`;
     return;
   }
   grid.style.display = 'grid';
@@ -2670,6 +2549,7 @@ function saveHustle() {
   }
   saveData(data);
   closeHustleModal();
+  _hustlesView = 'my'; // always land on My Hustles after saving
   renderHustles();
   showToast('⬡ Blueprint saved!');
 }
@@ -4131,7 +4011,9 @@ function disconnectFirebase() {
 // INIT
 // ══════════════════════════════════════════════════
 updateSaveStatus();
-renderDashboard();
+// Defer renderDashboard so the browser has time to compute iframe layout
+// before Chart.js tries to read canvas dimensions (avoids blank-on-load).
+setTimeout(renderDashboard, 0);
 (function(){ if(getFbConfig()) initFirebase(); else updateCloudStatus('off'); })();
 
 // One-time hustle cleanup — keep only Jet Washing + Personal Brands
@@ -4847,68 +4729,6 @@ window.addEventListener('message', function(ev) {
   }
 });
 </script>
-
-<!-- ═══ WHEEL EXPAND BUTTON ═══ -->
-<button id="wheel-expand-btn" onclick="openIdeasModal()" title="Expand all ideas">⤢</button>
-
-<!-- ═══ IDEAS EXPANDED MODAL ═══ -->
-<div id="ideas-modal" onclick="if(event.target===this)closeIdeasModal()">
-  <div id="ideas-modal-inner">
-    <div id="ideas-modal-header">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div>
-          <div style="font-size:20px;font-weight:800;color:var(--gold)">💡 WiFi Money Ideas</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:3px">Click ⭐ to favourite · Click a card to add as a hustle</div>
-        </div>
-        <button class="btn btn-ghost" onclick="closeIdeasModal()" style="font-size:20px;padding:4px 10px">✕</button>
-      </div>
-      <!-- tier filter -->
-      <div style="display:flex;gap:8px;flex-wrap:wrap" id="ideas-tier-filter">
-        <button class="btn btn-sm" id="itf-all"   onclick="setIdeasTier('all')"   style="border-color:var(--gold);color:var(--gold)">All</button>
-        <button class="btn btn-sm" id="itf-fav"   onclick="setIdeasTier('fav')"   >⭐ Favourites</button>
-        <button class="btn btn-sm" id="itf-entry" onclick="setIdeasTier('entry')" >🌱 Entry</button>
-        <button class="btn btn-sm" id="itf-mid"   onclick="setIdeasTier('mid')"   >⚡ Mid</button>
-        <button class="btn btn-sm" id="itf-high"  onclick="setIdeasTier('high')"  >🔥 High</button>
-        <button class="btn btn-sm" id="itf-elite" onclick="setIdeasTier('elite')" >👑 Elite</button>
-      </div>
-    </div>
-    <div id="ideas-modal-body"></div>
-  </div>
-</div>
-
-<!-- ═══ FIXED WIFI MONEY TITLE (top-right, above the wheel) ═══ -->
-<div id="wheel-title" style="
-  position:fixed;
-  top:18px;
-  right:18px;
-  z-index:201;
-  display:none;
-  text-align:right;
-  pointer-events:none;
-">
-  <div style="font-size:16px;font-weight:800;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;text-shadow:0 0 18px rgba(245,197,66,0.5)">💡 WiFi Money</div>
-  <div style="font-size:11px;color:var(--muted);margin-top:3px">Hover to pause · Click to add</div>
-  <div style="display:flex;gap:6px;margin-top:8px;justify-content:flex-end;flex-wrap:wrap">
-    <span style="font-size:10px;padding:2px 9px;border-radius:20px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e55;font-weight:700">🌱 Entry</span>
-    <span style="font-size:10px;padding:2px 9px;border-radius:20px;background:#06b6d422;color:#06b6d4;border:1px solid #06b6d455;font-weight:700">⚡ Mid</span>
-    <span style="font-size:10px;padding:2px 9px;border-radius:20px;background:#f5c54222;color:#f5c542;border:1px solid #f5c54255;font-weight:700">🔥 High</span>
-    <span style="font-size:10px;padding:2px 9px;border-radius:20px;background:#a855f722;color:#a855f7;border:1px solid #a855f755;font-weight:700">👑 Elite</span>
-  </div>
-</div>
-
-<!-- ═══ FIXED WIFI MONEY WHEEL (right edge of viewport) ═══ -->
-<div id="wheel-panel" style="
-  position:fixed;
-  right:0;
-  top:50%;
-  transform:translateY(-50%);
-  z-index:200;
-  width:340px;
-  display:none;
-  pointer-events:none;
-">
-  <div class="wheel-outer" id="income-wheel-outer" style="pointer-events:auto"></div>
-</div>
 
 <!-- ══ FIREBASE SETUP MODAL ══ -->
 <div class="modal-overlay" id="modal-firebase-setup" style="display:none" onclick="if(event.target===this)closeModal('modal-firebase-setup')">
