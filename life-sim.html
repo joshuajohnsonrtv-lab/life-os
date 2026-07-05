@@ -1886,7 +1886,7 @@ function showProgressModal() {
           </div>
           <div style="display:flex;align-items:center;gap:8px">
             <span style="font-size:10px;color:var(--muted)">${c.pts}/${c.max} pts</span>
-            <span style="font-size:14px;font-weight:900;color:${col};min-width:32px;text-align:right">${c.pts}%</span>
+            <span style="font-size:14px;font-weight:900;color:${col};min-width:36px;text-align:right">${barPct}%</span>
           </div>
         </div>
         <div style="height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;margin-bottom:5px">
@@ -1911,7 +1911,7 @@ function showProgressModal() {
     <div class="sblock">
       <div class="sblock-title" style="display:flex;justify-content:space-between;align-items:center">
         <span>Score Breakdown</span>
-        <span style="font-size:9px;color:var(--muted);font-weight:400">each % = 1 point out of 100</span>
+        <span style="font-size:9px;color:var(--muted);font-weight:400">% = progress within each category</span>
       </div>
       ${factorHTML}
     </div>
