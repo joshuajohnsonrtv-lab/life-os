@@ -4098,9 +4098,10 @@ function disconnectFirebase() {
 // INIT
 // ══════════════════════════════════════════════════
 updateSaveStatus();
-// Defer renderDashboard so the browser has time to compute iframe layout
-// before Chart.js tries to read canvas dimensions (avoids blank-on-load).
-setTimeout(renderDashboard, 0);
+// Use showPage (not renderDashboard directly) so the page-dashboard active class
+// is toggled — this forces a CSS layout cycle that gives Chart.js real canvas
+// dimensions before it tries to draw. Without this the chart renders at 0×0.
+setTimeout(() => showPage('dashboard'), 0);
 (function(){ if(getFbConfig()) initFirebase(); else updateCloudStatus('off'); })();
 
 // One-time hustle cleanup — keep only Jet Washing + Personal Brands
