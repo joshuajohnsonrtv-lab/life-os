@@ -1795,7 +1795,11 @@ function showPage(page) {
   const navEl  = document.getElementById('nav-' + page);
   if (pageEl) pageEl.classList.add('active');
   if (navEl)  navEl.classList.add('active');
-  renderPage(page);
+  // Defer render by one frame so the browser can apply the 'active' CSS
+  // (display:block) and compute real element dimensions before Chart.js runs.
+  requestAnimationFrame(function() {
+    try { renderPage(page); } catch(e) { console.error('renderPage error:', e); }
+  });
 }
 
 function renderPage(page) {
@@ -1878,7 +1882,8 @@ function renderDashboard() {
     return d.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
   });
 
-  if (_incomeChart) { _incomeChart.destroy(); _incomeChart = null; }
+  if (_incomeChart) { try { _incomeChart.destroy(); } catch(e){} _incomeChart = null; }
+  try {
   const ctx = document.getElementById('chart-income').getContext('2d');
   _incomeChart = new Chart(ctx, {
     type: 'bar',
@@ -1901,6 +1906,7 @@ function renderDashboard() {
       }
     }
   });
+  } catch(e) { console.warn('Dashboard chart error:', e); }
 
   // Goals preview
   const goalsEl = document.getElementById('dash-goals');
