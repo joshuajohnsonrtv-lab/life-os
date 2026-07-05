@@ -4194,11 +4194,24 @@ function disconnectFirebase() {
 // INIT
 // ══════════════════════════════════════════════════
 updateSaveStatus();
-(function(){ if(getFbConfig()) initFirebase(); else updateCloudStatus('off'); })();
 
 // Boot via showPage so the init code path is identical to pressing the Home button.
 showPage('dashboard');
 updateMobTitle('dashboard');
+
+// Belt-and-suspenders: re-render after 300ms in case localStorage was not yet
+// readable on the first synchronous pass (iframe + Safari quirk) or Firebase
+// fired and overwrote the dashboard with stale cloud data.
+setTimeout(function() {
+  if (document.querySelector('.page.active')?.id === 'page-dashboard') {
+    renderDashboard();
+  }
+}, 300);
+
+// Init Firebase AFTER first render so its async callback doesn't race with boot
+setTimeout(function() {
+  if(getFbConfig()) initFirebase(); else updateCloudStatus('off');
+}, 400);
 
 // One-time hustle cleanup — keep only Jet Washing + Personal Brands
 (function() {
