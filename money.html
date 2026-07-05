@@ -996,31 +996,68 @@
 
   <!-- ═══ DASHBOARD ═══ -->
   <div class="page active" id="page-dashboard">
-    <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between">
-      <p id="dash-date" style="font-size:13px;color:var(--muted2);font-weight:500"></p>
+
+    <!-- HERO -->
+    <div style="background:linear-gradient(135deg,#0f1117,#141820);border:1px solid var(--border);border-radius:16px;padding:28px 24px 22px;margin-bottom:14px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),#f97316,transparent)"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span id="dash-month-label" style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)"></span>
+        <button class="btn btn-gold btn-sm" onclick="openIncomeModal()">+ Log Income</button>
+      </div>
+      <div id="dash-hero-income" style="font-size:52px;font-weight:900;color:var(--gold);letter-spacing:-2px;line-height:1;margin-bottom:4px">£0</div>
+      <div id="dash-hero-delta" style="font-size:12px;color:var(--muted);margin-bottom:18px"></div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:99px;height:5px;overflow:hidden;margin-bottom:7px">
+        <div id="dash-hero-bar" style="height:100%;background:linear-gradient(90deg,var(--gold),#f97316);border-radius:99px;width:0%"></div>
+      </div>
+      <div id="dash-hero-subtext" style="font-size:11px;color:var(--muted);display:flex;justify-content:space-between"></div>
     </div>
-    <div id="dash-ticker" class="ticker"></div>
-    <div class="grid-4" style="margin-bottom:20px" id="dash-stats"></div>
-    <div class="grid-2" style="margin-bottom:20px">
-      <div class="card">
-        <div class="card-title">Income — Last 6 Months</div>
-        <div class="chart-container"><canvas id="chart-income"></canvas></div>
+
+    <!-- METRIC PILLS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 12px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px;font-weight:700">🚀 Hustles</div>
+        <div id="dash-pill-hustle" style="font-size:19px;font-weight:800;color:var(--cyan)">£0</div>
+        <div id="dash-pill-hustle-sub" style="font-size:10px;color:var(--muted);margin-top:3px">this month</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 12px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px;font-weight:700">🎯 Goals</div>
+        <div id="dash-pill-goals" style="font-size:19px;font-weight:800;color:var(--purple)">0</div>
+        <div id="dash-pill-goals-sub" style="font-size:10px;color:var(--muted);margin-top:3px">active</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 12px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px;font-weight:700">💰 All Time</div>
+        <div id="dash-pill-alltime" style="font-size:19px;font-weight:800;color:var(--gold)">£0</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">logged</div>
+      </div>
+    </div>
+
+    <!-- CONTENT GRID -->
+    <div class="grid-2">
+      <div>
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div class="card-title" style="margin:0">Recent Income</div>
+            <button class="btn btn-ghost btn-sm" onclick="showPage('income')">All →</button>
+          </div>
+          <div id="dash-recent-income"></div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div class="card-title" style="margin:0">Active Hustles</div>
+            <button class="btn btn-ghost btn-sm" onclick="showPage('hustles')">Manage →</button>
+          </div>
+          <div id="dash-hustles"></div>
+        </div>
       </div>
       <div class="card">
-        <div class="card-title">Goal Progress</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="card-title" style="margin:0">Goal Progress</div>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('goals')">All →</button>
+        </div>
         <div id="dash-goals"></div>
       </div>
     </div>
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">Active Hustles</div>
-        <div id="dash-hustles"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Recent Income</div>
-        <div id="dash-recent-income"></div>
-      </div>
-    </div>
+
   </div>
 
   <!-- ═══ INCOME ═══ -->
@@ -1824,14 +1861,9 @@ function renderPage(page) {
 // ══════════════════════════════════════════════════
 // DASHBOARD
 // ══════════════════════════════════════════════════
-let _incomeChart = null;
-
 function renderDashboard() {
   const data = getData();
   const now = new Date();
-  document.getElementById('dash-date').textContent =
-    now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-
   const thisMonth = today().slice(0, 7);
   const entries = data.income.entries || [];
   const thisMonthEntries = entries.filter(e => e.date.startsWith(thisMonth));
@@ -1841,137 +1873,133 @@ function renderDashboard() {
 
   const thisTotal = thisMonthEntries.reduce((s, e) => s + parseFloat(e.amount), 0);
   const lastTotal = lastMonthEntries.reduce((s, e) => s + parseFloat(e.amount), 0);
-  const allTime = entries.reduce((s, e) => s + parseFloat(e.amount), 0);
-  const activeHustles = (data.hustles.items || []).filter(h => h.status === 'active' || h.status === 'earning').length;
-  const monthlyRevenue = (data.hustles.items || []).filter(h => h.status === 'earning').reduce((s, h) => s + parseFloat(h.revenue || 0), 0);
-  const delta = lastTotal > 0 ? ((thisTotal - lastTotal) / lastTotal * 100).toFixed(1) : null;
+  const allTime   = entries.reduce((s, e) => s + parseFloat(e.amount), 0);
 
-  // Ticker
-  const ticker = document.getElementById('dash-ticker');
-  ticker.innerHTML = [
-    { label: 'This Month', val: fmt(thisTotal), color: 'var(--gold)' },
-    { label: 'Last Month', val: fmt(lastTotal), color: 'var(--muted2)' },
-    { label: 'Hustle Revenue/mo', val: fmt(monthlyRevenue), color: 'var(--cyan)' },
-    { label: 'Active Hustles', val: activeHustles, color: 'var(--gold)' },
-  ].map(t => `<div class="ticker-item">
-    <div class="t-label">${t.label}</div>
-    <div class="t-val" style="color:${t.color}">${t.val}</div>
-  </div>`).join('');
+  // ── Hero ──────────────────────────────────────────
+  const monthLabel = document.getElementById('dash-month-label');
+  if (monthLabel) monthLabel.textContent =
+    now.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }).toUpperCase();
 
-  // Stats
-  document.getElementById('dash-stats').innerHTML = [
-    { label: 'Income This Month', value: fmt(thisTotal), color: 'var(--gold)',
-      sub: delta !== null ? `<span class="${parseFloat(delta)>=0?'stat-delta-up':'stat-delta-down'}">${parseFloat(delta)>=0?'▲':'▼'} ${Math.abs(delta)}% vs last month</span>` : 'First month logged' },
-    { label: 'Hustle Revenue', value: fmt(monthlyRevenue) + '/mo', color: 'var(--cyan)', sub: `${activeHustles} active hustles` },
-    { label: 'Active Goals', value: (data.goals.items || []).filter(g => !g.complete).length, color: 'var(--purple)',
-      sub: (data.goals.items || []).filter(g => g.complete).length + ' completed' },
-  ].map(s => `<div class="stat-card">
-    <div class="stat-label">${s.label}</div>
-    <div class="stat-value" style="color:${s.color}">${s.value}</div>
-    <div class="stat-sub">${s.sub}</div>
-  </div>`).join('');
+  const heroIncome = document.getElementById('dash-hero-income');
+  if (heroIncome) heroIncome.textContent = fmt(thisTotal);
 
-  // Income chart — last 6 months
-  const months = [];
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    months.push(d.toISOString().slice(0, 7));
-  }
-  const monthTotals = months.map(m => entries.filter(e => e.date.startsWith(m)).reduce((s, e) => s + parseFloat(e.amount), 0));
-  const monthLabels = months.map(m => {
-    const d = new Date(m + '-01');
-    return d.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
-  });
+  // Monthly target pulled from salary source or sensible default
+  const salarySource = (data.income.sources||[]).find(s => s.id === 's1' || s.type === 'salary');
+  const monthTarget = parseFloat(salarySource?.target||0) || 0;
+  const heroPct = monthTarget > 0 ? Math.min(100, Math.round((thisTotal / monthTarget) * 100)) : 0;
+  const heroBar = document.getElementById('dash-hero-bar');
+  if (heroBar) heroBar.style.width = heroPct + '%';
 
-  if (_incomeChart) { try { _incomeChart.destroy(); } catch(e){} _incomeChart = null; }
-  try {
-  const ctx = document.getElementById('chart-income').getContext('2d');
-  _incomeChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: monthLabels,
-      datasets: [{
-        data: monthTotals,
-        backgroundColor: months.map(m => m === thisMonth ? '#f5c542' : 'rgba(245,197,66,0.25)'),
-        borderRadius: 6, borderSkipped: false,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: {
-        callbacks: { label: ctx => fmt(ctx.raw) }
-      }},
-      scales: {
-        x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 11 } } },
-        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 11 }, callback: v => fmt(v) } }
-      }
+  const deltaEl = document.getElementById('dash-hero-delta');
+  if (deltaEl) {
+    if (lastTotal > 0) {
+      const d = ((thisTotal - lastTotal) / lastTotal * 100).toFixed(1);
+      const up = parseFloat(d) >= 0;
+      deltaEl.innerHTML = `<span style="color:${up ? 'var(--green)' : 'var(--red)'}">${up ? '▲' : '▼'} ${Math.abs(d)}% vs last month</span>`;
+    } else {
+      deltaEl.textContent = 'First month on record';
     }
-  });
-  } catch(e) { console.warn('Dashboard chart error:', e); }
-
-  // Goals preview
-  const goalsEl = document.getElementById('dash-goals');
-  const activeGoals = (data.goals.items || []).filter(g => !g.complete).slice(0, 4);
-  if (!activeGoals.length) {
-    goalsEl.innerHTML = `<div class="empty"><div class="empty-icon">🎯</div><p>No goals set yet</p><button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="showPage('goals')">Set a Goal →</button></div>`;
-  } else {
-    goalsEl.innerHTML = activeGoals.map(g => {
-      const pct = Math.min(100, Math.round((parseFloat(g.current||0) / parseFloat(g.target||1)) * 100));
-      const color = pct >= 100 ? 'var(--green)' : pct >= 60 ? 'var(--gold)' : 'var(--cyan)';
-      return `<div style="margin-bottom:14px">
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
-          <span style="font-weight:600">${g.emoji||'🎯'} ${g.name}</span>
-          <span style="color:${color};font-weight:700">${pct}%</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" style="width:${pct}%;background:${color}"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)">
-          <span>${fmt(g.current||0)}</span><span>${fmt(g.target)}</span>
-        </div>
-      </div>`;
-    }).join('');
   }
 
-  // Hustles preview
+  const subtextEl = document.getElementById('dash-hero-subtext');
+  if (subtextEl) {
+    if (monthTarget > 0) {
+      const toGo = Math.max(0, monthTarget - thisTotal);
+      subtextEl.innerHTML = heroPct >= 100
+        ? `<span style="color:var(--green);font-weight:700">✓ Target smashed</span><span style="color:var(--green)">${fmt(thisTotal - monthTarget)} over</span>`
+        : `<span>${heroPct}% of ${fmt(monthTarget)} target</span><span>${fmt(toGo)} to go</span>`;
+    } else {
+      subtextEl.innerHTML = `<span>No salary target set</span><span>${fmt(thisTotal)} total</span>`;
+    }
+  }
+
+  // ── Metric pills ──────────────────────────────────
+  const hustleSrcIds = (data.income.sources||[])
+    .filter(s => s.type === 'hustle' || /hustle|freelance/i.test(s.name||''))
+    .map(s => s.id);
+  const hustleIncome = thisMonthEntries
+    .filter(e => hustleSrcIds.includes(e.sourceId))
+    .reduce((s, e) => s + parseFloat(e.amount), 0);
+
+  const pillHustle = document.getElementById('dash-pill-hustle');
+  if (pillHustle) pillHustle.textContent = fmt(hustleIncome);
+  const pillHustleSub = document.getElementById('dash-pill-hustle-sub');
+  if (pillHustleSub) pillHustleSub.textContent = hustleIncome > 0 ? 'earned this month' : 'log via Hustle source';
+
+  const activeGoals    = (data.goals?.items||[]).filter(g => !g.complete);
+  const completedGoals = (data.goals?.items||[]).filter(g => g.complete);
+  const pillGoals = document.getElementById('dash-pill-goals');
+  if (pillGoals) pillGoals.textContent = activeGoals.length;
+  const pillGoalsSub = document.getElementById('dash-pill-goals-sub');
+  if (pillGoalsSub) pillGoalsSub.textContent = completedGoals.length + ' completed';
+
+  const pillAlltime = document.getElementById('dash-pill-alltime');
+  if (pillAlltime) pillAlltime.textContent = fmt(allTime);
+
+  // ── Recent income ─────────────────────────────────
+  const recentEl = document.getElementById('dash-recent-income');
+  if (recentEl) {
+    const recent = [...entries].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
+    if (!recent.length) {
+      recentEl.innerHTML = `<div class="empty"><div class="empty-icon">💵</div><p>No income logged yet</p><button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="openIncomeModal()">Log Income →</button></div>`;
+    } else {
+      const sources = Object.fromEntries((data.income.sources||[]).map(s => [s.id, s]));
+      recentEl.innerHTML = recent.map(e => {
+        const src = sources[e.sourceId] || { name: 'Unknown', color: '#888' };
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:13px;font-weight:600">${e.note || src.name}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:1px">${fmtDate(e.date)} · <span style="color:${src.color}">${src.name}</span></div>
+          </div>
+          <span class="amount-positive">${fmt(e.amount)}</span>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // ── Goals preview ─────────────────────────────────
+  const goalsEl = document.getElementById('dash-goals');
+  if (goalsEl) {
+    if (!activeGoals.length) {
+      goalsEl.innerHTML = `<div class="empty"><div class="empty-icon">🎯</div><p>No goals set yet</p><button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="showPage('goals')">Set a Goal →</button></div>`;
+    } else {
+      goalsEl.innerHTML = activeGoals.slice(0, 6).map(g => {
+        const pct = Math.min(100, Math.round((parseFloat(g.current||0) / parseFloat(g.target||1)) * 100));
+        const color = pct >= 100 ? 'var(--green)' : pct >= 75 ? 'var(--gold)' : pct >= 40 ? 'var(--cyan)' : 'var(--purple)';
+        return `<div style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">
+            <span style="font-weight:600">${g.emoji||'🎯'} ${g.name}</span>
+            <span style="color:${color};font-weight:800">${pct}%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width:${pct}%;background:${color}"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:3px">
+            <span>${fmt(g.current||0)}</span><span>${fmt(g.target)}</span>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // ── Hustles preview ───────────────────────────────
   const hustlesEl = document.getElementById('dash-hustles');
-  const hustles = (data.hustles.items || []).filter(h => h.status !== 'idea').slice(0, 5);
-  if (!hustles.length) {
-    hustlesEl.innerHTML = `<div class="empty"><div class="empty-icon">🚀</div><p>No active hustles yet</p><button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="showPage('hustles')">Add a Hustle →</button></div>`;
-  } else {
-    hustlesEl.innerHTML = hustles.map(h => {
+  if (hustlesEl) {
+    const hustles = (data.hustles?.items||[]).filter(h => h.status !== 'idea').slice(0, 4);
+    if (!hustles.length) {
+      hustlesEl.innerHTML = `<div class="empty"><div class="empty-icon">🚀</div><p>No active hustles</p><button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="showPage('hustles')">Add a Hustle →</button></div>`;
+    } else {
       const statusColors = { earning:'var(--green)', active:'var(--gold)', building:'var(--cyan)', idea:'var(--muted)' };
       const statusLabels = { earning:'💸 Earning', active:'🔥 Active', building:'🔨 Building', idea:'💡 Idea' };
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
-        <div>
-          <div style="font-size:13px;font-weight:600">${h.name}</div>
-          ${h.action ? `<div style="font-size:11px;color:var(--muted);margin-top:2px">→ ${h.action}</div>` : ''}
-        </div>
-        <div style="text-align:right">
-          <div style="font-size:11px;color:${statusColors[h.status]};font-weight:700">${statusLabels[h.status]}</div>
-          ${parseFloat(h.revenue||0) > 0 ? `<div style="font-size:12px;color:var(--green)">${fmt(h.revenue)}/mo</div>` : ''}
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  // Recent income
-  const recentEl = document.getElementById('dash-recent-income');
-  const recent = [...entries].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 6);
-  if (!recent.length) {
-    recentEl.innerHTML = `<div class="empty"><div class="empty-icon">💵</div><p>No income logged yet</p><button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="showPage('income')">Log Income →</button></div>`;
-  } else {
-    const sources = Object.fromEntries((data.income.sources||[]).map(s => [s.id, s]));
-    recentEl.innerHTML = recent.map(e => {
-      const src = sources[e.sourceId] || { name: 'Unknown', color: '#888' };
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
-        <div>
-          <div style="font-size:13px;font-weight:600">${e.note || src.name}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px">${fmtDate(e.date)} · <span style="color:${src.color}">${src.name}</span></div>
-        </div>
-        <span class="amount-positive">${fmt(e.amount)}</span>
-      </div>`;
-    }).join('');
+      hustlesEl.innerHTML = hustles.map(h => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:13px;font-weight:600">${h.name}</div>
+            ${h.action ? `<div style="font-size:11px;color:var(--muted);margin-top:2px">→ ${h.action}</div>` : ''}
+          </div>
+          <span style="font-size:11px;font-weight:700;color:${statusColors[h.status]||'var(--muted)'}">${statusLabels[h.status]||h.status}</span>
+        </div>`).join('');
+    }
   }
 }
 
