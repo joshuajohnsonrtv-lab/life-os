@@ -1255,7 +1255,7 @@
     <div class="modal-title">➕ Add Income Source</div>
     <div class="form-group">
       <label>Source Name</label>
-      <input type="text" id="ms-name" placeholder="Freelance, Salary, YouTube, etc.">
+      <input type="text" id="ms-name" placeholder="Hustle, Salary, YouTube, etc.">
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -1676,7 +1676,7 @@ const DEFAULT_DATA = {
   income: {
     sources: [
       { id: 's1', name: 'Salary / PAYE', type: 'active', color: '#f5c542' },
-      { id: 's2', name: 'Freelance', type: 'active', color: '#22c55e' },
+      { id: 's2', name: 'Hustle', type: 'hustle', color: '#22c55e' },
       { id: 's3', name: 'Investments', type: 'passive', color: '#06b6d4' },
     ],
     entries: [] // { id, sourceId, amount, date, note }
@@ -1750,6 +1750,13 @@ function getData() {
     const def = JSON.parse(JSON.stringify(DEFAULT_DATA));
     for (const key of Object.keys(def)) {
       if (stored[key] === undefined) stored[key] = def[key];
+    }
+    // migrate: rename legacy "Freelance" source → "Hustle"
+    if (stored.income?.sources) {
+      stored.income.sources.forEach(s => {
+        if (s.id === 's2' && s.name === 'Freelance') { s.name = 'Hustle'; s.type = 'hustle'; }
+        if (s.name?.toLowerCase() === 'freelance' && s.type !== 'hustle') { s.name = 'Hustle'; s.type = 'hustle'; }
+      });
     }
     return stored;
   } catch(e) {

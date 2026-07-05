@@ -1587,8 +1587,13 @@ function calc() {
 
   const allHustles  = M.hustles?.items || [];
   const actHustles  = allHustles.filter(h => h.status === 'active' || parseFloat(h.revenue||0) > 0);
-  // revenue field = user's target/goal, not necessarily earned — label accordingly
-  const hustleRev   = actHustles.reduce((s,h) => s + (parseFloat(h.revenue)||0), 0);
+  // hustleRev = income actually LOGGED this month from hustle-type sources (not targets)
+  const hustleSrcIds = (M.income?.sources||[])
+    .filter(s => s.type === 'hustle' || /hustle|freelance/i.test(s.name||''))
+    .map(s => s.id);
+  const hustleRev = incEntries
+    .filter(e => e.date >= msStart && hustleSrcIds.includes(e.sourceId))
+    .reduce((sum,e) => sum + (parseFloat(e.amount)||0), 0);
   // monthTarget: stored in sim's own localStorage, editable in-sim. Default £50k/month.
   const monthTarget = parseFloat(localStorage.getItem('life_sim_month_target')) || 50000;
   const dreamAge    = parseInt(M.delusion?.targetAge) || null;
@@ -1755,7 +1760,7 @@ function render() {
   const gs = document.getElementById('zs-gym');
   if (gs) gs.textContent = s.gymSess7 + ' session' + (s.gymSess7!==1?'s':'') + ' this week';
   const hs = document.getElementById('zs-hustle');
-  if (hs) hs.textContent = s.hustleRev > 0 ? fmt(s.hustleRev) + '/month earned' : '£0 earned yet';
+  if (hs) hs.textContent = s.hustleRev > 0 ? fmt(s.hustleRev) + ' earned this month' : 'Log income → Hustle to record earnings';
   const ks = document.getElementById('zs-kitchen');
   if (ks) ks.textContent = s.mealCount + ' meal' + (s.mealCount!==1?'s':'') + ' logged today';
 
@@ -1772,7 +1777,7 @@ function renderStats(s) {
     ? s.actHustles.map(h => `
         <div class="hustle-row">
           <div class="hustle-n">${h.name || 'Unnamed hustle'}</div>
-          <div class="hustle-r">${h.revenue ? fmt(h.revenue)+' target' : 'No target set'}</div>
+          <div class="hustle-r">${h.revenue ? fmt(h.revenue)+' goal' : 'No goal set'}</div>
         </div>`).join('')
     : `<div style="font-size:10px;color:var(--muted)">None active. Add one in the Money Dashboard → Hustles.</div>`;
 
@@ -1840,7 +1845,7 @@ function showProgressModal() {
     ? s.actHustles.map(h => `
         <div class="hustle-row">
           <div class="hustle-n">${h.name || 'Unnamed hustle'}</div>
-          <div class="hustle-r">${h.revenue ? fmt(h.revenue)+' target' : 'No target set'}</div>
+          <div class="hustle-r">${h.revenue ? fmt(h.revenue)+' goal' : 'No goal set'}</div>
         </div>`).join('')
     : `<div style="font-size:10px;color:var(--muted)">None active — add one in Money → Hustles.</div>`;
 
