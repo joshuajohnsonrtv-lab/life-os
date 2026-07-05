@@ -997,6 +997,9 @@
   <!-- ═══ DASHBOARD ═══ -->
   <div class="page active" id="page-dashboard">
 
+    <!-- DEBUG STRIP — remove once bug confirmed fixed -->
+    <div id="debug-strip" style="background:#1a0a0a;border:1px solid #f5c54260;border-radius:8px;padding:7px 12px;margin-bottom:10px;font-size:10px;font-family:monospace;color:#f5c542;line-height:1.6;word-break:break-all"></div>
+
     <!-- HERO -->
     <div style="background:linear-gradient(135deg,#0f1117,#141820);border:1px solid var(--border);border-radius:16px;padding:28px 24px 22px;margin-bottom:14px;position:relative;overflow:hidden">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),#f97316,transparent)"></div>
@@ -1885,6 +1888,13 @@ function renderDashboard() {
   const now = new Date();
   const thisMonth = today().slice(0, 7);
   const entries = (data.income?.entries || []).filter(e => e && typeof e.date === 'string');
+  // DEBUG — write diagnostics to the strip so we can see exactly what's happening
+  const dbg = document.getElementById('debug-strip');
+  if (dbg) {
+    const lsRaw = localStorage.getItem('money_os_data');
+    const lsEntries = lsRaw ? (() => { try { return JSON.parse(lsRaw)?.income?.entries?.length ?? 'n/a'; } catch(e){ return 'parse-err'; } })() : 'empty';
+    dbg.textContent = `renderDashboard @ ${now.toLocaleTimeString()} | entries-after-filter: ${entries.length} | localStorage entries: ${lsEntries} | _bootPollMs: ${typeof _bootPollMs!=='undefined'?_bootPollMs:'?'}`;
+  }
   const thisMonthEntries = entries.filter(e => e.date.startsWith(thisMonth));
   const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const lastMonth = lastMonthDate.toISOString().slice(0, 7);
