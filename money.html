@@ -4150,15 +4150,13 @@ function disconnectFirebase() {
 updateSaveStatus();
 (function(){ if(getFbConfig()) initFirebase(); else updateCloudStatus('off'); })();
 
-// Use window.load to guarantee: DOM ready, Chart.js loaded, iframe layout computed.
-// setTimeout(0) inside load defers to after the browser's first paint of the
-// fully-laid-out page, so canvas dimensions are real before Chart.js renders.
-// On load: do exactly what the Home button does, just with a short delay
-// so iOS Safari has time to finish laying out the iframe before we render.
-setTimeout(function() {
-  showPage('dashboard');
-  updateMobTitle('dashboard');
-}, 300);
+// Render dashboard immediately — one rAF tick ensures Chart.js canvas dims are computed.
+requestAnimationFrame(function() {
+  requestAnimationFrame(function() {
+    showPage('dashboard');
+    updateMobTitle('dashboard');
+  });
+});
 
 // One-time hustle cleanup — keep only Jet Washing + Personal Brands
 (function() {
