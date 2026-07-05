@@ -215,18 +215,7 @@
     document.getElementById('tab-' + name).classList.add('ready');
   }
 
-  // Restore last active tab from sessionStorage
-  const saved = sessionStorage.getItem('life_os_tab');
-  if (saved && TABS.includes(saved) && saved !== 'money') {
-    switchTab(saved, document.getElementById('tab-' + saved));
-  }
-
-  // Persist tab choice
-  TABS.forEach(t => {
-    document.getElementById('tab-' + t).addEventListener('click', () => {
-      sessionStorage.setItem('life_os_tab', t);
-    });
-  });
+  // Always boot to Money Dashboard — no session restore.
 
   // Cross-frame routing from life-sim → wellness / money
   window.addEventListener('message', function(ev) {
