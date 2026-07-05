@@ -4190,10 +4190,11 @@ updateSaveStatus();
 // setTimeout(0) inside load defers to after the browser's first paint of the
 // fully-laid-out page, so canvas dimensions are real before Chart.js renders.
 window.addEventListener('load', function() {
-  setTimeout(function() {
-    showPage('dashboard');
-    updateMobTitle('dashboard');
-  }, 0);
+  // page-dashboard already has 'active' class in the HTML so the structure
+  // is visible immediately. Just render the data directly — no need to call
+  // showPage (which would hide-then-show the page and add unnecessary RAF delay).
+  renderDashboard();
+  updateMobTitle('dashboard');
 });
 
 // One-time hustle cleanup — keep only Jet Washing + Personal Brands
