@@ -261,7 +261,8 @@
   .hustle-card {
     background: var(--card); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 20px; position: relative;
-    transition: border-color .2s;
+    transition: border-color .2s; display: flex; flex-direction: column;
+    overflow: hidden;
   }
   .hustle-card:hover { border-color: rgba(245,197,66,0.3); }
   .hustle-card.status-earning { border-left: 3px solid var(--green); }
@@ -270,6 +271,27 @@
   .hustle-card.status-idea    { border-left: 3px solid var(--muted); }
   .hustle-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
   .hustle-desc  { font-size: 13px; color: var(--muted2); margin-bottom: 12px; line-height: 1.5; }
+  .hustle-cover {
+    margin: -20px -20px 16px; height: 110px;
+    background-size: cover; background-position: center;
+    border-radius: var(--radius) var(--radius) 0 0; position: relative;
+    flex-shrink: 0;
+  }
+  .hustle-cover::after {
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(to bottom, transparent 40%, rgba(10,14,22,0.85));
+    border-radius: inherit;
+  }
+  .hustle-tag {
+    font-size: 10px; font-weight: 700; padding: 2px 8px;
+    border-radius: 20px; background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.1);
+    letter-spacing: 0.3px;
+  }
+  .hustle-dream {
+    font-size: 11px; color: var(--gold); opacity: 0.75;
+    font-style: italic; margin-bottom: 8px; line-height: 1.4;
+  }
 
   /* ── DELUSION SECTION ── */
   .dream-number {
@@ -1327,7 +1349,9 @@
         <div class="bp-label">What is it & how does it make money</div>
         <textarea class="bp-input bp-textarea" id="mh-desc" placeholder="Describe the hustle. What does it do? Who pays you and why?" style="margin-bottom:12px"></textarea>
         <div class="bp-label">Why this? Your motivation</div>
-        <textarea class="bp-input bp-textarea" id="mh-why" placeholder="Why does this excite you? What does success look like?" style="min-height:56px"></textarea>
+        <textarea class="bp-input bp-textarea" id="mh-why" placeholder="Why does this excite you? What does success look like?" style="margin-bottom:12px;min-height:56px"></textarea>
+        <div class="bp-label">Dream outcome 🌟</div>
+        <input class="bp-input" id="mh-dream" placeholder="Where does this go at its best? e.g. £10k/mo agency by 2026">
       </div>
 
       <!-- Block 2: The Model -->
@@ -1348,7 +1372,9 @@
         <div class="bp-label">Target customer</div>
         <input class="bp-input" id="mh-customer" placeholder="Who are you selling to?" style="margin-bottom:12px">
         <div class="bp-label">Pricing idea (£)</div>
-        <input class="bp-input" id="mh-pricing" placeholder="e.g. £500/mo retainer, £97 product, etc.">
+        <input class="bp-input" id="mh-pricing" placeholder="e.g. £500/mo retainer, £97 product, etc." style="margin-bottom:12px">
+        <div class="bp-label">Tags (comma separated)</div>
+        <input class="bp-input" id="mh-tags" placeholder="e.g. creative, online, passive, local">
       </div>
 
       <!-- Block 3: The Build -->
@@ -1357,7 +1383,7 @@
         <div class="bp-label">Resources / tools needed</div>
         <textarea class="bp-input bp-textarea" id="mh-resources" placeholder="Software, budget, skills, people..." style="margin-bottom:12px;min-height:72px"></textarea>
         <div class="bp-label">Obstacles & risks</div>
-        <textarea class="bp-input bp-textarea" id="mh-obstacles" placeholder="What could slow you down or stop this?" style="min-height:56px"></textarea>
+        <textarea class="bp-input bp-textarea" id="mh-obstacles" placeholder="What could slow you down or stop this?"></textarea>
       </div>
 
       <!-- Block 4: Action Steps (span 2) -->
@@ -1375,12 +1401,32 @@
         <div class="bp-block-title">◈ Timeline</div>
         <div class="bp-label">Target start date</div>
         <input class="bp-input" id="mh-startdate" type="date" style="margin-bottom:12px">
+        <div class="bp-label">Est. hours per week</div>
+        <input class="bp-input" id="mh-hours" type="number" placeholder="e.g. 10" min="0" style="margin-bottom:12px">
         <div class="bp-label">Next single action (do this first)</div>
         <input class="bp-input" id="mh-action" placeholder="The one thing to do right now">
         <div id="mh-revenue-target-section" style="margin-top:12px">
           <div class="bp-label">Revenue target (£/mo)</div>
           <input class="bp-input" id="mh-target" type="number" placeholder="e.g. 2000" min="0">
         </div>
+      </div>
+
+      <!-- Block 6: Identity & Extras (span 2) -->
+      <div class="bp-block bp-span2">
+        <div class="bp-block-title">◈ Identity & Extras</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div>
+            <div class="bp-label">Cover image URL 🖼</div>
+            <input class="bp-input" id="mh-cover" placeholder="https://... paste any image URL" oninput="updateCoverPreview()">
+          </div>
+          <div>
+            <div class="bp-label">Platform / website link 🔗</div>
+            <input class="bp-input" id="mh-link" placeholder="https://your-site.com or @handle">
+          </div>
+        </div>
+        <div id="mh-cover-preview" style="display:none;height:80px;border-radius:8px;background-size:cover;background-position:center;margin-bottom:12px;border:1px solid var(--border);opacity:0.85"></div>
+        <div class="bp-label">Notes / ongoing thoughts 📝</div>
+        <textarea class="bp-input bp-textarea" id="mh-notes" placeholder="Anything goes — ideas, contacts, random thoughts, links, strategies..." style="min-height:80px"></textarea>
       </div>
 
     </div><!-- /.bp-body -->
@@ -2420,20 +2466,29 @@ function renderHustles() {
     const pct   = steps.length ? Math.round(done / steps.length * 100) : null;
     const modelLabels = { retainer:'Retainer', project:'Per Project', subscription:'Subscription',
       commission:'Commission', product:'Product', ads:'Ad Revenue', trading:'Trading', other:'Other' };
+    const tagList = (h.tags||'').split(',').map(t=>t.trim()).filter(Boolean);
+    const linkDomain = h.link ? (() => { try { return new URL(h.link.startsWith('http')?h.link:'https://'+h.link).hostname.replace(/^www\./,''); } catch(e){ return h.link; } })() : '';
     return `
     <div class="hustle-card status-${h.status}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+      ${h.coverImage ? `<div class="hustle-cover" style="background-image:url('${h.coverImage}')"></div>` : ''}
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
         <span class="hustle-title">${h.name}</span>
         <span class="badge ${statusBadge[h.status]||'badge-grey'}">${statusLabels[h.status]||h.status}</span>
       </div>
+      ${h.dreamOutcome ? `<div class="hustle-dream">"${h.dreamOutcome}"</div>` : ''}
       ${h.revenueModel ? `<div style="font-size:10px;color:var(--cyan);opacity:0.7;margin-bottom:6px;font-family:monospace;letter-spacing:0.5px">${modelLabels[h.revenueModel]||h.revenueModel}</div>` : ''}
       ${h.desc ? `<div class="hustle-desc">${h.desc}</div>` : ''}
+      ${tagList.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">${tagList.map(t=>`<span class="hustle-tag">${t}</span>`).join('')}</div>` : ''}
       ${parseFloat(h.revenue||0) > 0 ? `<div style="font-size:15px;font-weight:800;color:var(--green);margin-bottom:8px">${fmt(h.revenue)}<span style="font-size:11px;font-weight:500;color:var(--muted)">/mo</span>${h.target > 0 ? `<span style="font-size:10px;color:var(--muted);margin-left:6px">→ £${Number(h.target).toLocaleString()} target</span>` : ''}</div>` : ''}
       ${pct !== null ? `<div style="margin-bottom:8px">
         <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:4px"><span>Steps</span><span>${done}/${steps.length}</span></div>
         <div style="height:4px;background:var(--border);border-radius:2px"><div style="height:4px;width:${pct}%;background:var(--cyan);border-radius:2px;transition:width 0.3s"></div></div>
       </div>` : ''}
-      ${h.action ? `<div style="font-size:11px;color:var(--cyan);margin-bottom:10px;opacity:0.85">→ ${h.action}</div>` : ''}
+      ${h.action ? `<div style="font-size:11px;color:var(--cyan);margin-bottom:8px;opacity:0.85">→ ${h.action}</div>` : ''}
+      ${(h.hoursPerWeek > 0 || h.link) ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        ${h.hoursPerWeek > 0 ? `<span style="font-size:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:2px 8px;color:rgba(255,255,255,0.5)">⏱ ${h.hoursPerWeek}h/wk</span>` : ''}
+        ${h.link ? `<a href="${h.link.startsWith('http')?h.link:'https://'+h.link}" target="_blank" rel="noopener" style="font-size:10px;color:var(--cyan);text-decoration:none;opacity:0.75;hover:opacity:1">🔗 ${linkDomain}</a>` : ''}
+      </div>` : ''}
       <div style="display:flex;gap:6px;margin-top:auto">
         <button class="btn btn-sm btn-ghost" style="flex:1" onclick="openHustleModal('${h.id}')">📋 Blueprint</button>
         <button class="btn-icon" onclick="deleteHustle('${h.id}')">🗑</button>
@@ -2453,16 +2508,23 @@ function openHustleModal(id) {
     document.getElementById('mh-name').value        = h.name || '';
     document.getElementById('mh-desc').value        = h.desc || '';
     document.getElementById('mh-why').value         = h.why || '';
+    document.getElementById('mh-dream').value       = h.dreamOutcome || '';
     document.getElementById('mh-status').value      = h.status || 'idea';
     document.getElementById('mh-revenue').value     = h.revenue || '';
     document.getElementById('mh-revenue-model').value = h.revenueModel || '';
     document.getElementById('mh-customer').value    = h.customer || '';
     document.getElementById('mh-pricing').value     = h.pricing || '';
+    document.getElementById('mh-tags').value        = h.tags || '';
     document.getElementById('mh-resources').value   = h.resources || '';
     document.getElementById('mh-obstacles').value   = h.obstacles || '';
     document.getElementById('mh-action').value      = h.action || '';
     document.getElementById('mh-startdate').value   = h.startDate || '';
+    document.getElementById('mh-hours').value       = h.hoursPerWeek || '';
     document.getElementById('mh-target').value      = h.target || '';
+    document.getElementById('mh-cover').value       = h.coverImage || '';
+    document.getElementById('mh-link').value        = h.link || '';
+    document.getElementById('mh-notes').value       = h.notes || '';
+    updateCoverPreview();
     _hustleSteps = (h.steps || []).map(s => ({ ...s }));
     const ts = h.createdAt ? 'Created ' + h.createdAt : '';
     document.getElementById('mh-saved-at').textContent = ts;
@@ -2471,16 +2533,23 @@ function openHustleModal(id) {
     document.getElementById('mh-name').value        = '';
     document.getElementById('mh-desc').value        = '';
     document.getElementById('mh-why').value         = '';
+    document.getElementById('mh-dream').value       = '';
     document.getElementById('mh-status').value      = 'idea';
     document.getElementById('mh-revenue').value     = '';
     document.getElementById('mh-revenue-model').value = '';
     document.getElementById('mh-customer').value    = '';
     document.getElementById('mh-pricing').value     = '';
+    document.getElementById('mh-tags').value        = '';
     document.getElementById('mh-resources').value   = '';
     document.getElementById('mh-obstacles').value   = '';
     document.getElementById('mh-action').value      = '';
     document.getElementById('mh-startdate').value   = '';
+    document.getElementById('mh-hours').value       = '';
     document.getElementById('mh-target').value      = '';
+    document.getElementById('mh-cover').value       = '';
+    document.getElementById('mh-link').value        = '';
+    document.getElementById('mh-notes').value       = '';
+    updateCoverPreview();
     _hustleSteps = [];
     document.getElementById('mh-saved-at').textContent = '';
   }
@@ -2491,6 +2560,18 @@ function openHustleModal(id) {
 
 function closeHustleModal() {
   document.getElementById('modal-hustle-bp').style.display = 'none';
+}
+
+function updateCoverPreview() {
+  const url = (document.getElementById('mh-cover') || {}).value || '';
+  const preview = document.getElementById('mh-cover-preview');
+  if (!preview) return;
+  if (url) {
+    preview.style.display = 'block';
+    preview.style.backgroundImage = `url('${url}')`;
+  } else {
+    preview.style.display = 'none';
+  }
 }
 
 function renderHustleSteps() {
@@ -2529,16 +2610,22 @@ function saveHustle() {
     name,
     desc:         document.getElementById('mh-desc').value.trim(),
     why:          document.getElementById('mh-why').value.trim(),
+    dreamOutcome: document.getElementById('mh-dream').value.trim(),
     status:       document.getElementById('mh-status').value,
     revenue:      parseFloat(document.getElementById('mh-revenue').value) || 0,
     revenueModel: document.getElementById('mh-revenue-model').value,
     customer:     document.getElementById('mh-customer').value.trim(),
     pricing:      document.getElementById('mh-pricing').value.trim(),
+    tags:         document.getElementById('mh-tags').value.trim(),
     resources:    document.getElementById('mh-resources').value.trim(),
     obstacles:    document.getElementById('mh-obstacles').value.trim(),
     action:       document.getElementById('mh-action').value.trim(),
     startDate:    document.getElementById('mh-startdate').value,
+    hoursPerWeek: parseFloat(document.getElementById('mh-hours').value) || 0,
     target:       parseFloat(document.getElementById('mh-target').value) || 0,
+    coverImage:   document.getElementById('mh-cover').value.trim(),
+    link:         document.getElementById('mh-link').value.trim(),
+    notes:        document.getElementById('mh-notes').value.trim(),
     steps:        _hustleSteps.map(s => ({ ...s })),
   };
   if (existingId) {
