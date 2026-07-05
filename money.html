@@ -4189,12 +4189,17 @@ updateSaveStatus();
 // Use window.load to guarantee: DOM ready, Chart.js loaded, iframe layout computed.
 // setTimeout(0) inside load defers to after the browser's first paint of the
 // fully-laid-out page, so canvas dimensions are real before Chart.js renders.
-window.addEventListener('load', function() {
-  // page-dashboard already has 'active' class in the HTML so the structure
-  // is visible immediately. Just render the data directly — no need to call
-  // showPage (which would hide-then-show the page and add unnecessary RAF delay).
+// Render dashboard data on load.
+// iOS Safari inside iframes needs extra time for canvas dimensions to settle,
+// so we render immediately AND retry at 150ms and 500ms as fallbacks.
+function _initDashboard() {
   renderDashboard();
   updateMobTitle('dashboard');
+}
+window.addEventListener('load', function() {
+  _initDashboard();
+  setTimeout(_initDashboard, 150);
+  setTimeout(_initDashboard, 500);
 });
 
 // One-time hustle cleanup — keep only Jet Washing + Personal Brands
