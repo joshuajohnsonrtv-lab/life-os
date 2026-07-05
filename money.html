@@ -1834,11 +1834,17 @@ function showPage(page) {
   const navEl  = document.getElementById('nav-' + page);
   if (pageEl) pageEl.classList.add('active');
   if (navEl)  navEl.classList.add('active');
-  // Defer render by one frame so the browser can apply the 'active' CSS
-  // (display:block) and compute real element dimensions before Chart.js runs.
-  requestAnimationFrame(function() {
-    try { renderPage(page); } catch(e) { console.error('renderPage error:', e); }
-  });
+  // Scroll the main content area back to the top
+  const mainEl = document.querySelector('.main');
+  if (mainEl) mainEl.scrollTop = 0;
+  // Render synchronously first so data shows before the first browser paint
+  try { renderPage(page); } catch(e) { console.error('renderPage error:', e); }
+  // Also render via rAF for pages that use Chart.js (needs display:block for sizing)
+  if (page === 'income' || page === 'expenses' || page === 'savings' || page === 'delusion') {
+    requestAnimationFrame(function() {
+      try { renderPage(page); } catch(e) { console.error('renderPage rAF error:', e); }
+    });
+  }
 }
 
 function renderPage(page) {
@@ -4190,9 +4196,8 @@ function disconnectFirebase() {
 updateSaveStatus();
 (function(){ if(getFbConfig()) initFirebase(); else updateCloudStatus('off'); })();
 
-// Render dashboard synchronously so data is populated before the iframe onload fires.
-// page-dashboard already has class="page active" in HTML so no showPage needed.
-renderDashboard();
+// Boot via showPage so the init code path is identical to pressing the Home button.
+showPage('dashboard');
 updateMobTitle('dashboard');
 
 // One-time hustle cleanup — keep only Jet Washing + Personal Brands

@@ -204,11 +204,13 @@
   }
 
   function onFrameLoad(name) {
-    // Remove loading overlay instantly — no fade
-    const overlay = document.getElementById('load-' + name);
-    if (overlay) overlay.remove();
-    // Mark tab as ready (shows subtle dot)
-    document.getElementById('tab-' + name).classList.add('ready');
+    // Wait one rAF so the iframe has time to paint before the overlay is removed.
+    // This prevents the race where the overlay drops before the iframe's first frame renders.
+    requestAnimationFrame(function() {
+      const overlay = document.getElementById('load-' + name);
+      if (overlay) overlay.remove();
+      document.getElementById('tab-' + name).classList.add('ready');
+    });
   }
 
   // Always boot to Money Dashboard — no session restore.
