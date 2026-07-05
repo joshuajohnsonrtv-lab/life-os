@@ -876,7 +876,7 @@
   .ladder-card.ladder-lit .ladder-progress-fill { width:var(--progress, 0%); }
 </style>
 </head>
-<body>
+<body onload="showPage('dashboard')">
 
 <!-- ══ MOBILE TOPBAR ══ -->
 <div id="mob-topbar">
@@ -4098,10 +4098,7 @@ function disconnectFirebase() {
 // INIT
 // ══════════════════════════════════════════════════
 updateSaveStatus();
-// Use showPage (not renderDashboard directly) so the page-dashboard active class
-// is toggled — this forces a CSS layout cycle that gives Chart.js real canvas
-// dimensions before it tries to draw. Without this the chart renders at 0×0.
-setTimeout(() => showPage('dashboard'), 0);
+// showPage('dashboard') is also called via body onload for reliability.
 (function(){ if(getFbConfig()) initFirebase(); else updateCloudStatus('off'); })();
 
 // One-time hustle cleanup — keep only Jet Washing + Personal Brands
