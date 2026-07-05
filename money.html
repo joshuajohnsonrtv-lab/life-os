@@ -4212,21 +4212,32 @@ updateSaveStatus();
 showPage('dashboard');
 updateMobTitle('dashboard');
 
-// Init Firebase AFTER first render so its async callback doesn't race with boot
-setTimeout(function() {
-  if(getFbConfig()) initFirebase(); else updateCloudStatus('off');
-}, 200);
+// Start Firebase immediately — we need it to sync before we declare ready
+if(getFbConfig()) initFirebase(); else updateCloudStatus('off');
 
-// Re-render the dashboard and then signal the parent that we're ready.
-// The parent holds the loading overlay until this fires, so the user never
-// sees the blank placeholder HTML — they only see the populated dashboard.
-setTimeout(function() {
-  if (document.querySelector('.page.active')?.id === 'page-dashboard') {
-    renderDashboard();
+// Poll until we have real data (or 4s max), then signal the parent to lift the overlay.
+// This covers: Firebase taking time to sync, localStorage being temporarily unavailable,
+// or any other async thing that might make the first render show £0.
+var _bootPollMs = 0;
+function _pollUntilDataReady() {
+  var data = getData();
+  var hasData = (data.income.entries && data.income.entries.length > 0) ||
+                (data.goals.items   && data.goals.items.length   > 0)  ||
+                (data.hustles.items && data.hustles.items.length > 0);
+
+  if (hasData || _bootPollMs >= 4000) {
+    // We have data (or gave up waiting) — render and signal parent
+    if (document.querySelector('.page.active')?.id === 'page-dashboard') {
+      renderDashboard();
+    }
+    try { window.parent.postMessage({ action: 'moneyReady' }, '*'); } catch(e) {}
+  } else {
+    // No data yet — check again in 150ms
+    _bootPollMs += 150;
+    setTimeout(_pollUntilDataReady, 150);
   }
-  // Tell index.html we're done — it will lift the overlay on the next paint
-  try { window.parent.postMessage({ action: 'moneyReady' }, '*'); } catch(e) {}
-}, 350);
+}
+setTimeout(_pollUntilDataReady, 150);
 
 // One-time hustle cleanup — keep only Jet Washing + Personal Brands
 (function() {

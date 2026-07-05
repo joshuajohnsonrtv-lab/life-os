@@ -214,13 +214,14 @@
         document.getElementById('tab-' + name).classList.add('ready');
       });
     }
-    // Failsafe: if moneyReady never arrives, drop the overlay after 3s
+    // Failsafe: if moneyReady never arrives, drop the overlay after 5s
+    // (money.html polls up to 4s waiting for real data before firing moneyReady)
     if (name === 'money') {
       setTimeout(function() {
         const overlay = document.getElementById('load-money');
         if (overlay) overlay.remove();
         document.getElementById('tab-money').classList.add('ready');
-      }, 3000);
+      }, 5000);
     }
   }
 
