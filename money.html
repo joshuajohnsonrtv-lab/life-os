@@ -1734,7 +1734,8 @@ function getData() {
     if (!stored) return JSON.parse(JSON.stringify(DEFAULT_DATA));
     const def = JSON.parse(JSON.stringify(DEFAULT_DATA));
     for (const key of Object.keys(def)) {
-      if (stored[key] === undefined) stored[key] = def[key];
+      // == null catches both undefined and null (corrupted/missing keys)
+      if (stored[key] == null) stored[key] = def[key];
     }
     // migrate: rename legacy "Freelance" source → "Hustle"
     if (stored.income?.sources) {
@@ -2154,6 +2155,7 @@ function deleteSource(id) {
 // ══════════════════════════════════════════════════
 function renderGoals() {
   const data = getData();
+  if (!data.goals) data.goals = { items: [] };
   const items = data.goals.items || [];
   const active = items.filter(g => !g.complete);
   const complete = items.filter(g => g.complete);
@@ -2237,6 +2239,7 @@ function setGoalType(type) {
 
 function openGoalModal(id) {
   const data = getData();
+  if (!data.goals) data.goals = { items: [] };
   if (id) {
     const g = (data.goals.items||[]).find(x => x.id === id);
     if (!g) return;
@@ -2264,37 +2267,45 @@ function openGoalModal(id) {
 }
 
 function saveGoal() {
-  const name = document.getElementById('mg-name').value.trim();
-  const target = parseFloat(document.getElementById('mg-target').value);
-  const current = parseFloat(document.getElementById('mg-current').value) || 0;
-  if (!name || !target) { showToast('⚠️ Name and target amount required'); return; }
-  const data = getData();
-  if (!data.goals.items) data.goals.items = [];
-  const goalType = document.getElementById('mg-type').value || 'lump_sum';
-  const existingId = document.getElementById('mg-id').value;
-  if (existingId) {
-    const idx = data.goals.items.findIndex(g => g.id === existingId);
-    if (idx > -1) {
-      data.goals.items[idx] = { ...data.goals.items[idx], name, target, current, goalType,
+  try {
+    const name = document.getElementById('mg-name').value.trim();
+    const target = parseFloat(document.getElementById('mg-target').value);
+    const current = parseFloat(document.getElementById('mg-current').value) || 0;
+    if (!name) { showToast('⚠️ Goal name required'); return; }
+    if (!target || isNaN(target)) { showToast('⚠️ Enter a target amount'); return; }
+    const data = getData();
+    if (!data.goals) data.goals = { items: [] };
+    if (!data.goals.items) data.goals.items = [];
+    const goalType = document.getElementById('mg-type').value || 'lump_sum';
+    const existingId = document.getElementById('mg-id').value;
+    if (existingId) {
+      const idx = data.goals.items.findIndex(g => g.id === existingId);
+      if (idx > -1) {
+        data.goals.items[idx] = { ...data.goals.items[idx], name, target, current, goalType,
+          deadline: document.getElementById('mg-deadline').value,
+          emoji: document.getElementById('mg-emoji').value || '🎯',
+          notes: document.getElementById('mg-notes').value.trim() };
+      }
+    } else {
+      data.goals.items.push({ id: uid(), name, target, current, goalType,
         deadline: document.getElementById('mg-deadline').value,
         emoji: document.getElementById('mg-emoji').value || '🎯',
-        notes: document.getElementById('mg-notes').value.trim() };
+        notes: document.getElementById('mg-notes').value.trim(),
+        complete: false, createdAt: today() });
     }
-  } else {
-    data.goals.items.push({ id: uid(), name, target, current, goalType,
-      deadline: document.getElementById('mg-deadline').value,
-      emoji: document.getElementById('mg-emoji').value || '🎯',
-      notes: document.getElementById('mg-notes').value.trim(),
-      complete: false, createdAt: today() });
+    saveData(data);
+    closeModal('modal-goal');
+    renderGoals();
+    showToast('🎯 Goal saved!');
+  } catch(e) {
+    console.error('saveGoal error:', e);
+    showToast('❌ Error saving goal — check console');
   }
-  saveData(data);
-  closeModal('modal-goal');
-  renderGoals();
-  showToast('🎯 Goal saved!');
 }
 
 function completeGoal(id) {
   const data = getData();
+  if (!data.goals) data.goals = { items: [] };
   const g = (data.goals.items||[]).find(x => x.id === id);
   if (g) { g.complete = true; g.completedAt = today(); }
   saveData(data);
@@ -2305,6 +2316,7 @@ function completeGoal(id) {
 function deleteGoal(id) {
   if (!confirm('Delete this goal?')) return;
   const data = getData();
+  if (!data.goals) data.goals = { items: [] };
   data.goals.items = (data.goals.items||[]).filter(g => g.id !== id);
   saveData(data);
   renderGoals();
