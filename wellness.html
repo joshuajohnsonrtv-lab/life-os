@@ -837,7 +837,6 @@
 
     <div class="mob-menu-section-full">📈 Insights</div>
     <button class="mob-grid-card" onclick="showPage('measurements');closeMobileMenu()"><span class="mob-grid-emoji">📏</span><span class="mob-grid-label">Measurements</span></button>
-    <button class="mob-grid-card" onclick="showPage('reportcard');closeMobileMenu()"><span class="mob-grid-emoji">🗒️</span><span class="mob-grid-label">Report Card</span></button>
     <button class="mob-grid-card" onclick="showPage('allrecords');closeMobileMenu()"><span class="mob-grid-emoji">📋</span><span class="mob-grid-label">All Records</span></button>
 
     <div class="mob-menu-section-full">⚙️ Settings</div>
@@ -888,9 +887,6 @@
   <div class="nav-section-label">Insights</div>
   <div class="nav-item" onclick="showPage('measurements')" id="nav-measurements">
     <span class="icon">📏</span><span>Measurements</span>
-  </div>
-  <div class="nav-item" onclick="showPage('reportcard')" id="nav-reportcard">
-    <span class="icon">🗒️</span><span>Report Card</span>
   </div>
   <div class="nav-section-label">Records</div>
   <div class="nav-item" onclick="showPage('allrecords')" id="nav-allrecords">
@@ -1494,37 +1490,6 @@
     <div id="measure-history"></div>
   </div>
 
-  <!-- ========== TRENDS ========== -->
-  <!-- ========== WEEKLY REPORT CARD ========== -->
-  <div class="page" id="page-reportcard">
-    <div class="page-header">
-      <div>
-        <h2>🗒️ Weekly Report Card</h2>
-        <p>How consistent were you this week?</p>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn btn-outline btn-sm" onclick="shiftReportWeek(-1)">← Prev</button>
-        <span id="report-week-label" style="font-size:13px;color:var(--muted2);min-width:160px;text-align:center"></span>
-        <button class="btn btn-outline btn-sm" onclick="shiftReportWeek(1)">Next →</button>
-      </div>
-    </div>
-
-    <!-- Grade -->
-    <div style="text-align:center;margin-bottom:24px">
-      <div id="report-grade" style="font-size:80px;line-height:1">—</div>
-      <div id="report-grade-label" style="font-size:16px;color:var(--muted);margin-top:4px"></div>
-      <div id="report-overall-pct" style="font-size:14px;color:var(--muted2);margin-top:4px"></div>
-    </div>
-
-    <!-- Category breakdown -->
-    <div id="report-categories"></div>
-
-    <!-- Day-by-day grid -->
-    <div class="card" style="margin-top:16px">
-      <div class="card-title">Day by Day</div>
-      <div id="report-daygrid"></div>
-    </div>
-  </div>
 
   <!-- ========== JOURNAL ========== -->
   <!-- ========== SR TRACKER ========== -->
@@ -2103,7 +2068,7 @@ const PAGE_NAMES = {
   diet:'🥗 Diet', skincare:'🧴 Skincare', facial:'✨ Facial & Mewing',
   retention:'🔒 SR Tracker', mealideas:'🍽️ Meal Ideas',
   nafoods:'🧂 Na:K Foods', measurements:'📏 Measurements', trends:'📈 Trends',
-  reportcard:'🗒️ Report Card', journal:'✍️ Journal', allrecords:'📋 All Records',
+  journal:'✍️ Journal', allrecords:'📋 All Records',
   looksmax:'🪞 Looksmaxxing'
 };
 
@@ -2170,7 +2135,6 @@ function renderPage(page) {
     mealideas: renderMealIdeas,
     retention: renderRetention,
     measurements: renderMeasurements,
-    reportcard: renderReportCard,
     looksmax: renderLooksmax
   };
   if(fns[page]) fns[page]();
