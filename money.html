@@ -353,7 +353,7 @@
   }
   .bp-canvas {
     width: 100%;
-    max-width: 1060px;
+    max-width: 680px;
     max-height: calc(100vh - 40px);
     background: #060e1c;
     background-image:
@@ -368,13 +368,21 @@
     box-shadow: 0 0 60px rgba(0,140,255,0.18), 0 0 120px rgba(0,100,200,0.1);
   }
   .bp-topbar {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px 22px;
+    padding: 16px 20px 14px;
     border-bottom: 1px solid rgba(0,180,255,0.2);
     flex-shrink: 0;
     background: rgba(0,20,50,0.5);
+  }
+  .bp-topbar-row1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .bp-topbar-row2 {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
   }
   .bp-label {
     font-size: 9px;
@@ -382,22 +390,21 @@
     letter-spacing: 2px;
     text-transform: uppercase;
     color: rgba(0,200,255,0.6);
-    margin-bottom: 4px;
+    margin-bottom: 5px;
   }
   .bp-body {
     flex: 1;
     overflow-y: auto;
-    padding: 20px 22px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: auto auto;
-    gap: 14px;
+    padding: 16px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
   .bp-block {
     background: rgba(0,25,55,0.65);
     border: 1px solid rgba(0,180,255,0.18);
     border-radius: 10px;
-    padding: 14px 16px;
+    padding: 16px 18px;
     position: relative;
   }
   .bp-block::before {
@@ -424,7 +431,7 @@
     letter-spacing: 2.5px;
     text-transform: uppercase;
     color: rgba(0,210,255,0.75);
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     padding-bottom: 8px;
     border-bottom: 1px solid rgba(0,180,255,0.15);
   }
@@ -432,40 +439,41 @@
     width: 100%;
     background: rgba(0,15,40,0.7);
     border: 1px solid rgba(0,180,255,0.2);
-    border-radius: 6px;
+    border-radius: 8px;
     color: #e0f0ff;
-    padding: 8px 10px;
-    font-size: 13px;
+    padding: 11px 13px;
+    font-size: 14px;
     outline: none;
     box-sizing: border-box;
     transition: border-color 0.15s;
     font-family: inherit;
   }
-  .bp-input:focus { border-color: rgba(0,200,255,0.6); }
+  .bp-input:focus { border-color: rgba(0,200,255,0.6); outline: none; }
   .bp-input::placeholder { color: rgba(100,160,200,0.4); }
   .bp-textarea {
     resize: vertical;
-    min-height: 72px;
+    min-height: 90px;
+    line-height: 1.6;
+  }
+  .bp-textarea-lg {
+    min-height: 160px;
   }
   .bp-select {
     appearance: none;
     cursor: pointer;
   }
-  .bp-row { display: flex; gap: 10px; margin-bottom: 10px; }
-  .bp-row:last-child { margin-bottom: 0; }
-  .bp-field { flex: 1; }
-  .bp-field + .bp-field { flex: 1; }
+  .bp-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   /* step list */
   .bp-step-row {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 5px 0;
+    padding: 7px 0;
     border-bottom: 1px solid rgba(0,180,255,0.08);
   }
   .bp-step-row:last-of-type { border-bottom: none; }
   .bp-step-check {
-    width: 16px; height: 16px;
+    width: 18px; height: 18px;
     border: 1.5px solid rgba(0,200,255,0.5);
     border-radius: 3px;
     background: rgba(0,15,40,0.7);
@@ -482,12 +490,12 @@
     content: '✓';
     position: absolute;
     top: -2px; left: 1px;
-    font-size: 12px;
+    font-size: 13px;
     color: rgba(0,220,255,0.9);
   }
   .bp-step-text {
     flex: 1;
-    font-size: 12px;
+    font-size: 13px;
     color: #c0d8f0;
     background: none;
     border: none;
@@ -499,30 +507,49 @@
     border: none;
     color: rgba(255,80,80,0.5);
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     padding: 0 2px;
     line-height: 1;
     transition: color 0.1s;
   }
   .bp-step-del:hover { color: rgba(255,80,80,0.9); }
-  .bp-add-step {
-    display: flex; gap: 8px; margin-top: 10px;
+  .bp-add-step { display: flex; gap: 8px; margin-top: 10px; }
+  .bp-cover-preview {
+    width: 100%; height: 100px;
+    border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    margin-top: 10px;
+    border: 1px solid rgba(0,180,255,0.25);
+    display: none;
   }
+  .bp-file-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,180,255,0.1);
+    border: 1px solid rgba(0,180,255,0.35);
+    color: rgba(0,210,255,0.85);
+    padding: 9px 16px; border-radius: 8px;
+    font-size: 13px; cursor: pointer;
+    transition: background 0.15s;
+    width: 100%; justify-content: center;
+  }
+  .bp-file-btn:hover { background: rgba(0,180,255,0.2); }
   .bp-footer {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 10px;
-    padding: 14px 22px;
+    padding: 14px 20px;
     border-top: 1px solid rgba(0,180,255,0.2);
     background: rgba(0,20,50,0.5);
     flex-shrink: 0;
+    flex-wrap: wrap;
   }
   .btn-bp-cancel {
     background: transparent;
     border: 1px solid rgba(0,180,255,0.3);
     color: rgba(100,180,220,0.8);
-    padding: 9px 22px;
+    padding: 10px 22px;
     border-radius: 8px;
     cursor: pointer;
     font-size: 13px;
@@ -533,7 +560,7 @@
     background: rgba(0,180,255,0.15);
     border: 1px solid rgba(0,180,255,0.6);
     color: #00d4ff;
-    padding: 9px 28px;
+    padding: 10px 28px;
     border-radius: 8px;
     cursor: pointer;
     font-size: 13px;
@@ -546,9 +573,6 @@
     background: rgba(0,180,255,0.28);
     box-shadow: 0 0 24px rgba(0,180,255,0.4);
   }
-  /* span the bottom two blocks */
-  .bp-block.bp-span2 { grid-column: span 2; }
-  .bp-block.bp-span3 { grid-column: span 3; }
 
   /* ── IDEAS INLINE LIST ── */
   #hustles-ideas-panel {
@@ -1322,43 +1346,59 @@
 <div id="modal-hustle-bp" onclick="if(event.target===this)closeHustleModal()">
   <div class="bp-canvas">
 
-    <!-- Top bar: name + status + revenue + close -->
+    <!-- Top bar: two-row layout for mobile -->
     <div class="bp-topbar">
-      <div style="font-size:10px;font-family:monospace;letter-spacing:3px;color:rgba(0,200,255,0.5);text-transform:uppercase;flex-shrink:0">HUSTLE BLUEPRINT</div>
-      <input type="hidden" id="mh-id">
-      <input class="bp-input" id="mh-name" placeholder="Name your hustle..." style="flex:1;font-size:16px;font-weight:700;color:#e8f4ff;border-color:transparent;background:rgba(0,20,50,0.5)">
-      <select class="bp-input bp-select" id="mh-status" style="width:160px;flex-shrink:0">
-        <option value="idea">💡 Idea</option>
-        <option value="building">🔨 Building</option>
-        <option value="active">🔥 Active</option>
-        <option value="earning">💸 Earning</option>
-      </select>
-      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-        <span style="font-size:12px;color:rgba(0,200,255,0.5);font-family:monospace">£</span>
-        <input class="bp-input" id="mh-revenue" type="number" placeholder="0/mo" min="0" style="width:100px">
+      <div class="bp-topbar-row1">
+        <div style="font-size:10px;font-family:monospace;letter-spacing:3px;color:rgba(0,200,255,0.5);text-transform:uppercase">HUSTLE BLUEPRINT</div>
+        <button onclick="closeHustleModal()" style="background:none;border:none;color:rgba(100,180,220,0.6);font-size:22px;cursor:pointer;line-height:1;padding:0 4px" title="Close">✕</button>
       </div>
-      <button onclick="closeHustleModal()" style="background:none;border:none;color:rgba(100,180,220,0.6);font-size:22px;cursor:pointer;line-height:1;flex-shrink:0;padding:0 4px" title="Close">✕</button>
+      <input type="hidden" id="mh-id">
+      <input class="bp-input" id="mh-name" placeholder="Name your hustle..." style="font-size:16px;font-weight:700;color:#e8f4ff;border-color:rgba(0,200,255,0.35);background:rgba(0,20,50,0.6);margin-bottom:10px">
+      <div class="bp-topbar-row2">
+        <select class="bp-input bp-select" id="mh-status" style="flex:1;min-width:150px">
+          <option value="idea">💡 Idea</option>
+          <option value="building">🔨 Building</option>
+          <option value="active">🔥 Active</option>
+          <option value="earning">💸 Earning</option>
+        </select>
+        <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:120px">
+          <span style="font-size:13px;color:rgba(0,200,255,0.55);font-family:monospace;flex-shrink:0">£</span>
+          <input class="bp-input" id="mh-revenue" type="number" placeholder="monthly £" min="0">
+        </div>
+      </div>
     </div>
 
-    <!-- Grid body -->
+    <!-- Single-column body -->
     <div class="bp-body">
 
       <!-- Block 1: The Concept -->
       <div class="bp-block">
         <div class="bp-block-title">◈ The Concept</div>
         <div class="bp-label">What is it & how does it make money</div>
-        <textarea class="bp-input bp-textarea" id="mh-desc" placeholder="Describe the hustle. What does it do? Who pays you and why?" style="margin-bottom:12px"></textarea>
+        <textarea class="bp-input bp-textarea" id="mh-desc" placeholder="Describe the hustle. What does it do? Who pays you and why?" style="margin-bottom:14px"></textarea>
         <div class="bp-label">Why this? Your motivation</div>
-        <textarea class="bp-input bp-textarea" id="mh-why" placeholder="Why does this excite you? What does success look like?" style="margin-bottom:12px;min-height:56px"></textarea>
+        <textarea class="bp-input bp-textarea" id="mh-why" placeholder="Why does this excite you? What does success look like?" style="margin-bottom:14px"></textarea>
         <div class="bp-label">Dream outcome 🌟</div>
-        <input class="bp-input" id="mh-dream" placeholder="Where does this go at its best? e.g. £10k/mo agency by 2026">
+        <input class="bp-input" id="mh-dream" placeholder="Where does this go at its best? e.g. £10k/mo by 2027">
       </div>
 
-      <!-- Block 2: The Model -->
+      <!-- Block 2: Cover Image -->
+      <div class="bp-block">
+        <div class="bp-block-title">◈ Cover Image 🖼</div>
+        <input type="file" accept="image/*" id="mh-cover-file" style="display:none" onchange="handleCoverImageSelect(this)">
+        <input type="hidden" id="mh-cover">
+        <label for="mh-cover-file" class="bp-file-btn">
+          📷 Choose a photo from your device
+        </label>
+        <div id="mh-cover-preview" class="bp-cover-preview"></div>
+        <div id="mh-cover-name" style="font-size:11px;color:rgba(0,200,255,0.5);margin-top:6px;text-align:center"></div>
+      </div>
+
+      <!-- Block 3: The Model -->
       <div class="bp-block">
         <div class="bp-block-title">◈ The Model</div>
         <div class="bp-label">How you charge</div>
-        <select class="bp-input bp-select" id="mh-revenue-model" style="margin-bottom:12px">
+        <select class="bp-input bp-select" id="mh-revenue-model" style="margin-bottom:14px">
           <option value="">— select revenue model —</option>
           <option value="retainer">Monthly Retainer</option>
           <option value="project">Per Project / One-off</option>
@@ -1369,64 +1409,66 @@
           <option value="trading">Trading / Investment</option>
           <option value="other">Other</option>
         </select>
-        <div class="bp-label">Target customer</div>
-        <input class="bp-input" id="mh-customer" placeholder="Who are you selling to?" style="margin-bottom:12px">
-        <div class="bp-label">Pricing idea (£)</div>
-        <input class="bp-input" id="mh-pricing" placeholder="e.g. £500/mo retainer, £97 product, etc." style="margin-bottom:12px">
+        <div class="bp-two-col" style="margin-bottom:14px">
+          <div>
+            <div class="bp-label">Target customer</div>
+            <input class="bp-input" id="mh-customer" placeholder="Who are you selling to?">
+          </div>
+          <div>
+            <div class="bp-label">Pricing idea (£)</div>
+            <input class="bp-input" id="mh-pricing" placeholder="e.g. £97 product">
+          </div>
+        </div>
         <div class="bp-label">Tags (comma separated)</div>
         <input class="bp-input" id="mh-tags" placeholder="e.g. creative, online, passive, local">
       </div>
 
-      <!-- Block 3: The Build -->
+      <!-- Block 4: The Build -->
       <div class="bp-block">
         <div class="bp-block-title">◈ The Build</div>
         <div class="bp-label">Resources / tools needed</div>
-        <textarea class="bp-input bp-textarea" id="mh-resources" placeholder="Software, budget, skills, people..." style="margin-bottom:12px;min-height:72px"></textarea>
+        <textarea class="bp-input bp-textarea" id="mh-resources" placeholder="Software, budget, skills, people..." style="margin-bottom:14px"></textarea>
         <div class="bp-label">Obstacles & risks</div>
         <textarea class="bp-input bp-textarea" id="mh-obstacles" placeholder="What could slow you down or stop this?"></textarea>
       </div>
 
-      <!-- Block 4: Action Steps (span 2) -->
-      <div class="bp-block bp-span2">
+      <!-- Block 5: Action Steps -->
+      <div class="bp-block">
         <div class="bp-block-title">◈ Action Steps</div>
         <div id="mh-steps-list"></div>
         <div class="bp-add-step">
           <input class="bp-input" id="mh-step-input" placeholder="Add a step..." onkeydown="if(event.key==='Enter'){event.preventDefault();addHustleStep()}">
-          <button class="btn-bp-cancel" onclick="addHustleStep()" style="padding:8px 14px;flex-shrink:0">+ Add</button>
+          <button class="btn-bp-cancel" onclick="addHustleStep()" style="padding:10px 16px;flex-shrink:0">+ Add</button>
         </div>
       </div>
 
-      <!-- Block 5: Timeline -->
+      <!-- Block 6: Timeline -->
       <div class="bp-block">
         <div class="bp-block-title">◈ Timeline</div>
-        <div class="bp-label">Target start date</div>
-        <input class="bp-input" id="mh-startdate" type="date" style="margin-bottom:12px">
-        <div class="bp-label">Est. hours per week</div>
-        <input class="bp-input" id="mh-hours" type="number" placeholder="e.g. 10" min="0" style="margin-bottom:12px">
-        <div class="bp-label">Next single action (do this first)</div>
-        <input class="bp-input" id="mh-action" placeholder="The one thing to do right now">
-        <div id="mh-revenue-target-section" style="margin-top:12px">
+        <div class="bp-two-col" style="margin-bottom:14px">
+          <div>
+            <div class="bp-label">Target start date</div>
+            <input class="bp-input" id="mh-startdate" type="date">
+          </div>
+          <div>
+            <div class="bp-label">Est. hours/week</div>
+            <input class="bp-input" id="mh-hours" type="number" placeholder="e.g. 10" min="0">
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <div class="bp-label">Next single action (do this first)</div>
+          <input class="bp-input" id="mh-action" placeholder="The one thing to do right now">
+        </div>
+        <div id="mh-revenue-target-section">
           <div class="bp-label">Revenue target (£/mo)</div>
           <input class="bp-input" id="mh-target" type="number" placeholder="e.g. 2000" min="0">
         </div>
       </div>
 
-      <!-- Block 6: Identity & Extras (span 2) -->
-      <div class="bp-block bp-span2">
-        <div class="bp-block-title">◈ Identity & Extras</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-          <div>
-            <div class="bp-label">Cover image URL 🖼</div>
-            <input class="bp-input" id="mh-cover" placeholder="https://... paste any image URL" oninput="updateCoverPreview()">
-          </div>
-          <div>
-            <div class="bp-label">Platform / website link 🔗</div>
-            <input class="bp-input" id="mh-link" placeholder="https://your-site.com or @handle">
-          </div>
-        </div>
-        <div id="mh-cover-preview" style="display:none;height:80px;border-radius:8px;background-size:cover;background-position:center;margin-bottom:12px;border:1px solid var(--border);opacity:0.85"></div>
-        <div class="bp-label">Notes / ongoing thoughts 📝</div>
-        <textarea class="bp-input bp-textarea" id="mh-notes" placeholder="Anything goes — ideas, contacts, random thoughts, links, strategies..." style="min-height:80px"></textarea>
+      <!-- Block 7: Notes / Ongoing Thoughts -->
+      <div class="bp-block">
+        <div class="bp-block-title">◈ Notes / Ongoing Thoughts 📝</div>
+        <textarea class="bp-input bp-textarea bp-textarea-lg" id="mh-notes" placeholder="Anything goes — ideas, contacts, random thoughts, links, strategies, wins, setbacks..."></textarea>
       </div>
 
     </div><!-- /.bp-body -->
@@ -2407,15 +2449,11 @@ const INCOME_IDEAS = [
 function addHustleFromIdea(idx) {
   const idea = INCOME_IDEAS[idx];
   if (!idea) return;
-  // Pre-fill the hustle modal with idea details
-  document.getElementById('mh-title').textContent = '🚀 Add Hustle';
-  document.getElementById('mh-id').value    = '';
-  document.getElementById('mh-name').value  = idea.emoji + ' ' + idea.name;
-  document.getElementById('mh-desc').value  = idea.desc + ' (' + idea.range + ')';
+  // Pre-fill the hustle modal with idea details — start fresh then fill
+  openHustleModal(null);
+  document.getElementById('mh-name').value   = idea.emoji + ' ' + idea.name;
+  document.getElementById('mh-desc').value   = idea.desc + ' (' + idea.range + ')';
   document.getElementById('mh-status').value = 'idea';
-  document.getElementById('mh-revenue').value = '';
-  document.getElementById('mh-action').value = '';
-  document.getElementById('modal-hustle-bp').style.display = 'flex';
   setTimeout(() => document.getElementById('mh-name').focus(), 80);
 }
 
@@ -2467,7 +2505,6 @@ function renderHustles() {
     const modelLabels = { retainer:'Retainer', project:'Per Project', subscription:'Subscription',
       commission:'Commission', product:'Product', ads:'Ad Revenue', trading:'Trading', other:'Other' };
     const tagList = (h.tags||'').split(',').map(t=>t.trim()).filter(Boolean);
-    const linkDomain = h.link ? (() => { try { return new URL(h.link.startsWith('http')?h.link:'https://'+h.link).hostname.replace(/^www\./,''); } catch(e){ return h.link; } })() : '';
     return `
     <div class="hustle-card status-${h.status}">
       ${h.coverImage ? `<div class="hustle-cover" style="background-image:url('${h.coverImage}')"></div>` : ''}
@@ -2485,9 +2522,8 @@ function renderHustles() {
         <div style="height:4px;background:var(--border);border-radius:2px"><div style="height:4px;width:${pct}%;background:var(--cyan);border-radius:2px;transition:width 0.3s"></div></div>
       </div>` : ''}
       ${h.action ? `<div style="font-size:11px;color:var(--cyan);margin-bottom:8px;opacity:0.85">→ ${h.action}</div>` : ''}
-      ${(h.hoursPerWeek > 0 || h.link) ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-        ${h.hoursPerWeek > 0 ? `<span style="font-size:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:2px 8px;color:rgba(255,255,255,0.5)">⏱ ${h.hoursPerWeek}h/wk</span>` : ''}
-        ${h.link ? `<a href="${h.link.startsWith('http')?h.link:'https://'+h.link}" target="_blank" rel="noopener" style="font-size:10px;color:var(--cyan);text-decoration:none;opacity:0.75;hover:opacity:1">🔗 ${linkDomain}</a>` : ''}
+      ${h.hoursPerWeek > 0 ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-size:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:2px 8px;color:rgba(255,255,255,0.5)">⏱ ${h.hoursPerWeek}h/wk</span>
       </div>` : ''}
       <div style="display:flex;gap:6px;margin-top:auto">
         <button class="btn btn-sm btn-ghost" style="flex:1" onclick="openHustleModal('${h.id}')">📋 Blueprint</button>
@@ -2522,8 +2558,12 @@ function openHustleModal(id) {
     document.getElementById('mh-hours').value       = h.hoursPerWeek || '';
     document.getElementById('mh-target').value      = h.target || '';
     document.getElementById('mh-cover').value       = h.coverImage || '';
-    document.getElementById('mh-link').value        = h.link || '';
     document.getElementById('mh-notes').value       = h.notes || '';
+    // Reset file input (can't restore filename, but cover data is in hidden input)
+    const fi = document.getElementById('mh-cover-file');
+    if (fi) fi.value = '';
+    const cn = document.getElementById('mh-cover-name');
+    if (cn) cn.textContent = h.coverImage ? '✓ Image stored' : '';
     updateCoverPreview();
     _hustleSteps = (h.steps || []).map(s => ({ ...s }));
     const ts = h.createdAt ? 'Created ' + h.createdAt : '';
@@ -2547,8 +2587,11 @@ function openHustleModal(id) {
     document.getElementById('mh-hours').value       = '';
     document.getElementById('mh-target').value      = '';
     document.getElementById('mh-cover').value       = '';
-    document.getElementById('mh-link').value        = '';
     document.getElementById('mh-notes').value       = '';
+    const fi2 = document.getElementById('mh-cover-file');
+    if (fi2) fi2.value = '';
+    const cn2 = document.getElementById('mh-cover-name');
+    if (cn2) cn2.textContent = '';
     updateCoverPreview();
     _hustleSteps = [];
     document.getElementById('mh-saved-at').textContent = '';
@@ -2571,7 +2614,34 @@ function updateCoverPreview() {
     preview.style.backgroundImage = `url('${url}')`;
   } else {
     preview.style.display = 'none';
+    preview.style.backgroundImage = '';
   }
+}
+
+function handleCoverImageSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    // Compress image to max 600px wide at 75% JPEG quality
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const maxW = 600;
+      const ratio = Math.min(1, maxW / img.width);
+      canvas.width  = Math.round(img.width  * ratio);
+      canvas.height = Math.round(img.height * ratio);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      const compressed = canvas.toDataURL('image/jpeg', 0.75);
+      const hidden = document.getElementById('mh-cover');
+      if (hidden) hidden.value = compressed;
+      const nameEl = document.getElementById('mh-cover-name');
+      if (nameEl) nameEl.textContent = '✓ ' + file.name;
+      updateCoverPreview();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 function renderHustleSteps() {
@@ -2624,7 +2694,6 @@ function saveHustle() {
     hoursPerWeek: parseFloat(document.getElementById('mh-hours').value) || 0,
     target:       parseFloat(document.getElementById('mh-target').value) || 0,
     coverImage:   document.getElementById('mh-cover').value.trim(),
-    link:         document.getElementById('mh-link').value.trim(),
     notes:        document.getElementById('mh-notes').value.trim(),
     steps:        _hustleSteps.map(s => ({ ...s })),
   };
