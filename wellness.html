@@ -833,10 +833,7 @@
     <button class="mob-grid-card" onclick="showPage('skincare');closeMobileMenu()"><span class="mob-grid-emoji">🧴</span><span class="mob-grid-label">Skincare</span></button>
     <button class="mob-grid-card" onclick="showPage('facial');closeMobileMenu()"><span class="mob-grid-emoji">✨</span><span class="mob-grid-label">Facial & Mewing</span></button>
     <button class="mob-grid-card" onclick="showPage('retention');closeMobileMenu()"><span class="mob-grid-emoji">🔒</span><span class="mob-grid-label">SR Tracker</span></button>
-
-    <div class="mob-menu-section-full">🪞 Looksmax</div>
     <button class="mob-grid-card" onclick="showPage('looksmax');closeMobileMenu()"><span class="mob-grid-emoji">🪞</span><span class="mob-grid-label">Looksmaxxing</span></button>
-    <button class="mob-grid-card" onclick="showPage('mealideas');document.querySelector&&(document.getElementById('meal-goal-btn-looksmax')&&document.getElementById('meal-goal-btn-looksmax').click());closeMobileMenu()"><span class="mob-grid-emoji">🥩</span><span class="mob-grid-label">Primal Diet</span></button>
 
     <div class="mob-menu-section-full">📈 Insights</div>
     <button class="mob-grid-card" onclick="showPage('measurements');closeMobileMenu()"><span class="mob-grid-emoji">📏</span><span class="mob-grid-label">Measurements</span></button>
@@ -882,12 +879,11 @@
   <div class="nav-item" onclick="showPage('retention')" id="nav-retention">
     <span class="icon">🔒</span><span>SR Tracker</span>
   </div>
-  <div class="nav-item" onclick="showPage('mealideas')" id="nav-mealideas">
-    <span class="icon">🍽️</span><span>Meal Ideas</span>
-  </div>
-  <div class="nav-section-label">Looksmax</div>
   <div class="nav-item" onclick="showPage('looksmax')" id="nav-looksmax">
     <span class="icon">🪞</span><span>Looksmaxxing</span>
+  </div>
+  <div class="nav-item" onclick="showPage('mealideas')" id="nav-mealideas">
+    <span class="icon">🍽️</span><span>Meal Ideas</span>
   </div>
   <div class="nav-section-label">Insights</div>
   <div class="nav-item" onclick="showPage('measurements')" id="nav-measurements">
@@ -1257,7 +1253,6 @@
     <div class="lm-tab-row">
       <button class="lm-tab active" onclick="switchLmTab('overview')">📸 Overview</button>
       <button class="lm-tab" onclick="switchLmTab('exercises')">✨ Exercises</button>
-      <button class="lm-tab" onclick="switchLmTab('diet')">🥩 Primal Diet</button>
       <button class="lm-tab" onclick="switchLmTab('guidance')">💡 Guidance</button>
     </div>
 
@@ -1342,99 +1337,6 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- ── DIET TAB ── -->
-    <div class="lm-section" id="lm-tab-diet">
-      <div class="card">
-        <div class="card-title">🥩 Primal Diet — Overview</div>
-        <p style="font-size:13px;color:var(--muted2);line-height:1.6;margin-bottom:14px">Follow a simple whole-food primal diet based around nutrient-dense animal foods and minimally processed carbohydrates. Prioritise high-quality, locally sourced ingredients. Primary supplier: <strong style="color:var(--amber)">Dora's Dairy, Purton (near Swindon)</strong> — raw milk &amp; grass-fed beef.</p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
-          <div style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:10px 14px;flex:1;min-width:120px;text-align:center">
-            <div style="font-size:22px;margin-bottom:4px">🥚</div>
-            <div style="font-size:16px;font-weight:700;color:var(--amber)">12</div>
-            <div style="font-size:11px;color:var(--muted)">eggs / day</div>
-          </div>
-          <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:10px 14px;flex:1;min-width:120px;text-align:center">
-            <div style="font-size:22px;margin-bottom:4px">🥩</div>
-            <div style="font-size:16px;font-weight:700;color:var(--green)">600–800g</div>
-            <div style="font-size:11px;color:var(--muted)">beef / day</div>
-          </div>
-          <div style="background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.3);border-radius:10px;padding:10px 14px;flex:1;min-width:120px;text-align:center">
-            <div style="font-size:22px;margin-bottom:4px">🥛</div>
-            <div style="font-size:16px;font-weight:700;color:var(--cyan)">1–1.5L</div>
-            <div style="font-size:11px;color:var(--muted)">raw milk / day</div>
-          </div>
-          <div style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:10px;padding:10px 14px;flex:1;min-width:120px;text-align:center">
-            <div style="font-size:22px;margin-bottom:4px">🍠</div>
-            <div style="font-size:16px;font-weight:700;color:var(--purple)">600g–1kg</div>
-            <div style="font-size:11px;color:var(--muted)">sweet potato</div>
-          </div>
-        </div>
-        <div style="font-size:12px;color:var(--muted);background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:8px 12px">
-          💰 <strong>Estimated cost:</strong> £14–17/day (500g beef) · £18–27/day (700–800g beef)
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">🍽️ Daily Meal Plan</div>
-        <div class="primal-row">
-          <div class="primal-meal-time">☀️ Breakfast</div>
-          <div class="primal-meal-text">
-            <strong>6 eggs</strong> cooked in butter or beef tallow<br>
-            <strong>300–500 mL raw milk</strong><br>
-            <strong>1 tbsp raw honey</strong> (optional)
-          </div>
-        </div>
-        <div class="primal-row">
-          <div class="primal-meal-time">🌤 Lunch</div>
-          <div class="primal-meal-text">
-            <strong>300–400 g grass-fed beef</strong><br>
-            <strong>300–500 g baked sweet potato</strong> with butter<br>
-            Salt to taste
-          </div>
-        </div>
-        <div class="primal-row">
-          <div class="primal-meal-time">🍎 Snack</div>
-          <div class="primal-meal-text">
-            <strong>300–500 mL raw milk</strong><br>
-            <strong>1–2 tbsp raw honey</strong> (especially on training days)
-          </div>
-        </div>
-        <div class="primal-row">
-          <div class="primal-meal-time">🌙 Dinner</div>
-          <div class="primal-meal-text">
-            <strong>300–400 g grass-fed beef</strong><br>
-            <strong>300–500 g sweet potato</strong><br>
-            <strong>6 eggs</strong>
-          </div>
-        </div>
-        <div class="primal-row">
-          <div class="primal-meal-time">🌙 Before Bed</div>
-          <div class="primal-meal-text">
-            <strong>250–500 mL raw milk</strong> (optional)
-          </div>
-        </div>
-        <div class="primal-row" style="background:rgba(139,92,246,0.06);border-radius:8px;padding:10px;margin-top:4px;border:1px solid rgba(139,92,246,0.2);display:block">
-          <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:6px">📅 Weekly Additions</div>
-          <div class="primal-meal-text">
-            • <strong>100–150 g beef liver</strong> once per week (micronutrient powerhouse)<br>
-            • <strong>Optional fruit</strong>: berries, oranges, bananas, kiwi — a few times per week
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">🛒 Weekly Shopping List</div>
-        <div class="lm-shopping-item"><span class="qty">84 eggs</span><span class="item">7 dozen — keep in fridge, last several weeks</span></div>
-        <div class="lm-shopping-item"><span class="qty">3.5–5 kg</span><span class="item">Grass-fed beef — freeze most immediately, thaw as needed</span></div>
-        <div class="lm-shopping-item"><span class="qty">5–7 kg</span><span class="item">Sweet potatoes — cool dark cupboard, last several weeks</span></div>
-        <div class="lm-shopping-item"><span class="qty">7 L</span><span class="item">Raw milk — coldest part of fridge, consume within 5–7 days</span></div>
-        <div class="lm-shopping-item"><span class="qty">1 jar</span><span class="item">Raw honey — room temperature, lasts months</span></div>
-        <div class="lm-shopping-item"><span class="qty">250–500 g</span><span class="item">Butter or beef tallow for cooking</span></div>
-        <div class="lm-shopping-item"><span class="qty">100–150 g</span><span class="item">Beef liver (weekly)</span></div>
-        <div class="tip" style="margin-top:10px">🏪 Primary supplier: <strong>Dora's Dairy, Purton (near Swindon)</strong> for raw milk &amp; grass-fed beef. Buy once every 7 days to keep costs and travel low while keeping food fresh.</div>
       </div>
     </div>
 
