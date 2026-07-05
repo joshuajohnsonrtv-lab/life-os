@@ -1195,6 +1195,79 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .k-back:hover{border-color:rgba(255,255,255,.28);color:rgba(255,255,255,.65);}
 .k-save.saved{color:var(--gold);}
 
+/* ── KITCHEN GLOWS ──────────────────────────────────────────────────── */
+
+/* Window above sink — daylight blue */
+.k-win{
+  background:rgba(120,190,255,.32) !important;
+  border:1px solid rgba(100,170,255,.55) !important;
+  box-shadow:0 0 18px rgba(100,180,255,.45),inset 0 0 8px rgba(140,210,255,.25) !important;
+}
+
+/* Cooker burners — orange glow, animated flicker */
+.k-cooker-br{
+  border:2px solid rgba(220,90,20,.55) !important;
+  background:radial-gradient(circle,#2a1410,#141418) !important;
+  box-shadow:0 0 7px rgba(255,110,20,.55),inset 0 0 4px rgba(200,70,10,.35) !important;
+  animation:kBurnerPulse 2s ease-in-out infinite;
+}
+@keyframes kBurnerPulse{0%,100%{box-shadow:0 0 4px rgba(255,80,10,.38),inset 0 0 3px rgba(200,60,10,.22);}50%{box-shadow:0 0 11px rgba(255,130,20,.72),inset 0 0 6px rgba(220,90,10,.45);}}
+
+/* Cooker body — warm ambient around the unit */
+.k-cooker{box-shadow:0 0 14px rgba(255,100,20,.14),inset 0 0 8px rgba(0,0,0,.5) !important;}
+.k-cooker:hover{border-color:#f97316 !important;box-shadow:0 0 22px rgba(249,115,22,.42),inset 0 0 8px rgba(0,0,0,.5) !important;}
+
+/* Fridge — permanent cool blue glow */
+.k-fridge-l{
+  background:linear-gradient(90deg,#1e2236,#1a1e2e) !important;
+  border:1px solid #2e3a52 !important;
+  box-shadow:0 0 12px rgba(60,130,255,.14),inset 0 0 14px rgba(40,100,220,.08) !important;
+}
+.k-fridge-l:hover{border-color:#4d9eff !important;box-shadow:0 0 20px rgba(77,158,255,.38) !important;}
+
+/* Microwave screen — green phosphor glow */
+.k-micro-scr{
+  background:#020a02 !important;
+  border:1px solid #081408 !important;
+  box-shadow:inset 0 0 7px rgba(0,220,60,.38),0 0 8px rgba(0,190,50,.22) !important;
+}
+/* Button LEDs */
+.k-micro-btn{
+  background:#060e08 !important;
+  border:1px solid rgba(0,200,80,.5) !important;
+  box-shadow:0 0 5px rgba(0,210,60,.65) !important;
+}
+.k-micro-btn2{
+  background:#0e0606 !important;
+  border:1px solid rgba(210,50,20,.45) !important;
+  box-shadow:0 0 5px rgba(230,60,20,.58) !important;
+  animation:kBtn2 3.2s ease-in-out infinite;
+}
+@keyframes kBtn2{0%,100%{opacity:.55;}50%{opacity:1;}}
+
+/* Tap — chrome shine */
+.k-tap{background:linear-gradient(90deg,#3a4258,#7080a0) !important;box-shadow:0 0 5px rgba(80,140,220,.22) !important;}
+.k-tap::after{background:linear-gradient(180deg,#7080a0,#3a4258) !important;}
+
+/* Sink — subtle cyan depth */
+.k-sink{
+  background:#050d14 !important;
+  border:2px solid #162a3a !important;
+  box-shadow:inset 0 3px 8px rgba(0,0,0,.65),inset 0 0 14px rgba(20,90,140,.22) !important;
+}
+.k-sink:hover{border-color:#3a7aaa !important;}
+
+/* Occupied stool — purple glow */
+.k-stool.occupied{box-shadow:0 0 9px rgba(120,60,200,.38) !important;}
+
+/* Ambient warm ceiling wash from counter-top golden strip */
+.k-ct::after{box-shadow:0 -2px 18px rgba(196,176,128,.35);}
+
+/* Island top strip — warm amber edge */
+.k-island::after{box-shadow:0 -3px 12px rgba(180,155,90,.25);}
+
+/* ────────────────────────────────────────────────────────────────────── */
+
 /* fridge inventory modal */
 .k-fridge-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;
   display:flex;align-items:center;justify-content:center;padding:16px;}
