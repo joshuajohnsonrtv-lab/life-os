@@ -4189,18 +4189,12 @@ updateSaveStatus();
 // Use window.load to guarantee: DOM ready, Chart.js loaded, iframe layout computed.
 // setTimeout(0) inside load defers to after the browser's first paint of the
 // fully-laid-out page, so canvas dimensions are real before Chart.js renders.
-// Render dashboard data on load.
-// iOS Safari inside iframes needs extra time for canvas dimensions to settle,
-// so we render immediately AND retry at 150ms and 500ms as fallbacks.
-function _initDashboard() {
-  renderDashboard();
+// On load: do exactly what the Home button does, just with a short delay
+// so iOS Safari has time to finish laying out the iframe before we render.
+setTimeout(function() {
+  showPage('dashboard');
   updateMobTitle('dashboard');
-}
-window.addEventListener('load', function() {
-  _initDashboard();
-  setTimeout(_initDashboard, 150);
-  setTimeout(_initDashboard, 500);
-});
+}, 300);
 
 // One-time hustle cleanup — keep only Jet Washing + Personal Brands
 (function() {
