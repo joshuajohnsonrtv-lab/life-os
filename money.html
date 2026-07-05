@@ -641,13 +641,13 @@
     z-index: 200; padding-bottom: env(safe-area-inset-bottom);
   }
   .mob-nav-btn {
-    display:flex; flex-direction:column; align-items:center; gap:4px;
-    background:none; border:none; cursor:pointer; padding:8px; flex:1;
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    background:none; border:none; cursor:pointer; padding:6px 4px; flex:1;
     color:var(--muted); transition:color 0.15s;
   }
-  .mob-nav-btn .mob-icon  { font-size:24px; line-height:1; }
-  .mob-nav-btn .mob-label { font-size:11px; font-weight:600; }
-  .mob-nav-btn:active { color:var(--gold); }
+  .mob-nav-btn .mob-icon  { font-size:20px; line-height:1; }
+  .mob-nav-btn .mob-label { font-size:10px; font-weight:600; }
+  .mob-nav-btn:active, .mob-nav-btn.mob-active { color:var(--gold); }
 
   /* Full-screen grid menu */
   #mob-menu {
@@ -910,11 +910,20 @@
 
 <!-- ══ MOBILE BOTTOM NAV ══ -->
 <div id="mob-nav">
-  <button class="mob-nav-btn" onclick="showPage('dashboard');closeMobMenu()">
+  <button class="mob-nav-btn" id="mob-btn-dashboard" onclick="showPage('dashboard');updateMobTitle('dashboard')">
     <span class="mob-icon">📊</span><span class="mob-label">Home</span>
   </button>
-  <button class="mob-nav-btn" onclick="openMobMenu()">
-    <span class="mob-icon">☰</span><span class="mob-label">Menu</span>
+  <button class="mob-nav-btn" id="mob-btn-income" onclick="showPage('income');updateMobTitle('income')">
+    <span class="mob-icon">💵</span><span class="mob-label">Income</span>
+  </button>
+  <button class="mob-nav-btn" id="mob-btn-expenses" onclick="showPage('expenses');updateMobTitle('expenses')">
+    <span class="mob-icon">💸</span><span class="mob-label">Expenses</span>
+  </button>
+  <button class="mob-nav-btn" id="mob-btn-hustles" onclick="showPage('hustles');updateMobTitle('hustles')">
+    <span class="mob-icon">🚀</span><span class="mob-label">Hustles</span>
+  </button>
+  <button class="mob-nav-btn" id="mob-btn-more" onclick="openMobMenu()">
+    <span class="mob-icon">⋯</span><span class="mob-label">More</span>
   </button>
 </div>
 
@@ -990,7 +999,7 @@
 <main class="main">
 
   <!-- ═══ DASHBOARD ═══ -->
-  <div class="page" id="page-dashboard">
+  <div class="page active" id="page-dashboard">
     <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between">
       <p id="dash-date" style="font-size:13px;color:var(--muted2);font-weight:500"></p>
     </div>
@@ -4181,7 +4190,10 @@ updateSaveStatus();
 // setTimeout(0) inside load defers to after the browser's first paint of the
 // fully-laid-out page, so canvas dimensions are real before Chart.js renders.
 window.addEventListener('load', function() {
-  setTimeout(function() { showPage('dashboard'); }, 0);
+  setTimeout(function() {
+    showPage('dashboard');
+    updateMobTitle('dashboard');
+  }, 0);
 });
 
 // One-time hustle cleanup — keep only Jet Washing + Personal Brands
@@ -4886,6 +4898,10 @@ function updateMobTitle(page) {
   };
   const t = document.getElementById('mob-topbar-title');
   if (t) t.textContent = names[page] || '💰 MONEY OS';
+  // Highlight the active bottom nav button
+  document.querySelectorAll('.mob-nav-btn').forEach(b => b.classList.remove('mob-active'));
+  const activeBtn = document.getElementById('mob-btn-' + page);
+  if (activeBtn) activeBtn.classList.add('mob-active');
 }
 
 // Cross-frame: accept showMoneyPage from the Life OS hub
