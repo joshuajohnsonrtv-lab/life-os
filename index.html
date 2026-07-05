@@ -204,14 +204,37 @@
   }
 
   function onFrameLoad(name) {
-    // Wait one rAF so the iframe has time to paint before the overlay is removed.
-    // This prevents the race where the overlay drops before the iframe's first frame renders.
-    requestAnimationFrame(function() {
-      const overlay = document.getElementById('load-' + name);
-      if (overlay) overlay.remove();
-      document.getElementById('tab-' + name).classList.add('ready');
-    });
+    // For money, we wait for the iframe to post 'moneyReady' before removing the
+    // overlay — that fires after renderDashboard() has actually run and painted.
+    // Other frames use the old rAF fallback.
+    if (name !== 'money') {
+      requestAnimationFrame(function() {
+        const overlay = document.getElementById('load-' + name);
+        if (overlay) overlay.remove();
+        document.getElementById('tab-' + name).classList.add('ready');
+      });
+    }
+    // Failsafe: if moneyReady never arrives, drop the overlay after 3s
+    if (name === 'money') {
+      setTimeout(function() {
+        const overlay = document.getElementById('load-money');
+        if (overlay) overlay.remove();
+        document.getElementById('tab-money').classList.add('ready');
+      }, 3000);
+    }
   }
+
+  // Money iframe signals when it has actually rendered data
+  window.addEventListener('message', function(ev) {
+    if (ev.data && ev.data.action === 'moneyReady') {
+      requestAnimationFrame(function() {
+        const overlay = document.getElementById('load-money');
+        if (overlay) overlay.remove();
+        document.getElementById('tab-money').classList.add('ready');
+      });
+    }
+    // existing cross-frame routing below
+  });
 
   // Always boot to Money Dashboard — no session restore.
 

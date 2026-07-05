@@ -4212,19 +4212,21 @@ updateSaveStatus();
 showPage('dashboard');
 updateMobTitle('dashboard');
 
-// Belt-and-suspenders: re-render after 300ms in case localStorage was not yet
-// readable on the first synchronous pass (iframe + Safari quirk) or Firebase
-// fired and overwrote the dashboard with stale cloud data.
+// Init Firebase AFTER first render so its async callback doesn't race with boot
+setTimeout(function() {
+  if(getFbConfig()) initFirebase(); else updateCloudStatus('off');
+}, 200);
+
+// Re-render the dashboard and then signal the parent that we're ready.
+// The parent holds the loading overlay until this fires, so the user never
+// sees the blank placeholder HTML — they only see the populated dashboard.
 setTimeout(function() {
   if (document.querySelector('.page.active')?.id === 'page-dashboard') {
     renderDashboard();
   }
-}, 300);
-
-// Init Firebase AFTER first render so its async callback doesn't race with boot
-setTimeout(function() {
-  if(getFbConfig()) initFirebase(); else updateCloudStatus('off');
-}, 400);
+  // Tell index.html we're done — it will lift the overlay on the next paint
+  try { window.parent.postMessage({ action: 'moneyReady' }, '*'); } catch(e) {}
+}, 350);
 
 // One-time hustle cleanup — keep only Jet Washing + Personal Brands
 (function() {
