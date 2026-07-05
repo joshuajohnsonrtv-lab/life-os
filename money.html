@@ -1770,9 +1770,22 @@ function getData() {
     const stored = JSON.parse(localStorage.getItem('money_os_data'));
     if (!stored) return JSON.parse(JSON.stringify(DEFAULT_DATA));
     const def = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    // Deep merge: fix any null/missing values at both top-level AND nested level
     for (const key of Object.keys(def)) {
-      // == null catches both undefined and null (corrupted/missing keys)
-      if (stored[key] == null) stored[key] = def[key];
+      if (stored[key] == null) { stored[key] = def[key]; continue; }
+      // For plain objects (not arrays), also patch any missing nested keys
+      if (typeof def[key] === 'object' && !Array.isArray(def[key]) &&
+          typeof stored[key] === 'object' && !Array.isArray(stored[key])) {
+        for (const subKey of Object.keys(def[key])) {
+          if (stored[key][subKey] == null) stored[key][subKey] = def[key][subKey];
+        }
+      }
+    }
+    // Ensure income.entries contains only valid entries (non-null date & amount)
+    if (Array.isArray(stored.income?.entries)) {
+      stored.income.entries = stored.income.entries.filter(
+        e => e && typeof e.date === 'string' && e.date.length && (e.amount != null)
+      );
     }
     // migrate: rename legacy "Freelance" source → "Hustle"
     if (stored.income?.sources) {
@@ -1871,7 +1884,7 @@ function renderDashboard() {
   const data = getData();
   const now = new Date();
   const thisMonth = today().slice(0, 7);
-  const entries = data.income.entries || [];
+  const entries = (data.income?.entries || []).filter(e => e && typeof e.date === 'string');
   const thisMonthEntries = entries.filter(e => e.date.startsWith(thisMonth));
   const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const lastMonth = lastMonthDate.toISOString().slice(0, 7);
