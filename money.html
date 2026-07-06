@@ -2009,7 +2009,7 @@ function renderDashboard() {
   if (hustlesEl) {
     const hustles = (data.hustles?.items||[]).filter(h => h.status !== 'idea').slice(0, 4);
     if (!hustles.length) {
-      hustlesEl.innerHTML = `<div class="empty"><div class="empty-icon">🚀</div><p>No active hustles</p><button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="openDashHustlePicker()">Select a Hustle</button></div>`;
+      hustlesEl.innerHTML = `<div class="empty"><div class="empty-icon">🚀</div><p>No active hustles — use Select above</p></div>`;
     } else {
       const statusColors = { earning:'var(--green)', active:'var(--gold)', building:'var(--cyan)', idea:'var(--muted)' };
       const statusLabels = { earning:'💸 Earning', active:'🔥 Active', building:'🔨 Building', idea:'💡 Idea' };
@@ -2031,28 +2031,42 @@ function openDashHustlePicker() {
   const listEl  = document.getElementById('dash-hustle-picker-list');
   if (!listEl) return;
 
-  const statusColors  = { earning:'var(--green)', active:'var(--gold)', building:'var(--cyan)', idea:'var(--muted)' };
-  const statusLabels  = { earning:'💸 Earning', active:'🔥 Active', building:'🔨 Building', idea:'💡 Idea' };
+  const statusColors = { earning:'var(--green)', active:'var(--gold)', building:'var(--cyan)', idea:'var(--muted)' };
+  const statusLabels = { earning:'💸 Earning', active:'🔥 Active', building:'🔨 Building', idea:'💡 Idea' };
 
   if (!hustles.length) {
     listEl.innerHTML = `<div style="text-align:center;padding:24px;color:var(--muted)">
       <div style="font-size:32px;margin-bottom:8px">🚀</div>
-      <p>No hustles yet. Head to the Hustles page to create your first one.</p>
+      <p>No hustles yet — go to Hustles to create your first one.</p>
     </div>`;
   } else {
-    listEl.innerHTML = hustles.map(h => `
-      <div onclick="closeModal('modal-dash-hustle-picker');openHustleModal('${h.id}')"
-           style="display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:6px;background:var(--card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color 0.15s"
-           onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
+    listEl.innerHTML = hustles.map(h => {
+      const isActive = h.status && h.status !== 'idea';
+      return `<div onclick="dashActivateHustle('${h.id}')"
+           style="display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:6px;background:${isActive ? 'rgba(245,197,66,0.06)' : 'var(--card2)'};border:1px solid ${isActive ? 'rgba(245,197,66,0.3)' : 'var(--border)'};border-radius:10px;cursor:pointer;transition:border-color 0.15s"
+           onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='${isActive ? 'rgba(245,197,66,0.3)' : 'var(--border)'}'">
         <div>
           <div style="font-size:14px;font-weight:700">${h.name || 'Unnamed Hustle'}</div>
-          ${h.desc ? `<div style="font-size:11px;color:var(--muted);margin-top:2px">${h.desc.slice(0,60)}${h.desc.length>60?'…':''}</div>` : ''}
+          ${h.desc ? `<div style="font-size:11px;color:var(--muted);margin-top:2px">${h.desc.slice(0,55)}${h.desc.length>55?'…':''}</div>` : ''}
         </div>
-        <span style="font-size:11px;font-weight:700;color:${statusColors[h.status]||'var(--muted)'};flex-shrink:0;margin-left:12px">${statusLabels[h.status]||h.status||'—'}</span>
-      </div>`).join('');
+        <span style="font-size:11px;font-weight:700;color:${statusColors[h.status]||'var(--muted)'};flex-shrink:0;margin-left:12px">${isActive ? '✓ ' : ''}${statusLabels[h.status]||'Idea'}</span>
+      </div>`;
+    }).join('');
   }
 
-  openModal('modal-dash-hustle-picker');
+  document.getElementById('modal-dash-hustle-picker').style.display = 'flex';
+}
+
+function dashActivateHustle(id) {
+  const data = getData();
+  const h = (data.hustles?.items || []).find(x => x.id === id);
+  if (!h) return;
+  // Toggle: if already active/building/earning, switch back to idea; otherwise make active
+  h.status = (h.status && h.status !== 'idea') ? 'idea' : 'active';
+  saveData(data);
+  renderDashboard();
+  // Refresh picker list in place
+  openDashHustlePicker();
 }
 
 // ══════════════════════════════════════════════════
