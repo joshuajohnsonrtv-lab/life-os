@@ -6080,7 +6080,6 @@ function syncFromFirebase() {
     console.warn('Firebase pull failed:', e);
     updateCloudStatus('offline');
     _fbInitialSyncDone = true;
-    showToast('💥 Wellness sync error: ' + (e.code||e.message||e));
   });
 
   // Listen for real-time updates from other devices

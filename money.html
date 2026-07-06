@@ -984,7 +984,7 @@
     <div id="save-status">Not saved yet</div>
     <div id="cloud-status" style="font-size:11px;margin-top:4px;cursor:pointer" onclick="openFirebaseSetup()"><span style="color:var(--muted)">○ Cloud sync off</span></div>
     <div style="display:flex;gap:18px;justify-content:center;padding:10px 0 2px">
-      <span title="Cloud Sync" onclick="openFirebaseSetup()" style="font-size:17px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">☁️</span>
+      <span id="money-cloud-icon" title="Cloud Sync" onclick="openFirebaseSetup()" style="font-size:17px;cursor:pointer;opacity:0.28;transition:opacity 0.3s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity=window._moneyCloudOn?'1':'0.28'">☁️</span>
       <span title="Export backup" onclick="exportData()" style="font-size:17px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">💾</span>
       <span title="Import backup" onclick="document.getElementById('import-file').click()" style="font-size:17px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">📂</span>
     </div>
@@ -4253,7 +4253,7 @@ function syncFromFirebase() {
     }
     _fbInitDone = true;
     updateCloudStatus('connected');
-  }).catch(function(e) { console.warn('Firebase pull failed:',e); updateCloudStatus('offline'); _fbInitDone=true; showToast('💥 Money sync error: ' + (e.code||e.message||e)); });
+  }).catch(function(e) { console.warn('Firebase pull failed:',e); updateCloudStatus('offline'); _fbInitDone=true; });
 
   fbRef('main').on('value', function(snap) {
     if (_fbSyncing||!_fbInitDone) return;
@@ -4286,6 +4286,10 @@ function updateCloudStatus(status) {
   if (el) el.innerHTML = '<span style="color:'+pair[1]+'">'+pair[0]+'</span>';
   const mob = document.getElementById('mob-menu-cloud-status');
   if (mob) { mob.textContent = pair[0]; mob.style.color = pair[1]; }
+  // Brighten the ☁️ icon in the sidebar when connected
+  window._moneyCloudOn = (status === 'connected');
+  const icon = document.getElementById('money-cloud-icon');
+  if (icon) icon.style.opacity = window._moneyCloudOn ? '1' : '0.28';
 }
 
 function openFirebaseSetup() {

@@ -1440,8 +1440,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 <!-- ── BOTTOM UTILITY BAR ── -->
 <div id="sim-bottom-bar" style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:22px;padding:7px 18px;border-top:1px solid var(--border);background:var(--bg)">
-  <span id="sim-cloud-status" style="font-size:10px;color:var(--muted);white-space:nowrap;cursor:pointer" onclick="openSimFirebaseSetup()" title="Cloud Sync">○</span>
-  <span title="Cloud Sync" onclick="openSimFirebaseSetup()" style="font-size:16px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">☁️</span>
+  <span id="sim-cloud-status" style="font-size:11px;color:var(--muted);cursor:pointer;transition:color 0.3s" onclick="openSimFirebaseSetup()" title="Cloud sync status">●</span>
+  <span title="Cloud Sync settings" onclick="openSimFirebaseSetup()" style="font-size:16px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">☁️</span>
   <span title="Export backup" onclick="exportSimData()" style="font-size:16px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">💾</span>
   <span title="Import backup" onclick="document.getElementById('sim-import-file').click()" style="font-size:16px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">📂</span>
   <input type="file" id="sim-import-file" accept=".json" style="display:none" onchange="importSimData(event)">
@@ -3416,9 +3416,10 @@ function pushSimToFirebase() {
 }
 
 function updateSimCloudStatus(status) {
-  const map = { connected: '☁️', syncing: '↻', offline: '⚠️', error: '✕', off: '○' };
+  const colours = { connected: '#22c55e', syncing: '#f5c542', offline: '#f97316', error: '#ef4444', off: '#6b7280' };
+  const titles  = { connected: '☁️ Cloud sync on', syncing: '☁️ Syncing…', offline: '⚠️ Cloud offline', error: '❌ Sync error', off: '○ Cloud sync off' };
   const el = document.getElementById('sim-cloud-status');
-  if (el) el.textContent = map[status] || '○';
+  if (el) { el.style.color = colours[status] || colours.off; el.title = titles[status] || titles.off; }
 }
 
 // Hook pushSimToFirebase into the existing save flow
