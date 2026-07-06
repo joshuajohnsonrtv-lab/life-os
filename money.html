@@ -4253,7 +4253,7 @@ function syncFromFirebase() {
     }
     _fbInitDone = true;
     updateCloudStatus('connected');
-  }).catch(function(e) { console.warn('Firebase pull failed:',e); updateCloudStatus('offline'); _fbInitDone=true; });
+  }).catch(function(e) { console.warn('Firebase pull failed:',e); updateCloudStatus('offline'); _fbInitDone=true; showToast('💥 Money sync error: ' + (e.code||e.message||e)); });
 
   fbRef('main').on('value', function(snap) {
     if (_fbSyncing||!_fbInitDone) return;
