@@ -1694,6 +1694,9 @@
 </div>
 
 <script>
+// CHECKPOINT 1: script block started
+(function(){ var d=document.getElementById('debug-strip'); if(d) d.textContent='[CP1] Script started — DEFAULT_DATA about to be defined'; })();
+
 // ══════════════════════════════════════════════════
 // DATA
 // ══════════════════════════════════════════════════
@@ -1754,6 +1757,9 @@ const DEFAULT_DATA = {
   }
 };
 
+// CHECKPOINT 2: DEFAULT_DATA defined
+(function(){ var d=document.getElementById('debug-strip'); if(d) d.textContent='[CP2] DEFAULT_DATA defined — purgeAllHustles IIFE about to run'; })();
+
 // ── One-time cleanup: clear ALL hustles ───────────────────────────────────
 (function purgeAllHustles() {
   if (localStorage.getItem('money_os_hustles_purged_v2')) return;
@@ -1767,6 +1773,9 @@ const DEFAULT_DATA = {
   } catch(e) {}
   localStorage.setItem('money_os_hustles_purged_v2','1');
 })();
+
+// CHECKPOINT 3: past purgeAllHustles
+(function(){ var d=document.getElementById('debug-strip'); if(d) d.textContent='[CP3] Past purgeAllHustles — entering function definitions…'; })();
 
 function getData() {
   try {
@@ -4227,6 +4236,10 @@ function disconnectFirebase() {
 // ══════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════
+
+// CHECKPOINT 4: reached init section
+(function(){ var d=document.getElementById('debug-strip'); if(d) d.textContent='[CP4] Reached init section — calling updateSaveStatus then showPage…'; })();
+
 updateSaveStatus();
 
 // Boot via showPage so the init code path is identical to pressing the Home button.
