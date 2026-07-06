@@ -714,12 +714,29 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 }
 
 /* ── SEATED IDLE (in chair, no activity) ── */
+@keyframes char-seated-breathe {
+  0%,100% { transform:translateY(0); }
+  50%     { transform:translateY(-0.7px); }
+}
 .char-figure.seated-idle{
-  animation:none; /* no bob while sitting still */
+  animation:char-seated-breathe 3.4s ease-in-out infinite;
 }
 .char-figure.seated-idle .char-body{
-  /* Shorter bottom half — legs hidden by chair seat */
-  clip-path:polygon(0% 0%,100% 0%,82% 52%,82% 76%,18% 76%,18% 52%);
+  /* Thighs flare wider than waist → suggests bent legs resting on chair seat */
+  clip-path:polygon(0% 0%,100% 0%,82% 52%,96% 80%,4% 80%,18% 52%);
+}
+.char-figure.seated-idle .char-body::after{
+  display:none; /* leg-split line hidden — legs are behind chair seat */
+}
+
+/* ── POST-WORKOUT flash (brief pump animation after gym is logged) ── */
+@keyframes char-post-workout {
+  0%,100% { transform:scale(1)    translateY(0);    }
+  25%     { transform:scale(1.07) translateY(-2px); }
+  75%     { transform:scale(1.03) translateY(-1px); }
+}
+.char-figure.post-workout{
+  animation:char-post-workout 0.85s ease-in-out 3;
 }
 
 /* ── AT-DESK WORKING (seated, bird's-eye facing UP toward desk) ──
@@ -2346,6 +2363,33 @@ function stopActivity(e) {
     localStorage.setItem('life_sim_activity_log', JSON.stringify(log.slice(0, 200)));
   } catch(err) {}
   clearActivityTimer();
+
+  // ── Sleep → Wellness auto-log ──
+  // Capture before we null them out below
+  const _wasSleep = (_activityName || '').startsWith('😴') || (_activityName || '').startsWith('💤');
+  if (_wasSleep && _activityStart) {
+    try {
+      const sleepStartDate = new Date(_activityStart);
+      const sleepEndDate   = new Date();
+      const sleepDateKey   = sleepStartDate.toLocaleDateString('en-CA', { timeZone: 'Europe/London' });
+      const bedTimeFmt  = sleepStartDate.toLocaleTimeString('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit' });
+      const wakeTimeFmt = sleepEndDate.toLocaleTimeString('en-GB',   { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit' });
+      const wd = JSON.parse(localStorage.getItem('wellness_data') || '{}');
+      if (!wd.sleep)      wd.sleep     = { log: {}, goal: 8 };
+      if (!wd.sleep.log)  wd.sleep.log = {};
+      // Only write if no existing manual entry (don't overwrite something the user typed themselves)
+      if (!wd.sleep.log[sleepDateKey] || wd.sleep.log[sleepDateKey].fromSim) {
+        wd.sleep.log[sleepDateKey] = {
+          bedtime: bedTimeFmt, wakeTime: wakeTimeFmt,
+          quality: 0, notes: '⏱ Logged from Life Sim',
+          timestamp: new Date().toISOString(), fromSim: true
+        };
+        localStorage.setItem('wellness_data', JSON.stringify(wd));
+        setTimeout(() => showSimToast('😴 Sleep logged to Wellness!'), 500);
+      }
+    } catch(err) {}
+  }
+
   resetCharVisual();
   moveChar('center');   // always walk back to middle when activity ends
   _activityStart    = null;
@@ -3320,6 +3364,77 @@ window.addEventListener('pageshow', function(e) {
     loadState();
   }
 });
+
+// ─────────────────────────────────────────────
+//  WELLNESS BRIDGE — cross-iframe localStorage sync
+//  Wellness writes 'life_sim_wellness_bridge' → Sim reacts
+// ─────────────────────────────────────────────
+window.addEventListener('storage', function(e) {
+  if (e.key !== 'life_sim_wellness_bridge' || !e.newValue) return;
+  try {
+    const msg = JSON.parse(e.newValue);
+    if (msg.type === 'workout')      _handleWellnessBridgeWorkout(msg);
+    else if (msg.type === 'sleep_logged') _handleWellnessBridgeSleep(msg);
+  } catch(err) {}
+});
+
+function _handleWellnessBridgeWorkout(msg) {
+  if (_manualStatus) return; // don't interrupt active activity
+  // Post-workout status bubble
+  const muscleStr = (msg.muscles || []).join(', ') || 'Full body';
+  _manualStatus     = '💪 Post-workout';
+  _manualStatusTime = Date.now();
+  const bubble = document.getElementById('char-bubble');
+  if (bubble) {
+    bubble.innerHTML  = '💪 Post-workout · ' + muscleStr;
+    bubble.style.borderColor = 'var(--green)';
+  }
+  // Pump animation (3 bounces, ~2.6s total)
+  const figure = document.getElementById('char-figure');
+  if (figure && !figure.classList.contains('laying') && !figure.classList.contains('at-desk')) {
+    figure.classList.add('post-workout');
+    setTimeout(() => figure.classList.remove('post-workout'), 2700);
+  }
+  render(); // picks up fan-on + output % from updated wellness_data
+  showSimToast('💪 Gym session synced!');
+}
+
+function _handleWellnessBridgeSleep(msg) {
+  const now  = new Date();
+  const nowM = now.getHours() * 60 + now.getMinutes();
+
+  function _hhmm2mins(hhmm) {
+    if (!hhmm) return null;
+    const parts = hhmm.split(':');
+    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+  }
+  function _diffMins(m1, m2) {
+    if (m1 === null || m2 === null) return 9999;
+    let d = Math.abs(m1 - m2);
+    if (d > 720) d = 1440 - d; // wrap midnight
+    return d;
+  }
+
+  const wakeM = _hhmm2mins(msg.wakeTime);
+  const bedM  = _hhmm2mins(msg.bedtime);
+  const wakeIsRecent = _diffMins(wakeM, nowM) <= 60;
+
+  if (wakeIsRecent && (_manualStatus === '😴 Sleeping' || _manualStatus === '💤 Napping')) {
+    // User just logged their wake-up and character is still "asleep" → wake it
+    stopActivity(null);
+    showSimToast('☀️ Good morning — sleep synced from Wellness!');
+  } else if (!_manualStatus) {
+    // Just show a rested bubble
+    const hours = (msg.hours !== undefined) ? msg.hours : null;
+    const label = hours !== null ? '😴 Slept · ' + hours + 'h' : '😴 Sleep logged';
+    _manualStatus     = label;
+    _manualStatusTime = Date.now();
+    const bubble = document.getElementById('char-bubble');
+    if (bubble) { bubble.innerHTML = label; bubble.style.borderColor = 'var(--muted)'; }
+    render();
+    showSimToast('😴 Sleep logged from Wellness!');
+  }
+}
 
 // ─────────────────────────────────────────────
 //  CLOUD SYNC (Firebase Realtime Database)

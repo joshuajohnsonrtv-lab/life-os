@@ -2590,6 +2590,14 @@ function saveWorkout() {
     timestamp: new Date().toISOString()
   };
   saveData(data);
+  // ── Notify Life Sim ──
+  try {
+    localStorage.setItem('life_sim_wellness_bridge', JSON.stringify({
+      type: 'workout', ts: Date.now(),
+      muscles: selectedMuscles,
+      duration: parseInt(duration) || 0
+    }));
+  } catch(e) {}
   closeGymModal();
   renderGym();
   showToast('💪 Workout saved!');
@@ -2680,6 +2688,15 @@ function saveSleep() {
   const data = getData();
   data.sleep.log[today()] = { bedtime: bed, wakeTime: wake, quality: sleepStarVal, notes, timestamp: new Date().toISOString() };
   saveData(data);
+  // ── Notify Life Sim ──
+  try {
+    const hrs = calcSleepHours(bed, wake);
+    localStorage.setItem('life_sim_wellness_bridge', JSON.stringify({
+      type: 'sleep_logged', ts: Date.now(),
+      bedtime: bed, wakeTime: wake,
+      hours: hrs !== null ? Math.round(hrs * 10) / 10 : null
+    }));
+  } catch(e) {}
   renderSleep();
   showToast('😴 Sleep logged!');
 }
