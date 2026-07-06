@@ -1623,33 +1623,24 @@
 
   <!-- ========== MEAL IDEAS ========== -->
   <div class="page" id="page-mealideas">
-    <div class="page-header">
-      <div>
-        <h2>🍽️ Meal Ideas</h2>
-        <p>Suggestions tailored to your goal — tap any meal to log it instantly</p>
-      </div>
-    </div>
 
     <!-- Goal tabs -->
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
-      <div class="toggle-wrap" style="flex-wrap:wrap;margin-bottom:0" id="meal-goal-toggle">
-        <button class="toggle-btn active" onclick="setMealGoal('debloat')">🌊 Debloat</button>
-        <button class="toggle-btn" onclick="setMealGoal('muscle')">💪 Muscle Gain</button>
-        <button class="toggle-btn" onclick="setMealGoal('weight')">⚖️ Weight Gain</button>
-        <button class="toggle-btn" onclick="setMealGoal('highprotein')">🏋️ High Protein</button>
-        <button class="toggle-btn" onclick="setMealGoal('bulk')">💥 Bulk</button>
-        <button class="toggle-btn" id="meal-goal-btn-looksmax" onclick="setMealGoal('looksmax')" style="border-color:var(--amber);color:var(--amber)">🪞 Looksmax</button>
-        <button class="toggle-btn" onclick="setMealGoal('favourites')" style="border-color:var(--red);color:var(--red)">❤️ Favourites</button>
-        <button class="toggle-btn" onclick="setMealGoal('mymeal')" style="border-color:var(--purple);color:var(--purple)">🧑‍🍳 My Meals</button>
-      </div>
-      <button class="btn btn-primary btn-sm" onclick="openAddMealModal()" style="white-space:nowrap;flex-shrink:0">+ Add Meal</button>
+    <div class="toggle-wrap" style="flex-wrap:wrap;margin-bottom:6px" id="meal-goal-toggle">
+      <button class="toggle-btn active" onclick="setMealGoal('debloat')">🌊 Debloat</button>
+      <button class="toggle-btn" onclick="setMealGoal('muscle')">💪 Muscle Gain</button>
+      <button class="toggle-btn" onclick="setMealGoal('weight')">⚖️ Weight Gain</button>
+      <button class="toggle-btn" onclick="setMealGoal('highprotein')">🏋️ High Protein</button>
+      <button class="toggle-btn" onclick="setMealGoal('bulk')">💥 Bulk</button>
+      <button class="toggle-btn" id="meal-goal-btn-looksmax" onclick="setMealGoal('looksmax')" style="border-color:var(--amber);color:var(--amber)">🪞 Looksmax</button>
+      <button class="toggle-btn" onclick="setMealGoal('favourites')" style="border-color:var(--red);color:var(--red)">❤️ Favourites</button>
+      <button class="toggle-btn" onclick="setMealGoal('mymeal')" style="border-color:var(--purple);color:var(--purple)">🧑‍🍳 My Meals</button>
     </div>
 
-    <!-- Goal description banner -->
-    <div id="meal-goal-banner" class="tip" style="margin-bottom:20px;font-size:13px"></div>
+    <!-- Goal description — subtle one-liner -->
+    <div id="meal-goal-banner" style="font-size:11px;color:var(--muted);margin-bottom:14px;padding:0 2px"></div>
 
     <!-- Meal type filter -->
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px" id="meal-type-filter">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px" id="meal-type-filter">
       <button class="tag selected" style="background:var(--purple-dim);color:#fff" onclick="setMealTypeFilter('all')">All</button>
       <button class="tag" onclick="setMealTypeFilter('breakfast')">🌅 Breakfast</button>
       <button class="tag" onclick="setMealTypeFilter('lunch')">☀️ Lunch</button>
@@ -1657,8 +1648,11 @@
       <button class="tag" onclick="setMealTypeFilter('snack')">🍎 Snack</button>
     </div>
 
-    <!-- Search -->
-    <input type="text" id="meal-ideas-search" placeholder="🔍 Search meals..." style="max-width:320px;margin-bottom:20px" oninput="renderMealIdeas()">
+    <!-- Search + Add Meal -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+      <input type="text" id="meal-ideas-search" placeholder="🔍 Search meals..." style="flex:1;min-width:180px;max-width:320px;margin-bottom:0" oninput="renderMealIdeas()">
+      <button class="btn btn-primary btn-sm" onclick="openAddMealModal()" style="white-space:nowrap;flex-shrink:0">+ Add Meal</button>
+    </div>
 
     <!-- Meal cards grid -->
     <div id="meal-ideas-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px"></div>
