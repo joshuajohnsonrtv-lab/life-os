@@ -1853,8 +1853,19 @@ function showPage(page) {
   // Scroll the main content area back to the top
   const mainEl = document.querySelector('.main');
   if (mainEl) mainEl.scrollTop = 0;
+  // Debug: write to strip before renderPage so we know showPage ran
+  var _dbg = document.getElementById('debug-strip');
+  if (_dbg) _dbg.textContent = 'showPage("' + page + '") called — about to call renderPage…';
+
   // Render synchronously first so data shows before the first browser paint
-  try { renderPage(page); } catch(e) { console.error('renderPage error:', e); }
+  try {
+    renderPage(page);
+  } catch(e) {
+    // Surface the error in the debug strip — this is the catch that was hiding the bug
+    var _edbg = document.getElementById('debug-strip');
+    if (_edbg) _edbg.textContent = 'ERROR in renderPage("' + page + '"): ' + e.name + ': ' + e.message + ' | stack: ' + (e.stack||'').slice(0,200);
+    console.error('renderPage error:', e);
+  }
   // Also render via rAF for pages that use Chart.js (needs display:block for sizing)
   if (page === 'income' || page === 'expenses' || page === 'savings' || page === 'delusion') {
     requestAnimationFrame(function() {
