@@ -918,52 +918,88 @@
 
   <!-- ========== DASHBOARD ========== -->
   <div class="page active" id="page-dashboard">
-    <div class="page-header">
-      <div>
-        <h2>Good <span id="greeting-time"></span>, Joshua 👋</h2>
-        <p id="dashboard-date" style="color:var(--muted);font-size:14px;margin-top:4px;"></p>
-      </div>
-      <div class="date-pill" id="today-pill"></div>
-    </div>
 
-    <!-- Overview Grid -->
-    <div class="overview-grid" id="overview-grid"></div>
-
-    <!-- Switchable trend chart -->
-    <div class="card" style="margin-bottom:20px">
+    <!-- HERO -->
+    <div style="background:linear-gradient(135deg,#0f1117,#130d1e);border:1px solid var(--border);border-radius:16px;padding:28px 24px 22px;margin-bottom:14px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--cyan),transparent)"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div class="card-title" style="margin:0" id="dash-chart-title">😴 Sleep — Last 30 Days</div>
-        <select id="dash-chart-metric" onchange="renderDashChart()" style="font-size:12px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 8px">
-          <option value="sleep" selected>😴 Sleep</option>
-          <option value="hydration">💧 Hydration</option>
-          <option value="gym">🏋️ Gym</option>
-          <option value="calories">🥗 Calories</option>
-        </select>
+        <span id="dash-day-label" style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)"></span>
+        <span id="dash-greeting" style="font-size:12px;color:var(--muted2);font-weight:600"></span>
       </div>
-      <div style="position:relative;height:180px"><canvas id="chart-dash-main"></canvas></div>
+      <div style="display:flex;align-items:flex-end;gap:14px;margin-bottom:4px">
+        <div id="dash-hero-score" style="font-size:52px;font-weight:900;color:var(--purple);letter-spacing:-2px;line-height:1">0/7</div>
+        <div id="dash-hero-label" style="font-size:14px;color:var(--muted2);font-weight:600;padding-bottom:8px">habits done today</div>
+      </div>
+      <div id="dash-hero-delta" style="font-size:12px;color:var(--muted);margin-bottom:18px"></div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:99px;height:5px;overflow:hidden;margin-bottom:7px">
+        <div id="dash-hero-bar" style="height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:99px;width:0%;transition:width 0.5s ease"></div>
+      </div>
+      <div id="dash-hero-subtext" style="font-size:11px;color:var(--muted);display:flex;justify-content:space-between"></div>
     </div>
 
-    <!-- Today's Quick Log -->
+    <!-- METRIC PILLS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 12px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px;font-weight:700">😴 Sleep</div>
+        <div id="dash-pill-sleep" style="font-size:19px;font-weight:800;color:var(--purple)">—</div>
+        <div id="dash-pill-sleep-sub" style="font-size:10px;color:var(--muted);margin-top:3px">last night</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 12px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px;font-weight:700">💧 Water</div>
+        <div id="dash-pill-water" style="font-size:19px;font-weight:800;color:var(--cyan)">0</div>
+        <div id="dash-pill-water-sub" style="font-size:10px;color:var(--muted);margin-top:3px">glasses today</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 12px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px;font-weight:700">🏋️ Gym</div>
+        <div id="dash-pill-gym" style="font-size:19px;font-weight:800;color:var(--amber)">0</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">sessions this week</div>
+      </div>
+    </div>
+
+    <!-- CONTENT GRID -->
     <div class="grid-2">
-      <div class="card">
-        <div class="card-title">💧 Hydration Today</div>
-        <div style="text-align:center">
-          <div class="big-water-num" id="dash-water">0</div>
-          <div style="color:var(--muted);font-size:13px;">glasses of water</div>
-          <div style="margin-top:12px;display:flex;justify-content:center;gap:8px;">
-            <button class="btn btn-outline" onclick="changeWater(-1)">−</button>
-            <button class="btn" style="background:var(--cyan);color:#fff" onclick="changeWater(1)">+ Glass</button>
+      <!-- LEFT: today's habits + quick water log -->
+      <div>
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div class="card-title" style="margin:0">Today's Habits</div>
+            <span id="dash-habit-date" style="font-size:11px;color:var(--muted)"></span>
+          </div>
+          <div id="dash-habits-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">💧 Hydration</div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div id="dash-water" style="font-size:32px;font-weight:800;color:var(--cyan);line-height:1">0</div>
+              <div id="dash-water-goal-text" style="font-size:11px;color:var(--muted);margin-top:3px">glasses today</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-outline" onclick="changeWater(-1)" style="padding:8px 14px;font-size:18px">−</button>
+              <button class="btn" style="background:var(--cyan);color:#fff;padding:8px 14px;font-size:18px" onclick="changeWater(1)">+</button>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.06);border-radius:99px;height:4px;overflow:hidden;margin-top:12px">
+            <div id="dash-water-bar" style="height:100%;background:var(--cyan);border-radius:99px;width:0%;transition:width 0.4s"></div>
           </div>
         </div>
       </div>
+
+      <!-- RIGHT: trend chart -->
       <div class="card">
-        <div class="card-title">😴 Last Sleep</div>
-        <div id="dash-sleep" style="text-align:center;padding:10px 0;">
-          <div style="font-size:40px;font-weight:700;color:var(--purple)">—</div>
-          <div style="color:var(--muted);font-size:13px;">hours logged</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="card-title" style="margin:0" id="dash-chart-title">😴 Sleep — 30 Days</div>
+          <select id="dash-chart-metric" onchange="renderDashChart()" style="font-size:11px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 8px">
+            <option value="sleep" selected>😴 Sleep</option>
+            <option value="hydration">💧 Water</option>
+            <option value="gym">🏋️ Gym</option>
+            <option value="calories">🥗 Calories</option>
+          </select>
         </div>
+        <div style="position:relative;height:200px"><canvas id="chart-dash-main"></canvas></div>
       </div>
     </div>
+
   </div>
 
   <!-- ========== GYM ========== -->
@@ -2142,90 +2178,162 @@ function renderPage(page) {
 
 // ==================== DASHBOARD ====================
 function renderDashboard() {
-  const now = new Date();
-  const hour = now.getHours();
-  const greeting = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
-  document.getElementById('greeting-time').textContent = greeting;
-  document.getElementById('dashboard-date').textContent = now.toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
-  document.getElementById('today-pill').textContent = today();
+  const now   = new Date();
+  const hour  = now.getHours();
+  const data  = getData();
+  const t     = today();
 
-  const data = getData();
-  const t = today();
+  // ── Hero header ──────────────────────────────────────────────────────
+  const dayLabel = document.getElementById('dash-day-label');
+  if (dayLabel) dayLabel.textContent =
+    now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }).toUpperCase();
 
-  // Overview cards
+  const greetEl = document.getElementById('dash-greeting');
+  if (greetEl) greetEl.textContent =
+    hour < 12 ? '🌅 Good morning, Joshua' : hour < 17 ? '☀️ Good afternoon, Joshua' : '🌙 Good evening, Joshua';
+
+  // ── Habit sections ───────────────────────────────────────────────────
   const sections = [
-    { key: 'gym', icon: '🏋️', name: 'Gym', fn: () => {
-      const log = data.gym.log[t];
-      if(!log) return {status:'skip', text:'Not logged'};
-      return {status:'done', text: (log.muscleGroups||[]).join(', ') || 'Logged'};
+    { key:'gym',       icon:'🏋️', name:'Gym',       fn:() => {
+      const log = data.gym?.log?.[t];
+      if (!log) return { status:'skip', text:'Not logged' };
+      return { status:'done', text:(log.muscleGroups||[]).join(', ')||'Logged' };
     }},
-    { key: 'sleep', icon: '😴', name: 'Sleep', fn: () => {
-      const log = data.sleep.log[t];
-      if(!log) return {status:'skip', text:'Not logged'};
+    { key:'sleep',     icon:'😴', name:'Sleep',     fn:() => {
+      const log = data.sleep?.log?.[t];
+      if (!log) return { status:'skip', text:'Not logged' };
       const h = calcSleepHours(log.bedtime, log.wakeTime);
-      return {status: h >= data.sleep.goal ? 'done' : 'partial', text: h ? h+'h' : 'Logged'};
+      return { status: h >= (data.sleep?.goal||7) ? 'done' : 'partial', text: h ? h+'h' : 'Logged' };
     }},
-    { key: 'hydration', icon: '💧', name: 'Hydration', fn: () => {
-      const glasses = data.hydration.log[t] || 0;
-      const goal = data.hydration.goal || 8;
-      if(glasses === 0) return {status:'skip', text:'0 glasses'};
-      return {status: glasses >= goal ? 'done' : 'partial', text: glasses+'/'+goal+' glasses'};
+    { key:'hydration', icon:'💧', name:'Hydration', fn:() => {
+      const g = data.hydration?.log?.[t] || 0;
+      const goal = data.hydration?.goal || 8;
+      if (!g) return { status:'skip', text:'0 glasses' };
+      return { status: g >= goal ? 'done' : 'partial', text: g+'/'+goal+' glasses' };
     }},
-    { key: 'diet', icon: '🥗', name: 'Diet', fn: () => {
-      const log = data.diet.log[t];
-      if(!log || !(log.meals||[]).length) return {status:'skip', text:'No meals'};
-      return {status:'partial', text: log.meals.length+' meals'};
+    { key:'diet',      icon:'🥗', name:'Diet',      fn:() => {
+      const log = data.diet?.log?.[t];
+      if (!log || !(log.meals||[]).length) return { status:'skip', text:'No meals' };
+      return { status:'partial', text: log.meals.length+' meals' };
     }},
-    { key: 'skincare', icon: '🧴', name: 'Skincare', fn: () => {
-      const log = data.skincare.log[t] || {};
-      const mDone = (log.morning||[]).length;
-      const eDone = (log.evening||[]).length;
-      const mTotal = data.skincare.morning.length;
-      const eTotal = data.skincare.evening.length;
-      if(!mDone && !eDone) return {status:'skip', text:'Not started'};
-      if(mDone>=mTotal && eDone>=eTotal) return {status:'done', text:'Full routine'};
-      return {status:'partial', text: `AM:${mDone}/${mTotal} PM:${eDone}/${eTotal}`};
+    { key:'skincare',  icon:'🧴', name:'Skincare',  fn:() => {
+      const log = data.skincare?.log?.[t] || {};
+      const mDone = (log.morning||[]).length, eDone = (log.evening||[]).length;
+      const mTot  = (data.skincare?.morning||[]).length, eTot = (data.skincare?.evening||[]).length;
+      if (!mDone && !eDone) return { status:'skip', text:'Not started' };
+      if (mDone >= mTot && eDone >= eTot) return { status:'done', text:'Full routine' };
+      return { status:'partial', text:`AM:${mDone}/${mTot} PM:${eDone}/${eTot}` };
     }},
-    { key: 'facial', icon: '✨', name: 'Facial', fn: () => {
-      const log = data.facialExercises.log[t] || {};
+    { key:'facial',    icon:'✨', name:'Facial',    fn:() => {
+      const log  = data.facialExercises?.log?.[t] || {};
       const done = (log.completed||[]).length;
-      const total = data.facialExercises.exercises.length;
-      if(!done) return {status:'skip', text:'Not done'};
-      return {status: done>=total ? 'done' : 'partial', text: done+'/'+total+' done'};
+      const tot  = (data.facialExercises?.exercises||[]).length;
+      if (!done) return { status:'skip', text:'Not done' };
+      return { status: done >= tot ? 'done' : 'partial', text: done+'/'+tot+' done' };
     }},
-    { key: 'mewing', icon: '😤', name: 'Mewing', fn: () => {
-      const log = data.mewing.log[t];
-      if(!log || !log.done) return {status:'skip', text:'Not logged'};
-      return {status:'done', text: log.duration ? log.duration+'min' : 'Done'};
+    { key:'retention', icon:'😤', name:'Mewing',    fn:() => {
+      const log = data.mewing?.log?.[t];
+      if (!log || !log.done) return { status:'skip', text:'Not logged' };
+      return { status:'done', text: log.duration ? log.duration+'min' : 'Done' };
     }},
   ];
 
-  const grid = document.getElementById('overview-grid');
-  grid.innerHTML = sections.map(s => {
-    const result = s.fn();
-    const cls = result.status === 'done' ? 'oc-done' : result.status === 'partial' ? 'oc-partial' : 'oc-skip';
-    const indicator = result.status === 'done' ? '✅' : result.status === 'partial' ? '⏳' : '○';
-    return `<div class="overview-card" onclick="showPage('${s.key}')">
-      <div class="oc-icon">${s.icon}</div>
-      <div class="oc-name">${s.name}</div>
-      <div class="oc-status ${cls}">${indicator} ${result.text}</div>
-    </div>`;
-  }).join('');
+  const done    = sections.filter(s => s.fn().status === 'done').length;
+  const total   = sections.length;
+  const heroPct = Math.round((done / total) * 100);
 
-  // Water on dashboard
-  document.getElementById('dash-water').textContent = data.hydration.log[t] || 0;
+  // Hero score
+  const scoreEl = document.getElementById('dash-hero-score');
+  if (scoreEl) scoreEl.textContent = done + '/' + total;
+  const scoreColor = done === total ? 'var(--green)' : done >= Math.ceil(total * 0.6) ? 'var(--purple)' : 'var(--amber)';
+  if (scoreEl) scoreEl.style.color = scoreColor;
 
-  // Sleep on dashboard
-  const sleepLog = data.sleep.log[t];
-  const sleepEl = document.getElementById('dash-sleep');
-  if(sleepLog) {
-    const h = calcSleepHours(sleepLog.bedtime, sleepLog.wakeTime);
-    sleepEl.innerHTML = `<div style="font-size:40px;font-weight:700;color:var(--purple)">${h || '?'}</div><div style="color:var(--muted);font-size:13px;">hours logged</div>`;
-  } else {
-    sleepEl.innerHTML = `<div style="font-size:40px;font-weight:700;color:var(--purple)">—</div><div style="color:var(--muted);font-size:13px;">not logged yet</div>`;
+  const barEl = document.getElementById('dash-hero-bar');
+  if (barEl) {
+    barEl.style.width = heroPct + '%';
+    barEl.style.background = done === total
+      ? 'linear-gradient(90deg,var(--green),var(--cyan))'
+      : 'linear-gradient(90deg,var(--purple),var(--cyan))';
   }
 
-  // Streaks
+  const deltaEl = document.getElementById('dash-hero-delta');
+  if (deltaEl) {
+    if (done === 0) deltaEl.textContent = 'Nothing logged yet today — let\'s get started 💪';
+    else if (done === total) deltaEl.innerHTML = '<span style="color:var(--green);font-weight:700">🎯 Perfect day — every habit done!</span>';
+    else deltaEl.textContent = `${total - done} habit${total - done > 1 ? 's' : ''} still to go`;
+  }
+
+  const subtextEl = document.getElementById('dash-hero-subtext');
+  if (subtextEl) {
+    const partial = sections.filter(s => { const r = s.fn(); return r.status === 'partial'; }).length;
+    subtextEl.innerHTML = `<span>${heroPct}% complete</span><span>${partial} in progress</span>`;
+  }
+
+  // ── Metric pills ─────────────────────────────────────────────────────
+  // Sleep pill
+  const sleepLog = data.sleep?.log?.[t];
+  const sleepHrs = sleepLog ? calcSleepHours(sleepLog.bedtime, sleepLog.wakeTime) : null;
+  const pillSleep = document.getElementById('dash-pill-sleep');
+  if (pillSleep) pillSleep.textContent = sleepHrs ? sleepHrs + 'h' : '—';
+  const pillSleepSub = document.getElementById('dash-pill-sleep-sub');
+  if (pillSleepSub) {
+    const goal = data.sleep?.goal || 7;
+    pillSleepSub.textContent = sleepHrs
+      ? (sleepHrs >= goal ? '✓ goal met' : 'goal: ' + goal + 'h')
+      : 'not logged yet';
+  }
+
+  // Water pill
+  const waterGlasses = data.hydration?.log?.[t] || 0;
+  const waterGoal    = data.hydration?.goal || 8;
+  const pillWater    = document.getElementById('dash-pill-water');
+  if (pillWater) pillWater.textContent = waterGlasses;
+  const pillWaterSub = document.getElementById('dash-pill-water-sub');
+  if (pillWaterSub) pillWaterSub.textContent = waterGlasses >= waterGoal ? '✓ goal met' : 'goal: ' + waterGoal + ' glasses';
+
+  // Gym pill — sessions this week
+  const weekStart = new Date(now); weekStart.setDate(now.getDate() - now.getDay());
+  let gymWeek = 0;
+  for (let i = 0; i <= 6; i++) {
+    const d = new Date(weekStart); d.setDate(weekStart.getDate() + i);
+    const key = d.toISOString().split('T')[0];
+    if (data.gym?.log?.[key]) gymWeek++;
+  }
+  const pillGym = document.getElementById('dash-pill-gym');
+  if (pillGym) pillGym.textContent = gymWeek;
+
+  // ── Habits list ──────────────────────────────────────────────────────
+  const listEl = document.getElementById('dash-habits-list');
+  if (listEl) {
+    listEl.innerHTML = sections.map(s => {
+      const r = s.fn();
+      const color  = r.status === 'done' ? 'var(--green)' : r.status === 'partial' ? 'var(--amber)' : 'var(--muted)';
+      const dot    = r.status === 'done' ? '✓' : r.status === 'partial' ? '◑' : '○';
+      return `<div onclick="showPage('${s.key}')" style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:16px">${s.icon}</span>
+          <span style="font-size:13px;font-weight:600">${s.name}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:var(--muted)">${r.text}</span>
+          <span style="font-size:13px;font-weight:700;color:${color}">${dot}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  const habitDateEl = document.getElementById('dash-habit-date');
+  if (habitDateEl) habitDateEl.textContent = now.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+
+  // ── Hydration card ───────────────────────────────────────────────────
+  const waterEl = document.getElementById('dash-water');
+  if (waterEl) waterEl.textContent = waterGlasses;
+  const waterGoalText = document.getElementById('dash-water-goal-text');
+  if (waterGoalText) waterGoalText.textContent = waterGlasses + ' / ' + waterGoal + ' glasses';
+  const waterBarEl = document.getElementById('dash-water-bar');
+  if (waterBarEl) waterBarEl.style.width = Math.min(100, Math.round((waterGlasses / waterGoal) * 100)) + '%';
+
+  // ── Trend chart ──────────────────────────────────────────────────────
   renderDashChart();
 }
 
