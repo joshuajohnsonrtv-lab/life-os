@@ -2076,8 +2076,13 @@ function importData() {
   input.click();
 }
 
+// Always use Europe/London so BST (UTC+1 summer) and GMT (UTC+0 winter)
+// are both handled correctly — day resets at midnight UK time, not midnight UTC.
+function dateKey(d) {
+  return d.toLocaleDateString('en-CA', { timeZone: 'Europe/London' });
+}
 function today() {
-  return new Date().toISOString().split('T')[0];
+  return dateKey(new Date());
 }
 
 function formatDate(d) {
@@ -2290,7 +2295,7 @@ function renderDashboard() {
   let gymWeek = 0;
   for (let i = 0; i <= 6; i++) {
     const d = new Date(weekStart); d.setDate(weekStart.getDate() + i);
-    const key = d.toISOString().split('T')[0];
+    const key = dateKey(d);
     if (data.gym?.log?.[key]) gymWeek++;
   }
   const pillGym = document.getElementById('dash-pill-gym');
@@ -2343,7 +2348,7 @@ function renderDashChart() {
 
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i);
-    const key = d.toISOString().split('T')[0];
+    const key = dateKey(d);
     labels.push(d.toLocaleDateString('en-GB', {day:'numeric',month:'short'}));
     if (metric === 'sleep') {
       const s = data.sleep.log[key];
@@ -2394,7 +2399,7 @@ function renderStreaks() {
     let count = 0;
     let d = new Date();
     while(true) {
-      const key = d.toISOString().split('T')[0];
+      const key = dateKey(d);
       if(checkFn(logObj[key])) { count++; d.setDate(d.getDate()-1); }
       else break;
     }
@@ -2719,7 +2724,7 @@ function renderHydration() {
   const last7 = [];
   for(let i=0; i<7; i++) {
     const d = new Date(); d.setDate(d.getDate()-i);
-    const key = d.toISOString().split('T')[0];
+    const key = dateKey(d);
     last7.push([key, data.hydration.log[key]||0]);
   }
   hist.innerHTML = last7.map(([d, g]) => {
@@ -2973,7 +2978,7 @@ function renderSkinWeekly() {
   const rows = [];
   for(let i=6; i>=0; i--) {
     const d = new Date(); d.setDate(d.getDate()-i);
-    const key = d.toISOString().split('T')[0];
+    const key = dateKey(d);
     const log = data.skincare.log[key] || {};
     // Only count steps that are still in the current routine
     const mDone = (log.morning||[]).filter(s => mRoutine.includes(s)).length;
@@ -3136,7 +3141,7 @@ function renderMewing() {
   let streak = 0;
   let d = new Date();
   while(true) {
-    const key = d.toISOString().split('T')[0];
+    const key = dateKey(d);
     if(data.mewing.log[key]?.done) { streak++; d.setDate(d.getDate()-1); }
     else break;
   }
@@ -3413,7 +3418,7 @@ function renderSRCalendar(data) {
   const days = [];
   for(let i=29; i>=0; i--) {
     const d = new Date(); d.setDate(d.getDate()-i);
-    days.push(d.toISOString().split('T')[0]);
+    days.push(dateKey(d));
   }
   const dayNames = ['S','M','T','W','T','F','S'];
   const header = dayNames.map(n=>`<div style="text-align:center;font-size:10px;color:var(--muted);padding:2px">${n}</div>`).join('');
@@ -3785,7 +3790,7 @@ function getWeekDates(offset) {
   for(let i=0; i<7; i++) {
     const d = new Date(monday);
     d.setDate(monday.getDate()+i);
-    days.push(d.toISOString().split('T')[0]);
+    days.push(dateKey(d));
   }
   return days;
 }
