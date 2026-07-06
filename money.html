@@ -940,9 +940,11 @@
     <button class="mob-grid-card" onclick="showPage('goals');updateMobTitle('goals');closeMobMenu()"><span class="mob-grid-emoji">🎯</span><span class="mob-grid-label">Goals</span></button>
     <button class="mob-grid-card" onclick="showPage('milestones');updateMobTitle('milestones');closeMobMenu()"><span class="mob-grid-emoji">🗓️</span><span class="mob-grid-label">Milestones</span></button>
     <button class="mob-grid-card" onclick="showPage('hustles');updateMobTitle('hustles');closeMobMenu()"><span class="mob-grid-emoji">🚀</span><span class="mob-grid-label">Hustles</span></button>
-    <button class="mob-grid-card" onclick="openFirebaseSetup();closeMobMenu()"><span class="mob-grid-emoji">☁️</span><span class="mob-grid-label">Cloud Sync</span></button>
-    <button class="mob-grid-card" onclick="exportData();closeMobMenu()"><span class="mob-grid-emoji">💾</span><span class="mob-grid-label">Export</span></button>
-    <button class="mob-grid-card" onclick="document.getElementById('import-file').click();closeMobMenu()"><span class="mob-grid-emoji">📂</span><span class="mob-grid-label">Import</span></button>
+  </div>
+  <div style="display:flex;gap:20px;justify-content:center;padding:14px 0 10px;border-top:1px solid rgba(255,255,255,0.06);margin-top:4px">
+    <span onclick="openFirebaseSetup();closeMobMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Cloud Sync">☁️</span>
+    <span onclick="exportData();closeMobMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Export">💾</span>
+    <span onclick="document.getElementById('import-file').click();closeMobMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Import">📂</span>
   </div>
 </div>
 
@@ -978,12 +980,10 @@
   <div class="sidebar-footer">
     <div id="save-status">Not saved yet</div>
     <div id="cloud-status" style="font-size:11px;margin-top:4px;cursor:pointer" onclick="openFirebaseSetup()"><span style="color:var(--muted)">○ Cloud sync off</span></div>
-    <button onclick="openFirebaseSetup()" style="display:flex;align-items:center;gap:7px;width:100%;padding:8px 10px;background:rgba(245,197,66,0.08);border:1px solid rgba(245,197,66,0.25);color:var(--gold);border-radius:8px;cursor:pointer;font-size:12px;margin-top:8px;margin-bottom:6px">
-      <span>☁️</span><span>Cloud Sync Setup</span>
-    </button>
-    <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <button class="btn btn-sm btn-ghost" onclick="exportData()" style="flex:1;font-size:11px">Export</button>
-      <button class="btn btn-sm btn-ghost" onclick="document.getElementById('import-file').click()" style="flex:1;font-size:11px">Import</button>
+    <div style="display:flex;gap:18px;justify-content:center;padding:10px 0 2px">
+      <span title="Cloud Sync" onclick="openFirebaseSetup()" style="font-size:17px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">☁️</span>
+      <span title="Export backup" onclick="exportData()" style="font-size:17px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">💾</span>
+      <span title="Import backup" onclick="document.getElementById('import-file').click()" style="font-size:17px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">📂</span>
     </div>
     <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
   </div>

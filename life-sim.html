@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>The Sim — Joshua</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 :root {
   --bg:#0d0d0f; --bg2:#141416; --surface:#1a1a1e; --border:#2a2a30;
@@ -1181,23 +1183,10 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .f-del{color:#ef4444 !important;border-color:rgba(239,68,68,.28) !important;}
 .f-del:hover{background:rgba(239,68,68,.18) !important;border-color:#ef4444 !important;}
 
-/* floor — dark wood planks (matches bedroom) */
+/* floor tile hint */
 .k-floor{position:absolute;bottom:0;left:0;right:0;height:185px;
-  background-color:#181008;
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      transparent 0px, transparent 27px,
-      rgba(0,0,0,.22) 27px, rgba(0,0,0,.22) 28px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent 0px, transparent 55px,
-      rgba(255,255,255,.016) 55px, rgba(255,255,255,.016) 56px
-    ),
-    linear-gradient(180deg,rgba(0,0,0,.28) 0%,transparent 60%);
-  background-size:56px 28px, 56px 28px, 100% 100%;
-}
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.007),rgba(255,255,255,.007) 1px,transparent 1px,transparent 60px),
+  repeating-linear-gradient(0deg,rgba(255,255,255,.007),rgba(255,255,255,.007) 1px,transparent 1px,transparent 60px);}
 
 /* back button */
 .k-back{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
@@ -1207,79 +1196,6 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   transition:all .2s;font-family:inherit;white-space:nowrap;}
 .k-back:hover{border-color:rgba(255,255,255,.28);color:rgba(255,255,255,.65);}
 .k-save.saved{color:var(--gold);}
-
-/* ── KITCHEN GLOWS ──────────────────────────────────────────────────── */
-
-/* Window above sink — daylight blue */
-.k-win{
-  background:rgba(120,190,255,.32) !important;
-  border:1px solid rgba(100,170,255,.55) !important;
-  box-shadow:0 0 18px rgba(100,180,255,.45),inset 0 0 8px rgba(140,210,255,.25) !important;
-}
-
-/* Cooker burners — orange glow, animated flicker */
-.k-cooker-br{
-  border:2px solid rgba(220,90,20,.55) !important;
-  background:radial-gradient(circle,#2a1410,#141418) !important;
-  box-shadow:0 0 7px rgba(255,110,20,.55),inset 0 0 4px rgba(200,70,10,.35) !important;
-  animation:kBurnerPulse 2s ease-in-out infinite;
-}
-@keyframes kBurnerPulse{0%,100%{box-shadow:0 0 4px rgba(255,80,10,.38),inset 0 0 3px rgba(200,60,10,.22);}50%{box-shadow:0 0 11px rgba(255,130,20,.72),inset 0 0 6px rgba(220,90,10,.45);}}
-
-/* Cooker body — warm ambient around the unit */
-.k-cooker{box-shadow:0 0 14px rgba(255,100,20,.14),inset 0 0 8px rgba(0,0,0,.5) !important;}
-.k-cooker:hover{border-color:#f97316 !important;box-shadow:0 0 22px rgba(249,115,22,.42),inset 0 0 8px rgba(0,0,0,.5) !important;}
-
-/* Fridge — permanent cool blue glow */
-.k-fridge-l{
-  background:linear-gradient(90deg,#1e2236,#1a1e2e) !important;
-  border:1px solid #2e3a52 !important;
-  box-shadow:0 0 12px rgba(60,130,255,.14),inset 0 0 14px rgba(40,100,220,.08) !important;
-}
-.k-fridge-l:hover{border-color:#4d9eff !important;box-shadow:0 0 20px rgba(77,158,255,.38) !important;}
-
-/* Microwave screen — green phosphor glow */
-.k-micro-scr{
-  background:#020a02 !important;
-  border:1px solid #081408 !important;
-  box-shadow:inset 0 0 7px rgba(0,220,60,.38),0 0 8px rgba(0,190,50,.22) !important;
-}
-/* Button LEDs */
-.k-micro-btn{
-  background:#060e08 !important;
-  border:1px solid rgba(0,200,80,.5) !important;
-  box-shadow:0 0 5px rgba(0,210,60,.65) !important;
-}
-.k-micro-btn2{
-  background:#0e0606 !important;
-  border:1px solid rgba(210,50,20,.45) !important;
-  box-shadow:0 0 5px rgba(230,60,20,.58) !important;
-  animation:kBtn2 3.2s ease-in-out infinite;
-}
-@keyframes kBtn2{0%,100%{opacity:.55;}50%{opacity:1;}}
-
-/* Tap — chrome shine */
-.k-tap{background:linear-gradient(90deg,#3a4258,#7080a0) !important;box-shadow:0 0 5px rgba(80,140,220,.22) !important;}
-.k-tap::after{background:linear-gradient(180deg,#7080a0,#3a4258) !important;}
-
-/* Sink — subtle cyan depth */
-.k-sink{
-  background:#050d14 !important;
-  border:2px solid #162a3a !important;
-  box-shadow:inset 0 3px 8px rgba(0,0,0,.65),inset 0 0 14px rgba(20,90,140,.22) !important;
-}
-.k-sink:hover{border-color:#3a7aaa !important;}
-
-/* Occupied stool — purple glow */
-.k-stool.occupied{box-shadow:0 0 9px rgba(120,60,200,.38) !important;}
-
-/* Ambient warm ceiling wash from counter-top golden strip */
-.k-ct::after{box-shadow:0 -2px 18px rgba(196,176,128,.35);}
-
-/* Island top strip — warm amber edge */
-.k-island::after{box-shadow:0 -3px 12px rgba(180,155,90,.25);}
-
-/* ────────────────────────────────────────────────────────────────────── */
 
 /* fridge inventory modal */
 .k-fridge-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;
@@ -1337,6 +1253,13 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
     <button class="loc-btn kitchen" id="btn-kitchen" onclick="goLoc('kitchen')">🍳 Kitchen</button>
   </div>
   <button class="save-btn" id="save-btn" onclick="manualSave()">💾 Save</button>
+  <div style="display:flex;gap:14px;align-items:center;margin-left:8px;padding-left:12px;border-left:1px solid var(--border)">
+    <span id="sim-cloud-status" style="font-size:10px;color:var(--muted);white-space:nowrap;cursor:pointer" onclick="openSimFirebaseSetup()" title="Cloud Sync">○</span>
+    <span title="Cloud Sync" onclick="openSimFirebaseSetup()" style="font-size:15px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">☁️</span>
+    <span title="Export backup" onclick="exportSimData()" style="font-size:15px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">💾</span>
+    <span title="Import backup" onclick="document.getElementById('sim-import-file').click()" style="font-size:15px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">📂</span>
+    <input type="file" id="sim-import-file" accept=".json" style="display:none" onchange="importSimData(event)">
+  </div>
 </div>
 
 <!-- BODY -->
@@ -1548,22 +1471,6 @@ function fmt(n) {
 }
 function clamp(v,mn,mx){return Math.min(mx,Math.max(mn,v));}
 
-// Sleep stored as {bedtime:'22:00', wakeTime:'06:30'} — derive hours
-function simSleepHours(sl) {
-  if (!sl) return 0;
-  if (typeof sl === 'object') {
-    if (sl.bedtime && sl.wakeTime) {
-      const [bh,bm] = sl.bedtime.split(':').map(Number);
-      const [wh,wm] = sl.wakeTime.split(':').map(Number);
-      let mins = (wh*60+wm) - (bh*60+bm);
-      if (mins < 0) mins += 1440;
-      return Math.round(mins/60*10)/10;
-    }
-    return parseFloat(sl.hours||sl.value||0)||0;
-  }
-  return parseFloat(sl)||0;
-}
-
 // ─────────────────────────────────────────────
 //  CALCULATE
 // ─────────────────────────────────────────────
@@ -1587,13 +1494,8 @@ function calc() {
 
   const allHustles  = M.hustles?.items || [];
   const actHustles  = allHustles.filter(h => h.status === 'active' || parseFloat(h.revenue||0) > 0);
-  // hustleRev = income actually LOGGED this month from hustle-type sources (not targets)
-  const hustleSrcIds = (M.income?.sources||[])
-    .filter(s => s.type === 'hustle' || /hustle|freelance/i.test(s.name||''))
-    .map(s => s.id);
-  const hustleRev = incEntries
-    .filter(e => e.date >= msStart && hustleSrcIds.includes(e.sourceId))
-    .reduce((sum,e) => sum + (parseFloat(e.amount)||0), 0);
+  // revenue field = user's target/goal, not necessarily earned — label accordingly
+  const hustleRev   = actHustles.reduce((s,h) => s + (parseFloat(h.revenue)||0), 0);
   // monthTarget: stored in sim's own localStorage, editable in-sim. Default £50k/month.
   const monthTarget = parseFloat(localStorage.getItem('life_sim_month_target')) || 50000;
   const dreamAge    = parseInt(M.delusion?.targetAge) || null;
@@ -1609,46 +1511,43 @@ function calc() {
   let gymSess7=0, sleepTotal=0, sleepDays=0, hydDays=0;
   for (let i=0;i<7;i++) {
     const d = daysAgo(i);
-    // Gym: only count days with at least one exercise actually logged
-    const gl = gymLog[d];
-    if (gl && (typeof gl === 'object' ? (gl.exercises?.length > 0) : true)) gymSess7++;
-    // Sleep: stored as {bedtime, wakeTime} — use helper to get hours
+    if (gymLog[d]) gymSess7++;
     const sl = sleepLog[d];
     if (sl !== undefined && sl !== null) {
-      const hrs = simSleepHours(sl);
+      const hrs = typeof sl === 'object' ? (parseFloat(sl.hours||sl.value||0)) : parseFloat(sl)||0;
       if (hrs > 0) { sleepTotal += hrs; sleepDays++; }
     }
-    // Hydration: any logged glass (≥1) counts as a day
     const hy = hydLog[d];
-    if (hy !== undefined && hy !== null) {
-      const cups = typeof hy === 'object' ? parseFloat(hy.cups||hy.count||hy.value||0) : parseFloat(hy)||0;
-      if (cups >= 1) hydDays++;
+    if (hy !== undefined) {
+      const cups = typeof hy === 'object' ? (hy.cups||hy.count||hy.value||0) : (hy||0);
+      if (parseFloat(cups) >= hydGoal) hydDays++;
     }
   }
   const sleepAvg   = sleepDays > 0 ? sleepTotal/sleepDays : 0;
-  const gymToday   = !!(gymLog[tod] && (typeof gymLog[tod]==='object' ? gymLog[tod].exercises?.length>0 : true));
+  const gymToday   = !!gymLog[tod];
   const todayDiet  = dietLog[tod];
   const mealCount  = todayDiet
     ? (Array.isArray(todayDiet) ? todayDiet.length : (typeof todayDiet === 'object' ? Object.keys(todayDiet).length : 1))
     : 0;
 
-  // ── Score components ──────────────────────
-  // Income (max 35) — £1,000 = 35 pts, linear
-  const incomeScore = Math.min(35, Math.round((monthIncome / 1000) * 35));
-  // Hustles (max 25) — based on hustle revenue, £1,000/month = 25 pts
-  const hustleScore = Math.min(25, Math.round((hustleRev / 1000) * 25));
-  // Gym (max 22) — 7 sessions = max
-  const gymScore    = clamp(gymSess7 * Math.ceil(22/7), 0, 22);
+  // ── Score (0–100) ─────────────────────────
+  let score = 0;
+  // Income (max 35)
+  if (monthIncome > 0)    score += 10;
+  if (monthIncome >= 500) score += 10;
+  if (monthIncome >= 1500)score += 10;
+  if (monthIncome >= 3000)score +=  5;
+  // Hustles (max 25)
+  score += clamp(actHustles.length * 12, 0, 25);
+  // Gym (max 22)
+  score += clamp(gymSess7 * 4, 0, 22);
   // Sleep (max 10)
-  let sleepScore = 0;
-  if (sleepAvg >= 7 && sleepAvg <= 9) sleepScore = 10;
-  else if (sleepAvg >= 6)              sleepScore =  5;
-  else if (sleepAvg > 0)               sleepScore =  2;
+  if (sleepAvg >= 7 && sleepAvg <= 9) score += 10;
+  else if (sleepAvg >= 6)              score +=  5;
   // Hydration (max 8)
-  const hydScore = Math.round((hydDays/7)*8);
+  score += Math.round((hydDays/7)*8);
 
-  const score     = incomeScore + hustleScore + gymScore + sleepScore + hydScore;
-  const outputPct = clamp(score, 0, 100);
+  const outputPct = clamp(Math.round(score), 0, 100);
 
   // ── Status ────────────────────────────────
   let emoji, text, col;
@@ -1666,8 +1565,7 @@ function calc() {
     monthTarget,
     dreamAge, curAge,
     gymSess7, gymToday, sleepAvg, hydDays, mealCount,
-    gymLog, dietLog, M, W,
-    incomeScore, hustleScore, gymScore, sleepScore, hydScore
+    gymLog, dietLog, M, W
   };
 }
 
@@ -1760,7 +1658,7 @@ function render() {
   const gs = document.getElementById('zs-gym');
   if (gs) gs.textContent = s.gymSess7 + ' session' + (s.gymSess7!==1?'s':'') + ' this week';
   const hs = document.getElementById('zs-hustle');
-  if (hs) hs.textContent = s.hustleRev > 0 ? fmt(s.hustleRev) + ' earned this month' : 'Log income → Hustle to record earnings';
+  if (hs) hs.textContent = s.actHustles.length + ' active hustle' + (s.actHustles.length!==1?'s':'');
   const ks = document.getElementById('zs-kitchen');
   if (ks) ks.textContent = s.mealCount + ' meal' + (s.mealCount!==1?'s':'') + ' logged today';
 
@@ -1777,7 +1675,7 @@ function renderStats(s) {
     ? s.actHustles.map(h => `
         <div class="hustle-row">
           <div class="hustle-n">${h.name || 'Unnamed hustle'}</div>
-          <div class="hustle-r">${h.revenue ? fmt(h.revenue)+' goal' : 'No goal set'}</div>
+          <div class="hustle-r">${h.revenue ? fmt(h.revenue)+' target' : 'No target set'}</div>
         </div>`).join('')
     : `<div style="font-size:10px;color:var(--muted)">None active. Add one in the Money Dashboard → Hustles.</div>`;
 
@@ -1845,33 +1743,38 @@ function showProgressModal() {
     ? s.actHustles.map(h => `
         <div class="hustle-row">
           <div class="hustle-n">${h.name || 'Unnamed hustle'}</div>
-          <div class="hustle-r">${h.revenue ? fmt(h.revenue)+' goal' : 'No goal set'}</div>
+          <div class="hustle-r">${h.revenue ? fmt(h.revenue)+' target' : 'No target set'}</div>
         </div>`).join('')
     : `<div style="font-size:10px;color:var(--muted)">None active — add one in Money → Hustles.</div>`;
 
-  // Score per category — use values already computed in calc()
-  const incomePts = s.incomeScore;
-  const hustlePts = s.hustleScore;
-  const gymPts    = s.gymScore;
-  const sleepPts  = s.sleepScore;
-  const hydroPts  = s.hydScore;
+  // Score per category (matches calc() formula exactly)
+  const incomePts = (s.monthIncome > 0 ? 10 : 0)
+                  + (s.monthIncome >= 500  ? 10 : 0)
+                  + (s.monthIncome >= 1500 ? 10 : 0)
+                  + (s.monthIncome >= 3000 ?  5 : 0);
+  const hustlePts = Math.min(s.actHustles.length * 12, 25);
+  const gymPts    = Math.min(s.gymSess7 * 4, 22);
+  const sleepPts  = (s.sleepAvg >= 7 && s.sleepAvg <= 9) ? 10 : (s.sleepAvg >= 6 ? 5 : 0);
+  const hydroPts  = Math.round((s.hydDays / 7) * 8);
 
   const cats = [
     { emoji:'💰', label:'Income',     pts:incomePts, max:35,
-      detail: s.monthIncome > 0 ? fmt(s.monthIncome)+' this month → '+incomePts+' pts' : 'No income logged yet',
-      next: incomePts < 35 ? 'Earn more — £1,000/month = max 35 pts (linear)' : 'Max reached ✓' },
+      detail: s.monthIncome > 0 ? fmt(s.monthIncome)+' this month' : 'No income logged',
+      next: incomePts < 35
+        ? (s.monthIncome < 500 ? 'Log £500+ to earn +10 pts' : s.monthIncome < 1500 ? 'Log £1,500+ for +10 pts' : s.monthIncome < 3000 ? 'Log £3,000+ for +5 pts' : '')
+        : 'Max reached ✓' },
     { emoji:'🚀', label:'Hustles',    pts:hustlePts, max:25,
-      detail: s.hustleRev > 0 ? fmt(s.hustleRev)+'/month → '+hustlePts+' pts' : '£0 earned from hustles yet',
-      next: hustlePts < 25 ? 'Hustle revenue: £1,000/month = max 25 pts' : 'Max reached ✓' },
+      detail: s.actHustles.length + ' active hustle' + (s.actHustles.length!==1?'s':''),
+      next: hustlePts < 25 ? 'Add more hustles for +12 pts each (max 25)' : 'Max reached ✓' },
     { emoji:'🏋️', label:'Gym',       pts:gymPts,    max:22,
       detail: s.gymSess7 + '/7 sessions this week',
-      next: gymPts < 22 ? (7 - s.gymSess7) + ' more session' + (7-s.gymSess7!==1?'s':'') + ' this week' : 'Max reached ✓' },
+      next: gymPts < 22 ? (7 - s.gymSess7) + ' more session'+(7-s.gymSess7!==1?'s':'')+' = +'+(Math.min(s.gymSess7+1,5)*4 - gymPts)+' pts' : 'Max reached ✓' },
     { emoji:'😴', label:'Sleep',      pts:sleepPts,  max:10,
-      detail: s.sleepAvg > 0 ? s.sleepAvg.toFixed(1)+'h avg this week' : 'No sleep logged',
-      next: sleepPts < 10 ? (s.sleepAvg < 6 ? 'Log sleep to start earning pts' : 'Aim for 7–9h for max 10 pts') : 'Max reached ✓' },
+      detail: s.sleepAvg > 0 ? s.sleepAvg.toFixed(1)+'h avg (7d)' : 'No sleep logged',
+      next: sleepPts < 10 ? (s.sleepAvg < 6 ? 'Log 6h+ sleep for +5 pts' : 'Aim for 7–9h for +10 pts') : 'Max reached ✓' },
     { emoji:'💧', label:'Hydration',  pts:hydroPts,  max:8,
-      detail: s.hydDays + '/7 days logged this week',
-      next: hydroPts < 8 ? 'Log water daily in Wellness Dashboard' : 'Max reached ✓' },
+      detail: s.hydDays + '/7 days hitting goal',
+      next: hydroPts < 8 ? 'Hit daily water goal more days this week' : 'Max reached ✓' },
   ];
 
   const factorHTML = cats.map(c => {
@@ -1886,7 +1789,7 @@ function showProgressModal() {
           </div>
           <div style="display:flex;align-items:center;gap:8px">
             <span style="font-size:10px;color:var(--muted)">${c.pts}/${c.max} pts</span>
-            <span style="font-size:14px;font-weight:900;color:${col};min-width:36px;text-align:right">${barPct}%</span>
+            <span style="font-size:14px;font-weight:900;color:${col};min-width:32px;text-align:right">${c.pts}%</span>
           </div>
         </div>
         <div style="height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;margin-bottom:5px">
@@ -1911,7 +1814,7 @@ function showProgressModal() {
     <div class="sblock">
       <div class="sblock-title" style="display:flex;justify-content:space-between;align-items:center">
         <span>Score Breakdown</span>
-        <span style="font-size:9px;color:var(--muted);font-weight:400">% = progress within each category</span>
+        <span style="font-size:9px;color:var(--muted);font-weight:400">each % = 1 point out of 100</span>
       </div>
       ${factorHTML}
     </div>
@@ -3416,6 +3319,201 @@ window.addEventListener('pageshow', function(e) {
     loadState();
   }
 });
+
+// ─────────────────────────────────────────────
+//  CLOUD SYNC (Firebase Realtime Database)
+//  Keys synced: todos, todo_tmpls, walks,
+//               activity_log, month_target,
+//               poster, food
+//  NOT synced: runtime (character position —
+//              device-specific, meaningless cross-device)
+// ─────────────────────────────────────────────
+const SIM_SYNC_KEYS = [
+  'life_sim_todos', 'life_sim_todo_tmpls',
+  'life_sim_walks', 'life_sim_activity_log',
+  'life_sim_month_target', 'life_sim_poster', 'life_sim_food'
+];
+
+let _simFbApp = null, _simFbDb = null, _simFbEnabled = false;
+let _simFbSyncing = false, _simFbInitDone = false;
+
+function getSimFbConfig() {
+  try { return JSON.parse(localStorage.getItem('sim_firebase_config') || 'null'); } catch(e) { return null; }
+}
+function getSimFbKey() {
+  return localStorage.getItem('sim_firebase_key') || 'default';
+}
+function getSimFbRef() {
+  return _simFbDb.ref('life_sim/' + getSimFbKey());
+}
+
+function initSimFirebase() {
+  const config = getSimFbConfig();
+  if (!config) return;
+  try {
+    if (typeof firebase === 'undefined') return;
+    // Re-use existing firebase app if already initialised by money/wellness iframes
+    if (!firebase.apps.length) { _simFbApp = firebase.initializeApp(config); }
+    else { _simFbApp = firebase.apps[0]; }
+    _simFbDb = firebase.database();
+    _simFbEnabled = true;
+    updateSimCloudStatus('syncing');
+    syncFromSimFirebase();
+  } catch(e) { console.warn('Sim Firebase init failed:', e); updateSimCloudStatus('error'); }
+}
+
+function syncFromSimFirebase() {
+  getSimFbRef().once('value').then(function(snap) {
+    const cloud = snap.val();
+    const localTs = parseInt(localStorage.getItem('sim_saved_at') || '0');
+    if (cloud) {
+      const cloudTs = cloud._savedAt || 0;
+      if (!localTs || cloudTs > localTs) {
+        // Cloud is newer — pull down
+        SIM_SYNC_KEYS.forEach(function(k) {
+          if (cloud[k] !== undefined) localStorage.setItem(k, JSON.stringify(cloud[k]));
+        });
+        if (cloudTs) localStorage.setItem('sim_saved_at', cloudTs);
+        if (_simFbInitDone) showSimToast('☁️ Synced from cloud');
+        render();
+      } else {
+        pushSimToFirebase();
+      }
+    } else {
+      pushSimToFirebase();
+    }
+    _simFbInitDone = true;
+    updateSimCloudStatus('connected');
+    // Listen for real-time updates from other devices
+    getSimFbRef().on('value', function(snap) {
+      if (_simFbSyncing || !_simFbInitDone) return;
+      const cloud = snap.val(); if (!cloud) return;
+      const localTs2 = parseInt(localStorage.getItem('sim_saved_at') || '0');
+      const cloudTs2 = cloud._savedAt || 0;
+      if (cloudTs2 > localTs2 + 2000) {
+        SIM_SYNC_KEYS.forEach(function(k) {
+          if (cloud[k] !== undefined) localStorage.setItem(k, JSON.stringify(cloud[k]));
+        });
+        localStorage.setItem('sim_saved_at', cloudTs2);
+        render();
+        showSimToast('☁️ Synced from another device');
+      }
+    });
+  }).catch(function(e) { console.warn('Sim Firebase pull failed:', e); updateSimCloudStatus('offline'); _simFbInitDone = true; });
+}
+
+function pushSimToFirebase() {
+  if (!_simFbEnabled || !_simFbDb) return;
+  _simFbSyncing = true;
+  const payload = { _savedAt: Date.now() };
+  SIM_SYNC_KEYS.forEach(function(k) {
+    try { payload[k] = JSON.parse(localStorage.getItem(k) || 'null'); } catch(e) {}
+  });
+  getSimFbRef().set(payload)
+    .then(function() { _simFbSyncing = false; localStorage.setItem('sim_saved_at', payload._savedAt); updateSimCloudStatus('connected'); })
+    .catch(function(e) { _simFbSyncing = false; updateSimCloudStatus('error'); console.warn(e); });
+}
+
+function updateSimCloudStatus(status) {
+  const map = { connected: '☁️', syncing: '↻', offline: '⚠️', error: '✕', off: '○' };
+  const el = document.getElementById('sim-cloud-status');
+  if (el) el.textContent = map[status] || '○';
+}
+
+// Hook pushSimToFirebase into the existing save flow
+const _origManualSave = manualSave;
+manualSave = function() {
+  _origManualSave();
+  if (_simFbEnabled) pushSimToFirebase();
+};
+
+function openSimFirebaseSetup() {
+  const existing = getSimFbConfig();
+  const ta = document.getElementById('sim-fb-config-input');
+  const ki = document.getElementById('sim-fb-secret-key');
+  if (ta && existing) ta.value = JSON.stringify(existing, null, 2);
+  if (ki) ki.value = getSimFbKey();
+  const db = document.getElementById('sim-fb-disconnect-btn');
+  if (db) db.style.display = _simFbEnabled ? 'block' : 'none';
+  document.getElementById('modal-sim-firebase').style.display = 'flex';
+}
+
+function saveSimFirebaseConfig() {
+  const raw = (document.getElementById('sim-fb-config-input') || {}).value || '';
+  const key = ((document.getElementById('sim-fb-secret-key') || {}).value || '').trim() || 'default';
+  if (!raw.trim()) { showSimToast('⚠️ Paste your Firebase config first'); return; }
+  let config;
+  try { config = JSON.parse(raw); }
+  catch(e) {
+    try { const m = raw.match(/firebaseConfig\s*=\s*(\{[\s\S]*?\})\s*;/); if (m) config = (new Function('return ' + m[1]))(); } catch(e2) {}
+  }
+  if (!config || !config.apiKey) { showSimToast('⚠️ Invalid Firebase config'); return; }
+  localStorage.setItem('sim_firebase_config', JSON.stringify(config));
+  localStorage.setItem('sim_firebase_key', key);
+  document.getElementById('modal-sim-firebase').style.display = 'none';
+  if (firebase.apps.length) {
+    try { firebase.apps[0].delete().then(function() { _simFbApp=null; _simFbDb=null; _simFbEnabled=false; initSimFirebase(); }); }
+    catch(e) { _simFbApp=null; _simFbDb=null; _simFbEnabled=false; initSimFirebase(); }
+  } else { initSimFirebase(); }
+  showSimToast('✅ Connecting to Firebase…');
+}
+
+function disconnectSimFirebase() {
+  if (!confirm('Disconnect cloud sync? Your local sim data stays safe.')) return;
+  _simFbApp = null; _simFbDb = null; _simFbEnabled = false; _simFbInitDone = false;
+  localStorage.removeItem('sim_firebase_config');
+  updateSimCloudStatus('off');
+  document.getElementById('modal-sim-firebase').style.display = 'none';
+  showSimToast('🔌 Cloud sync disconnected');
+}
+
+function exportSimData() {
+  const payload = { _exportedAt: new Date().toISOString() };
+  SIM_SYNC_KEYS.forEach(function(k) {
+    try { payload[k] = JSON.parse(localStorage.getItem(k) || 'null'); } catch(e) {}
+  });
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'life-sim-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click(); URL.revokeObjectURL(url);
+  showSimToast('📦 Sim backup downloaded!');
+}
+
+function importSimData(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (!confirm('Import this backup? Your current sim data will be replaced.')) return;
+      SIM_SYNC_KEYS.forEach(function(k) {
+        if (d[k] !== undefined) localStorage.setItem(k, JSON.stringify(d[k]));
+      });
+      render();
+      showSimToast('✅ Sim data imported!');
+      if (_simFbEnabled) pushSimToFirebase();
+    } catch(err) { showSimToast('⚠️ Invalid backup file'); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function showSimToast(msg) {
+  let t = document.getElementById('sim-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'sim-toast';
+    t.style.cssText = 'position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#1e1e2e;border:1px solid rgba(255,255,255,0.12);color:#e8e8ec;padding:10px 18px;border-radius:10px;font-size:13px;z-index:9999;pointer-events:none;transition:opacity 0.3s';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._to);
+  t._to = setTimeout(function() { t.style.opacity = '0'; }, 2400);
+}
+
+// Start Firebase if already configured
+if (getSimFbConfig()) initSimFirebase(); else updateSimCloudStatus('off');
 </script>
 
 <!-- ── FACIAL EXERCISE MODAL ── -->
@@ -3438,6 +3536,24 @@ window.addEventListener('pageshow', function(e) {
     <button class="prog-sheet-close" onclick="closeProgressModal()">✕</button>
   </div>
   <div class="prog-sheet-body" id="prog-sheet-body"></div>
+</div>
+
+<!-- ── SIM CLOUD SYNC MODAL ── -->
+<div id="modal-sim-firebase" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9000;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#0e1016;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h3 style="font-size:15px;font-weight:800">☁️ Sim Cloud Sync</h3>
+      <button onclick="document.getElementById('modal-sim-firebase').style.display='none'" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 4px">✕</button>
+    </div>
+    <p style="font-size:12px;color:var(--muted2);margin-bottom:16px;line-height:1.6">Syncs your to-dos, activity log, walks, and sim settings across devices using Firebase Realtime Database. Use the same config as your Money or Wellness dashboards.</p>
+    <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;display:block;margin-bottom:6px">Firebase Config</label>
+    <textarea id="sim-fb-config-input" placeholder='Paste your firebaseConfig JSON here...' style="width:100%;height:120px;background:#141416;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);padding:12px;font-size:12px;font-family:monospace;resize:vertical;box-sizing:border-box;line-height:1.5;margin-bottom:10px"></textarea>
+    <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;display:block;margin-bottom:6px">Secret Key (optional — isolates your data)</label>
+    <input id="sim-fb-secret-key" type="text" placeholder="e.g. joshua123" style="width:100%;padding:10px 12px;background:#141416;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:14px">
+    <button onclick="saveSimFirebaseConfig()" style="width:100%;padding:11px;background:var(--gold);color:#000;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">☁️ Connect &amp; Sync</button>
+    <button onclick="document.getElementById('modal-sim-firebase').style.display='none'" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:8px">Cancel</button>
+    <button id="sim-fb-disconnect-btn" onclick="disconnectSimFirebase()" style="display:none;width:100%;padding:10px;background:transparent;border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:13px;color:#ef4444;cursor:pointer">🔌 Disconnect</button>
+  </div>
 </div>
 
 <!-- ── GAMING WARNING OVERLAY ── -->
