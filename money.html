@@ -941,10 +941,13 @@
     <button class="mob-grid-card" onclick="showPage('milestones');updateMobTitle('milestones');closeMobMenu()"><span class="mob-grid-emoji">🗓️</span><span class="mob-grid-label">Milestones</span></button>
     <button class="mob-grid-card" onclick="showPage('hustles');updateMobTitle('hustles');closeMobMenu()"><span class="mob-grid-emoji">🚀</span><span class="mob-grid-label">Hustles</span></button>
   </div>
-  <div style="display:flex;gap:20px;justify-content:center;padding:14px 0 10px;border-top:1px solid rgba(255,255,255,0.06);margin-top:4px">
-    <span onclick="openFirebaseSetup();closeMobMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Cloud Sync">☁️</span>
-    <span onclick="exportData();closeMobMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Export">💾</span>
-    <span onclick="document.getElementById('import-file').click();closeMobMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Import">📂</span>
+  <div style="border-top:1px solid rgba(255,255,255,0.06);margin-top:4px;padding:12px 0 10px">
+    <div id="mob-menu-cloud-status" style="text-align:center;font-size:11px;color:var(--muted);margin-bottom:10px;cursor:pointer" onclick="openFirebaseSetup();closeMobMenu()">○ Cloud sync off</div>
+    <div style="display:flex;gap:20px;justify-content:center">
+      <span onclick="openFirebaseSetup();closeMobMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Cloud Sync">☁️</span>
+      <span onclick="exportData();closeMobMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Export">💾</span>
+      <span onclick="document.getElementById('import-file').click();closeMobMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Import">📂</span>
+    </div>
   </div>
 </div>
 
@@ -4281,6 +4284,8 @@ function updateCloudStatus(status) {
   const pair = configs[status]||configs.off;
   const el = document.getElementById('cloud-status');
   if (el) el.innerHTML = '<span style="color:'+pair[1]+'">'+pair[0]+'</span>';
+  const mob = document.getElementById('mob-menu-cloud-status');
+  if (mob) { mob.textContent = pair[0]; mob.style.color = pair[1]; }
 }
 
 function openFirebaseSetup() {

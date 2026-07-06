@@ -796,7 +796,6 @@
 <!-- ══ MOBILE TOPBAR ══ -->
 <div id="mobile-topbar">
   <div id="mobile-topbar-title">⚡ Wellness</div>
-  <div id="mobile-topbar-cloud" onclick="openFirebaseSetup()"></div>
   <button id="mobile-topbar-menu" onclick="openMobileMenu()">☰</button>
 </div>
 
@@ -840,10 +839,13 @@
     <button class="mob-grid-card" onclick="showPage('allrecords');closeMobileMenu()"><span class="mob-grid-emoji">📋</span><span class="mob-grid-label">All Records</span></button>
 
   </div>
-  <div style="display:flex;gap:20px;justify-content:center;padding:14px 0 10px;border-top:1px solid rgba(255,255,255,0.06);margin-top:4px">
-    <span onclick="openFirebaseSetup();closeMobileMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Cloud Sync">☁️</span>
-    <span onclick="exportData();closeMobileMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Export">💾</span>
-    <span onclick="importData();closeMobileMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Import">📂</span>
+  <div style="border-top:1px solid rgba(255,255,255,0.06);margin-top:4px;padding:12px 0 10px">
+    <div id="mob-menu-cloud-status" style="text-align:center;font-size:11px;color:var(--muted);margin-bottom:10px;cursor:pointer" onclick="openFirebaseSetup();closeMobileMenu()">○ Cloud sync off</div>
+    <div style="display:flex;gap:20px;justify-content:center">
+      <span onclick="openFirebaseSetup();closeMobileMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Cloud Sync">☁️</span>
+      <span onclick="exportData();closeMobileMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Export">💾</span>
+      <span onclick="importData();closeMobileMenu()" style="font-size:20px;cursor:pointer;opacity:0.35" title="Import">📂</span>
+    </div>
   </div>
 </div>
 
@@ -2150,9 +2152,9 @@ function updateCloudStatus(status) {
   // Sidebar cloud status
   const el = document.getElementById('cloud-status');
   if (el) el.innerHTML = '<span style="color:' + pair[1] + '">' + pair[0] + '</span>';
-  // Mobile topbar cloud status
-  const mob = document.getElementById('mobile-topbar-cloud');
-  if (mob) mob.innerHTML = '<span style="color:' + pair[1] + ';font-size:11px">' + pair[0] + '</span>';
+  // Mobile menu cloud status
+  const mob = document.getElementById('mob-menu-cloud-status');
+  if (mob) { mob.textContent = pair[0]; mob.style.color = pair[1]; }
 }
 
 function renderPage(page) {
