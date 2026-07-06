@@ -1117,9 +1117,9 @@
         <div class="card-title">Settings & History</div>
         <div class="form-group">
           <label>Daily Goal (glasses)</label>
-          <input type="number" id="water-goal-input" value="8" min="4" max="20" onchange="saveWaterGoal()">
+          <input type="number" id="water-goal-input" value="6" min="4" max="20" onchange="saveWaterGoal()">
         </div>
-        <div class="tip">💡 Aim for 8 glasses (4.4L) per day. Each glass = 1 pint (550ml). Increase if you worked out or it's hot outside.</div>
+        <div class="tip">💡 Aim for 6 glasses (3L) per day. Each glass = 500ml. Increase to 8+ glasses on training days or hot days.</div>
         <hr class="divider">
         <div class="card-title">Last 7 Days</div>
         <div id="water-history"></div>
@@ -2285,7 +2285,7 @@ function renderDashboard() {
 
   // Water pill
   const waterGlasses = data.hydration?.log?.[t] || 0;
-  const waterGoal    = data.hydration?.goal || 8;
+  const waterGoal    = data.hydration?.goal || 6;
   const pillWater    = document.getElementById('dash-pill-water');
   if (pillWater) pillWater.textContent = waterGlasses;
   const pillWaterSub = document.getElementById('dash-pill-water-sub');
@@ -2701,8 +2701,8 @@ function renderHydration() {
   const goal = data.hydration.goal || 8;
 
   document.getElementById('hydration-count').textContent = glasses;
-  document.getElementById('hydration-oz').textContent = glasses * 550;
-  document.getElementById('hydration-L').textContent = (glasses * 0.55).toFixed(2);
+  document.getElementById('hydration-oz').textContent = glasses * 500;
+  document.getElementById('hydration-L').textContent = (glasses * 0.5).toFixed(2);
   document.getElementById('hydration-goal-label').textContent = goal + ' glasses';
   document.getElementById('water-goal-input').value = goal;
 
@@ -2761,7 +2761,7 @@ function changeWaterTo(n) {
 
 function saveWaterGoal() {
   const data = getData();
-  data.hydration.goal = parseInt(document.getElementById('water-goal-input').value) || 8;
+  data.hydration.goal = parseInt(document.getElementById('water-goal-input').value) || 6;
   saveData(data);
   renderHydration();
 }
@@ -5884,8 +5884,8 @@ function buildDayEntries(data, date, filter) {
   if((filter==='all'||filter==='hydration') && data.hydration.log[date] !== undefined) {
     const glasses = data.hydration.log[date] || 0;
     const goal = data.hydration.goal || 8;
-    const ml = glasses * 550;
-    const L = (glasses * 0.55).toFixed(2);
+    const ml = glasses * 500;
+    const L = (glasses * 0.5).toFixed(2);
     const pct = Math.min(100, Math.round((glasses/goal)*100));
     const color = glasses >= goal ? 'var(--cyan)' : glasses >= goal*0.6 ? 'var(--amber)' : 'var(--red)';
     const lines = `
