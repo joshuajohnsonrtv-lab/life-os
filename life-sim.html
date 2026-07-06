@@ -1252,14 +1252,6 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
     <button class="loc-btn" id="btn-out" onclick="goLoc('outside')">🌍 Outside</button>
     <button class="loc-btn kitchen" id="btn-kitchen" onclick="goLoc('kitchen')">🍳 Kitchen</button>
   </div>
-  <button class="save-btn" id="save-btn" onclick="manualSave()">💾 Save</button>
-  <div style="display:flex;gap:14px;align-items:center;margin-left:8px;padding-left:12px;border-left:1px solid var(--border)">
-    <span id="sim-cloud-status" style="font-size:10px;color:var(--muted);white-space:nowrap;cursor:pointer" onclick="openSimFirebaseSetup()" title="Cloud Sync">○</span>
-    <span title="Cloud Sync" onclick="openSimFirebaseSetup()" style="font-size:15px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">☁️</span>
-    <span title="Export backup" onclick="exportSimData()" style="font-size:15px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">💾</span>
-    <span title="Import backup" onclick="document.getElementById('sim-import-file').click()" style="font-size:15px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">📂</span>
-    <input type="file" id="sim-import-file" accept=".json" style="display:none" onchange="importSimData(event)">
-  </div>
 </div>
 
 <!-- BODY -->
@@ -1445,6 +1437,15 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   <div class="stats-panel" id="stats-panel"></div>
 
 </div><!-- /sim-body -->
+
+<!-- ── BOTTOM UTILITY BAR ── -->
+<div id="sim-bottom-bar" style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:22px;padding:7px 18px;border-top:1px solid var(--border);background:var(--bg)">
+  <span id="sim-cloud-status" style="font-size:10px;color:var(--muted);white-space:nowrap;cursor:pointer" onclick="openSimFirebaseSetup()" title="Cloud Sync">○</span>
+  <span title="Cloud Sync" onclick="openSimFirebaseSetup()" style="font-size:16px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">☁️</span>
+  <span title="Export backup" onclick="exportSimData()" style="font-size:16px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">💾</span>
+  <span title="Import backup" onclick="document.getElementById('sim-import-file').click()" style="font-size:16px;cursor:pointer;opacity:0.28;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.28'">📂</span>
+  <input type="file" id="sim-import-file" accept=".json" style="display:none" onchange="importSimData(event)">
+</div>
 
 <script>
 // ─────────────────────────────────────────────
@@ -3504,7 +3505,7 @@ function showSimToast(msg) {
   if (!t) {
     t = document.createElement('div');
     t.id = 'sim-toast';
-    t.style.cssText = 'position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#1e1e2e;border:1px solid rgba(255,255,255,0.12);color:#e8e8ec;padding:10px 18px;border-radius:10px;font-size:13px;z-index:9999;pointer-events:none;transition:opacity 0.3s';
+    t.style.cssText = 'position:fixed;bottom:52px;left:50%;transform:translateX(-50%);background:#1e1e2e;border:1px solid rgba(255,255,255,0.12);color:#e8e8ec;padding:10px 18px;border-radius:10px;font-size:13px;z-index:9999;pointer-events:none;transition:opacity 0.3s';
     document.body.appendChild(t);
   }
   t.textContent = msg; t.style.opacity = '1';
