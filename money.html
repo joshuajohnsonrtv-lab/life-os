@@ -997,9 +997,6 @@
   <!-- ═══ DASHBOARD ═══ -->
   <div class="page active" id="page-dashboard">
 
-    <!-- DEBUG STRIP — remove once bug confirmed fixed -->
-    <div id="debug-strip" style="background:#1a0a0a;border:1px solid #f5c54260;border-radius:8px;padding:7px 12px;margin-bottom:10px;font-size:10px;font-family:monospace;color:#f5c542;line-height:1.6;word-break:break-all">⏳ renderDashboard has NOT run yet — if you still see this, the function is being skipped entirely</div>
-
     <!-- HERO -->
     <div style="background:linear-gradient(135deg,#0f1117,#141820);border:1px solid var(--border);border-radius:16px;padding:28px 24px 22px;margin-bottom:14px;position:relative;overflow:hidden">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),#f97316,transparent)"></div>
@@ -1694,9 +1691,6 @@
 </div>
 
 <script>
-// CHECKPOINT 1: script block started
-(function(){ var d=document.getElementById('debug-strip'); if(d) d.textContent='[CP1] Script started — DEFAULT_DATA about to be defined'; })();
-
 // ══════════════════════════════════════════════════
 // DATA
 // ══════════════════════════════════════════════════
@@ -1757,9 +1751,6 @@ const DEFAULT_DATA = {
   }
 };
 
-// CHECKPOINT 2: DEFAULT_DATA defined
-(function(){ var d=document.getElementById('debug-strip'); if(d) d.textContent='[CP2] DEFAULT_DATA defined — purgeAllHustles IIFE about to run'; })();
-
 // ── One-time cleanup: clear ALL hustles ───────────────────────────────────
 (function purgeAllHustles() {
   if (localStorage.getItem('money_os_hustles_purged_v2')) return;
@@ -1773,9 +1764,6 @@ const DEFAULT_DATA = {
   } catch(e) {}
   localStorage.setItem('money_os_hustles_purged_v2','1');
 })();
-
-// CHECKPOINT 3: past purgeAllHustles
-(function(){ var d=document.getElementById('debug-strip'); if(d) d.textContent='[CP3] Past purgeAllHustles — entering function definitions…'; })();
 
 function getData() {
   try {
@@ -1862,19 +1850,8 @@ function showPage(page) {
   // Scroll the main content area back to the top
   const mainEl = document.querySelector('.main');
   if (mainEl) mainEl.scrollTop = 0;
-  // Debug: write to strip before renderPage so we know showPage ran
-  var _dbg = document.getElementById('debug-strip');
-  if (_dbg) _dbg.textContent = 'showPage("' + page + '") called — about to call renderPage…';
-
   // Render synchronously first so data shows before the first browser paint
-  try {
-    renderPage(page);
-  } catch(e) {
-    // Surface the error in the debug strip — this is the catch that was hiding the bug
-    var _edbg = document.getElementById('debug-strip');
-    if (_edbg) _edbg.textContent = 'ERROR in renderPage("' + page + '"): ' + e.name + ': ' + e.message + ' | stack: ' + (e.stack||'').slice(0,200);
-    console.error('renderPage error:', e);
-  }
+  try { renderPage(page); } catch(e) { console.error('renderPage error:', e); }
   // Also render via rAF for pages that use Chart.js (needs display:block for sizing)
   if (page === 'income' || page === 'expenses' || page === 'savings' || page === 'delusion') {
     requestAnimationFrame(function() {
@@ -1908,13 +1885,6 @@ function renderDashboard() {
   const now = new Date();
   const thisMonth = today().slice(0, 7);
   const entries = (data.income?.entries || []).filter(e => e && typeof e.date === 'string');
-  // DEBUG — write diagnostics to the strip so we can see exactly what's happening
-  const dbg = document.getElementById('debug-strip');
-  if (dbg) {
-    const lsRaw = localStorage.getItem('money_os_data');
-    const lsEntries = lsRaw ? (() => { try { return JSON.parse(lsRaw)?.income?.entries?.length ?? 'n/a'; } catch(e){ return 'parse-err'; } })() : 'empty';
-    dbg.textContent = `renderDashboard @ ${now.toLocaleTimeString()} | entries-after-filter: ${entries.length} | localStorage entries: ${lsEntries} | _bootPollMs: ${typeof _bootPollMs!=='undefined'?_bootPollMs:'?'}`;
-  }
   const thisMonthEntries = entries.filter(e => e.date.startsWith(thisMonth));
   const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const lastMonth = lastMonthDate.toISOString().slice(0, 7);
@@ -3024,11 +2994,16 @@ function saveDelusionJournal() {
   saveData(data);
 }
 
-document.getElementById('delusion-journal-date').addEventListener('change', function() {
-  const data = getData();
-  const date = this.value;
-  document.getElementById('delusion-journal-text').value = (data.delusion?.journal || {})[date] || '';
-});
+// Guard: element only exists when the Delusion page is in the DOM
+(function() {
+  const el = document.getElementById('delusion-journal-date');
+  if (el) el.addEventListener('change', function() {
+    const data = getData();
+    const date = this.value;
+    const textEl = document.getElementById('delusion-journal-text');
+    if (textEl) textEl.value = (data.delusion?.journal || {})[date] || '';
+  });
+})();
 
 function addAffirmation() {
   const input = document.getElementById('new-affirmation');
@@ -3049,10 +3024,11 @@ function deleteAffirmation(i) {
   renderDelusion();
 }
 
-// Enter key for affirmation
-document.getElementById('new-affirmation').addEventListener('keydown', e => {
-  if (e.key === 'Enter') addAffirmation();
-});
+// Enter key for affirmation — guard against missing element
+(function() {
+  const el = document.getElementById('new-affirmation');
+  if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') addAffirmation(); });
+})();
 
 // ══════════════════════════════════════════════════
 // ESSENTIALS / BARE MINIMUM
@@ -4236,10 +4212,6 @@ function disconnectFirebase() {
 // ══════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════
-
-// CHECKPOINT 4: reached init section
-(function(){ var d=document.getElementById('debug-strip'); if(d) d.textContent='[CP4] Reached init section — calling updateSaveStatus then showPage…'; })();
-
 updateSaveStatus();
 
 // Boot via showPage so the init code path is identical to pressing the Home button.
