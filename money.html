@@ -4291,7 +4291,7 @@ function openFirebaseSetup() {
   if (ki) ki.value = getFbKey();
   const db = document.getElementById('fb-disconnect-btn');
   if (db) db.style.display = _fbEnabled ? 'block' : 'none';
-  openModal('modal-firebase-setup');
+  document.getElementById('modal-firebase-setup').style.display = 'flex';
 }
 
 function saveFirebaseConfig() {
