@@ -1044,7 +1044,10 @@
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
             <div class="card-title" style="margin:0">Active Hustles</div>
-            <button class="btn btn-ghost btn-sm" onclick="showPage('hustles')">Manage →</button>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-gold btn-sm" onclick="openHustleModal()">+ Add</button>
+              <button class="btn btn-ghost btn-sm" onclick="showPage('hustles')">Manage →</button>
+            </div>
           </div>
           <div id="dash-hustles"></div>
         </div>
@@ -2006,7 +2009,7 @@ function renderDashboard() {
   if (hustlesEl) {
     const hustles = (data.hustles?.items||[]).filter(h => h.status !== 'idea').slice(0, 4);
     if (!hustles.length) {
-      hustlesEl.innerHTML = `<div class="empty"><div class="empty-icon">🚀</div><p>No active hustles</p><button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="showPage('hustles')">Add a Hustle →</button></div>`;
+      hustlesEl.innerHTML = `<div class="empty"><div class="empty-icon">🚀</div><p>No active hustles</p><button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="openHustleModal()">+ Add Hustle</button></div>`;
     } else {
       const statusColors = { earning:'var(--green)', active:'var(--gold)', building:'var(--cyan)', idea:'var(--muted)' };
       const statusLabels = { earning:'💸 Earning', active:'🔥 Active', building:'🔨 Building', idea:'💡 Idea' };
