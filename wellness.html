@@ -5997,11 +5997,11 @@ let _fbSyncing = false;
 let _fbInitialSyncDone = false;
 
 function getFirebaseConfig() {
-  try { return JSON.parse(localStorage.getItem('wellness_firebase_config') || 'null'); } catch(e) { return null; }
+  try { return JSON.parse(localStorage.getItem('wellness_firebase_config') || localStorage.getItem('life_os_firebase_config') || 'null'); } catch(e) { return null; }
 }
 
 function getFirebaseKey() {
-  return localStorage.getItem('wellness_firebase_key') || 'default';
+  return localStorage.getItem('wellness_firebase_key') || localStorage.getItem('life_os_firebase_key') || 'default';
 }
 
 function fbRef(key) {
@@ -6149,6 +6149,8 @@ function saveFirebaseConfig() {
   }
   localStorage.setItem('wellness_firebase_config', JSON.stringify(config));
   localStorage.setItem('wellness_firebase_key', secretKey);
+  localStorage.setItem('life_os_firebase_config', JSON.stringify(config));
+  localStorage.setItem('life_os_firebase_key', secretKey);
   closeFirebaseSetup();
   // Re-init (may already have an app)
   if (firebase.apps.length) {

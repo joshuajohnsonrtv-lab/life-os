@@ -4213,8 +4213,8 @@ function importData(event) {
 // ══════════════════════════════════════════════════
 let _fbApp=null, _fbDb=null, _fbEnabled=false, _fbSyncing=false, _fbInitDone=false;
 
-function getFbConfig() { try { return JSON.parse(localStorage.getItem('money_firebase_config')||'null'); } catch(e){return null;} }
-function getFbKey()    { return localStorage.getItem('money_firebase_key')||'default'; }
+function getFbConfig() { try { return JSON.parse(localStorage.getItem('money_firebase_config')||localStorage.getItem('life_os_firebase_config')||'null'); } catch(e){return null;} }
+function getFbKey()    { return localStorage.getItem('money_firebase_key')||localStorage.getItem('life_os_firebase_key')||'default'; }
 function fbRef(key)    { return _fbDb.ref('money/'+getFbKey()+'/'+key); }
 
 function initFirebase() {
@@ -4315,6 +4315,8 @@ function saveFirebaseConfig() {
   if (!config.databaseURL) { showToast('⚠️ Missing databaseURL — enable Realtime Database first'); return; }
   localStorage.setItem('money_firebase_config', JSON.stringify(config));
   localStorage.setItem('money_firebase_key', key);
+  localStorage.setItem('life_os_firebase_config', JSON.stringify(config));
+  localStorage.setItem('life_os_firebase_key', key);
   closeModal('modal-firebase-setup');
   if (firebase.apps.length) {
     try { firebase.apps[0].delete().then(function(){ _fbApp=null;_fbDb=null;_fbEnabled=false; initFirebase(); }); }

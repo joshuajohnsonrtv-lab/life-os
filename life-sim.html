@@ -3339,10 +3339,10 @@ let _simFbApp = null, _simFbDb = null, _simFbEnabled = false;
 let _simFbSyncing = false, _simFbInitDone = false;
 
 function getSimFbConfig() {
-  try { return JSON.parse(localStorage.getItem('sim_firebase_config') || 'null'); } catch(e) { return null; }
+  try { return JSON.parse(localStorage.getItem('sim_firebase_config') || localStorage.getItem('life_os_firebase_config') || 'null'); } catch(e) { return null; }
 }
 function getSimFbKey() {
-  return localStorage.getItem('sim_firebase_key') || 'default';
+  return localStorage.getItem('sim_firebase_key') || localStorage.getItem('life_os_firebase_key') || 'default';
 }
 function getSimFbRef() {
   return _simFbDb.ref('life_sim/' + getSimFbKey());
@@ -3452,6 +3452,8 @@ function saveSimFirebaseConfig() {
   if (!config || !config.apiKey) { showSimToast('⚠️ Invalid Firebase config'); return; }
   localStorage.setItem('sim_firebase_config', JSON.stringify(config));
   localStorage.setItem('sim_firebase_key', key);
+  localStorage.setItem('life_os_firebase_config', JSON.stringify(config));
+  localStorage.setItem('life_os_firebase_key', key);
   document.getElementById('modal-sim-firebase').style.display = 'none';
   if (firebase.apps.length) {
     try { firebase.apps[0].delete().then(function() { _simFbApp=null; _simFbDb=null; _simFbEnabled=false; initSimFirebase(); }); }
