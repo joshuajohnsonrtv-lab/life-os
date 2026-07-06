@@ -1355,6 +1355,14 @@
       <label>Notes</label>
       <textarea id="mg-notes" placeholder="Why this goal matters..."></textarea>
     </div>
+    <div class="form-group">
+      <label>Cover Photo (optional)</label>
+      <input type="file" accept="image/*" id="mg-cover-file" style="display:none" onchange="handleGoalImageSelect(this)">
+      <input type="hidden" id="mg-cover">
+      <label for="mg-cover-file" class="bp-file-btn">📷 Choose a photo from your device</label>
+      <div id="mg-cover-preview" class="bp-cover-preview"></div>
+      <div id="mg-cover-name" style="font-size:11px;color:rgba(245,197,66,0.6);margin-top:6px;text-align:center"></div>
+    </div>
     <div style="display:flex;gap:8px;margin-top:4px">
       <button class="btn btn-ghost" style="flex:1" onclick="closeModal('modal-goal')">Cancel</button>
       <button class="btn btn-gold" style="flex:1" onclick="saveGoal()">Save Goal</button>
@@ -1988,7 +1996,9 @@ function renderDashboard() {
       goalsEl.innerHTML = activeGoals.slice(0, 6).map(g => {
         const pct = Math.min(100, Math.round((parseFloat(g.current||0) / parseFloat(g.target||1)) * 100));
         const color = pct >= 100 ? 'var(--green)' : pct >= 75 ? 'var(--gold)' : pct >= 40 ? 'var(--cyan)' : 'var(--purple)';
-        return `<div style="margin-bottom:16px">
+        const coverBlock = g.coverImage ? `<div style="width:100%;height:90px;background-image:url('${g.coverImage}');background-size:cover;background-position:center;border-radius:8px;margin-bottom:10px"></div>` : '';
+        return `<div style="margin-bottom:16px" onclick="showPage('goals')" style="cursor:pointer">
+          ${coverBlock}
           <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">
             <span style="font-weight:600">${g.emoji||'🎯'} ${g.name}</span>
             <span style="color:${color};font-weight:800">${pct}%</span>
@@ -2285,7 +2295,11 @@ function goalCard(g) {
   const currentLabel = isCashFlow ? 'Monthly Now:' : 'Current:';
   const targetLabel  = isCashFlow ? 'Monthly Target:' : 'Target:';
   const toGoLabel    = isCashFlow ? '/mo to go' : ' to go';
-  return `<div class="goal-card ${g.complete?'complete':''}">
+  const coverBanner = g.coverImage
+    ? `<div style="width:100%;height:130px;background-image:url('${g.coverImage}');background-size:cover;background-position:center;border-radius:10px 10px 0 0;margin:-14px -14px 14px -14px;width:calc(100% + 28px)"></div>`
+    : '';
+  return `<div class="goal-card ${g.complete?'complete':''}" style="overflow:hidden">
+    ${coverBanner}
     <div class="goal-header">
       <div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
@@ -2346,6 +2360,11 @@ function openGoalModal(id) {
     document.getElementById('mg-emoji').value = g.emoji || '';
     document.getElementById('mg-notes').value = g.notes || '';
     setGoalType(g.goalType || 'lump_sum');
+    const coverHidden = document.getElementById('mg-cover');
+    if (coverHidden) coverHidden.value = g.coverImage || '';
+    const coverName = document.getElementById('mg-cover-name');
+    if (coverName) coverName.textContent = g.coverImage ? '✓ Photo loaded' : '';
+    updateGoalCoverPreview();
   } else {
     document.getElementById('mg-title').textContent = '🎯 Add Goal';
     document.getElementById('mg-id').value = '';
@@ -2356,6 +2375,13 @@ function openGoalModal(id) {
     document.getElementById('mg-emoji').value = '🎯';
     document.getElementById('mg-notes').value = '';
     setGoalType('lump_sum');
+    const coverHidden = document.getElementById('mg-cover');
+    if (coverHidden) coverHidden.value = '';
+    const coverFile = document.getElementById('mg-cover-file');
+    if (coverFile) coverFile.value = '';
+    const coverName = document.getElementById('mg-cover-name');
+    if (coverName) coverName.textContent = '';
+    updateGoalCoverPreview();
   }
   document.getElementById('modal-goal').style.display = 'flex';
 }
@@ -2375,16 +2401,20 @@ function saveGoal() {
     if (existingId) {
       const idx = data.goals.items.findIndex(g => g.id === existingId);
       if (idx > -1) {
+        const coverVal = (document.getElementById('mg-cover')||{}).value || '';
         data.goals.items[idx] = { ...data.goals.items[idx], name, target, current, goalType,
           deadline: document.getElementById('mg-deadline').value,
           emoji: document.getElementById('mg-emoji').value || '🎯',
-          notes: document.getElementById('mg-notes').value.trim() };
+          notes: document.getElementById('mg-notes').value.trim(),
+          coverImage: coverVal || data.goals.items[idx].coverImage || '' };
       }
     } else {
+      const coverVal = (document.getElementById('mg-cover')||{}).value || '';
       data.goals.items.push({ id: uid(), name, target, current, goalType,
         deadline: document.getElementById('mg-deadline').value,
         emoji: document.getElementById('mg-emoji').value || '🎯',
         notes: document.getElementById('mg-notes').value.trim(),
+        coverImage: coverVal,
         complete: false, createdAt: today() });
     }
     saveData(data);
@@ -2756,6 +2786,44 @@ function handleCoverImageSelect(input) {
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
+}
+
+function handleGoalImageSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const maxW = 600;
+      const ratio = Math.min(1, maxW / img.width);
+      canvas.width  = Math.round(img.width  * ratio);
+      canvas.height = Math.round(img.height * ratio);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      const compressed = canvas.toDataURL('image/jpeg', 0.75);
+      const hidden = document.getElementById('mg-cover');
+      if (hidden) hidden.value = compressed;
+      const nameEl = document.getElementById('mg-cover-name');
+      if (nameEl) nameEl.textContent = '✓ ' + file.name;
+      updateGoalCoverPreview();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateGoalCoverPreview() {
+  const url = (document.getElementById('mg-cover') || {}).value || '';
+  const preview = document.getElementById('mg-cover-preview');
+  if (!preview) return;
+  if (url) {
+    preview.style.display = 'block';
+    preview.style.backgroundImage = `url('${url}')`;
+  } else {
+    preview.style.display = 'none';
+    preview.style.backgroundImage = '';
+  }
 }
 
 function renderHustleSteps() {
