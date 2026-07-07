@@ -1049,6 +1049,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   color:rgba(255,255,255,.35);font-size:12px;font-weight:700;padding:10px 6px;cursor:pointer;
   letter-spacing:.3px;transition:color .15s,border-color .15s;font-family:inherit;}
 .j-tab-btn.active{color:#a855f7;border-bottom-color:#a855f7;}
+.j-tab-btn:last-child.active{color:#f97316;border-bottom-color:#f97316;}
 .j-tab-btn:hover{color:rgba(255,255,255,.65);}
 .j-journal-body{overflow-y:auto;flex:1;padding:10px 16px;display:flex;flex-direction:column;gap:8px;}
 .j-journal-txt{width:100%;background:#141420;border:1px solid #2a2840;color:rgba(255,255,255,.88);
@@ -1283,6 +1284,264 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 /* kitchen loc btn color */
 .loc-btn.kitchen.active{color:#f97316;border-color:#f97316;}
+
+/* ══════════════════════════════════════════════
+   CHALLENGE TAB
+══════════════════════════════════════════════ */
+.loc-btn.challenge.active{
+  background:linear-gradient(90deg,#f97316,#ef4444);
+  color:#fff;border-color:#f97316;
+}
+.challenge-wrap{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:none;flex-direction:column;
+}
+.challenge-wrap.show{display:flex;}
+
+/* ── Hero countdown ── */
+.ch-hero{
+  background:linear-gradient(160deg,#100a03 0%,#1c0d05 45%,#0d0a16 100%);
+  padding:22px 18px 18px;border-bottom:1px solid rgba(249,115,22,.2);
+  flex-shrink:0;position:relative;overflow:hidden;
+}
+.ch-hero::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse at 15% 0%,rgba(249,115,22,.14) 0%,transparent 55%),
+    radial-gradient(ellipse at 85% 100%,rgba(239,68,68,.1) 0%,transparent 55%);
+}
+.ch-top-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.ch-name-badge{
+  font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(249,115,22,.75);display:flex;align-items:center;gap:5px;
+}
+.ch-settings-btn{
+  background:none;border:1px solid rgba(255,255,255,.12);border-radius:8px;
+  padding:5px 9px;color:rgba(255,255,255,.35);cursor:pointer;font-size:13px;
+  transition:all .2s;flex-shrink:0;
+}
+.ch-settings-btn:hover{border-color:rgba(249,115,22,.55);color:var(--orange);}
+.ch-countdown-row{display:flex;align-items:baseline;gap:10px;line-height:1;}
+.ch-days-hero{
+  font-size:58px;font-weight:900;letter-spacing:-4px;color:#fff;
+  text-shadow:0 0 40px rgba(249,115,22,.45);font-variant-numeric:tabular-nums;
+}
+.ch-days-unit{font-size:14px;font-weight:900;color:rgba(255,255,255,.35);letter-spacing:1px;text-transform:uppercase;align-self:flex-end;margin-bottom:6px;}
+.ch-clock{
+  font-size:20px;font-weight:900;letter-spacing:3px;
+  color:rgba(249,115,22,.9);font-variant-numeric:tabular-nums;
+  align-self:flex-end;margin-bottom:4px;
+}
+.ch-days-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;margin-top:6px;}
+.ch-prog-wrap{margin-top:14px;}
+.ch-prog-bar-bg{height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
+.ch-prog-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,#f97316,#ef4444);transition:width .8s ease;}
+.ch-prog-labels{display:flex;justify-content:space-between;margin-top:5px;font-size:10px;font-weight:700;color:rgba(255,255,255,.25);}
+
+/* ── Today section ── */
+.ch-today-hdr{
+  padding:14px 16px 10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.ch-today-label{font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);}
+.ch-today-score{font-size:12px;font-weight:900;color:var(--gold);}
+.ch-all-done-banner{
+  margin:0 16px 10px;padding:10px 14px;border-radius:10px;
+  background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);
+  font-size:12px;font-weight:800;color:var(--green);text-align:center;
+  display:none;
+}
+.ch-all-done-banner.show{display:block;}
+
+/* ── Habit cards ── */
+.ch-habits{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  padding:0 16px 10px;
+}
+.ch-card{
+  background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);
+  border-radius:13px;padding:12px 10px 10px;
+  display:flex;flex-direction:column;gap:3px;
+  cursor:pointer;transition:transform .15s,background .2s,border-color .2s;
+  user-select:none;position:relative;-webkit-tap-highlight-color:transparent;
+  animation:ch-card-in .35s ease both;
+}
+.ch-card:active{transform:scale(.94);}
+.ch-card.done{
+  background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.3);
+}
+.ch-card.auto-done{
+  background:rgba(59,130,246,.07);border-color:rgba(59,130,246,.28);
+}
+.ch-card-top{display:flex;align-items:flex-start;justify-content:space-between;}
+.ch-card-icon{font-size:22px;line-height:1;margin-bottom:5px;}
+.ch-card-check{
+  width:18px;height:18px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.15);background:transparent;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;transition:all .2s;flex-shrink:0;margin-top:1px;
+}
+.ch-card.done .ch-card-check{background:var(--green);border-color:var(--green);color:#000;font-weight:900;}
+.ch-card.auto-done .ch-card-check{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:900;}
+.ch-card-name{font-size:11px;font-weight:800;color:rgba(255,255,255,.78);line-height:1.3;}
+.ch-card-streak{font-size:10px;color:rgba(255,255,255,.28);margin-top:2px;}
+.ch-card-auto{font-size:9px;font-weight:700;color:rgba(59,130,246,.5);margin-top:1px;}
+.ch-card.done .ch-card-name{color:rgba(34,197,94,.8);}
+.ch-card.auto-done .ch-card-name{color:rgba(59,130,246,.8);}
+
+/* ── Add habit + photos ── */
+.ch-add-row{padding:2px 16px 12px;display:flex;gap:8px;}
+.ch-add-btn{
+  flex:1;padding:10px;border-radius:10px;
+  border:1px dashed rgba(255,255,255,.1);
+  background:transparent;color:rgba(255,255,255,.28);
+  font-size:12px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  transition:all .2s;font-family:inherit;
+}
+.ch-add-btn:hover{border-color:var(--orange);color:var(--orange);}
+.ch-photos-wrap{padding:0 16px 28px;flex-shrink:0;}
+.ch-photos-lbl{
+  font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.22);margin-bottom:8px;
+}
+.ch-photo-strip{
+  display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  padding-bottom:4px;scrollbar-width:none;
+}
+.ch-photo-strip::-webkit-scrollbar{display:none;}
+.ch-photo-add{
+  width:68px;height:68px;border-radius:10px;flex-shrink:0;
+  border:1.5px dashed rgba(255,255,255,.13);
+  background:rgba(255,255,255,.025);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;cursor:pointer;transition:all .2s;
+}
+.ch-photo-add:hover{border-color:var(--orange);background:rgba(249,115,22,.05);}
+.ch-photo-thumb{
+  width:68px;height:68px;object-fit:cover;border-radius:10px;flex-shrink:0;
+  border:1px solid rgba(255,255,255,.1);cursor:pointer;transition:transform .2s;
+}
+.ch-photo-thumb:hover{transform:scale(1.05);}
+
+/* ── Lightbox ── */
+.ch-lightbox{
+  position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:4000;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.ch-lightbox.open{opacity:1;pointer-events:auto;}
+.ch-lightbox img{max-width:96vw;max-height:88vh;border-radius:12px;object-fit:contain;}
+.ch-lightbox-x{
+  position:absolute;top:14px;right:18px;background:none;border:none;
+  color:rgba(255,255,255,.5);font-size:26px;cursor:pointer;
+}
+.ch-lightbox-del{
+  position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+  background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);
+  color:#ef4444;border-radius:10px;padding:9px 22px;
+  font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;
+}
+
+/* ── Setup / manage modal (opened from journal) ── */
+.ch-setup-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:3500;
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .22s;
+}
+.ch-setup-overlay.open{opacity:1;pointer-events:auto;}
+.ch-setup-sheet{
+  width:min(420px,100%);max-height:88vh;
+  background:#0d0a16;border:1px solid rgba(249,115,22,.22);
+  border-radius:18px 18px 0 0;display:flex;flex-direction:column;overflow:hidden;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);
+}
+.ch-setup-overlay.open .ch-setup-sheet{transform:translateY(0);}
+.ch-setup-handle{width:36px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:10px auto 0;}
+.ch-setup-hdr{padding:14px 16px 12px;border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.ch-setup-title{font-size:13px;font-weight:900;color:#fff;}
+.ch-setup-x{background:none;border:none;color:rgba(255,255,255,.3);font-size:20px;cursor:pointer;line-height:1;}
+.ch-setup-body{overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;}
+.ch-setup-lbl{font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:4px;}
+.ch-setup-inp{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:9px;padding:10px 12px;color:#fff;font-size:13px;
+  outline:none;font-family:inherit;transition:border-color .2s;
+}
+.ch-setup-inp:focus{border-color:rgba(249,115,22,.5);}
+.ch-setup-inp[type=number]{width:80px;}
+.ch-habit-toggle-row{
+  display:flex;align-items:center;gap:8px;padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.ch-habit-toggle-row:last-child{border-bottom:none;}
+.ch-ht-icon{font-size:16px;flex-shrink:0;}
+.ch-ht-label{flex:1;font-size:12px;font-weight:600;color:rgba(255,255,255,.7);}
+.ch-ht-auto{font-size:9px;padding:2px 6px;border-radius:5px;
+  background:rgba(59,130,246,.1);color:rgba(59,130,246,.65);font-weight:700;}
+.ch-ht-switch{
+  width:36px;height:20px;border-radius:10px;border:none;
+  background:rgba(255,255,255,.1);cursor:pointer;position:relative;
+  transition:background .2s;flex-shrink:0;
+}
+.ch-ht-switch.on{background:var(--orange);}
+.ch-ht-switch::after{
+  content:'';position:absolute;width:14px;height:14px;
+  background:#fff;border-radius:50%;top:3px;left:3px;
+  transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);
+}
+.ch-ht-switch.on::after{transform:translateX(16px);}
+.ch-setup-start-btn{
+  padding:13px;border-radius:12px;border:none;width:100%;
+  background:linear-gradient(135deg,#f97316,#ef4444);
+  color:#fff;font-size:14px;font-weight:900;
+  cursor:pointer;font-family:inherit;transition:opacity .15s;
+  letter-spacing:.3px;
+}
+.ch-setup-start-btn:hover{opacity:.88;}
+.ch-setup-end-btn{
+  padding:11px;border-radius:12px;border:1px solid rgba(239,68,68,.3);
+  width:100%;background:rgba(239,68,68,.08);
+  color:#ef4444;font-size:13px;font-weight:800;
+  cursor:pointer;font-family:inherit;transition:all .15s;
+}
+.ch-setup-end-btn:hover{background:rgba(239,68,68,.16);}
+.ch-setup-divider{height:1px;background:rgba(255,255,255,.06);}
+
+/* ── No challenge placeholder ── */
+.ch-empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:14px;padding:40px 20px;text-align:center;
+}
+.ch-empty-icon{font-size:52px;opacity:.35;}
+.ch-empty-title{font-size:15px;font-weight:900;color:rgba(255,255,255,.5);}
+.ch-empty-sub{font-size:12px;color:rgba(255,255,255,.25);max-width:220px;line-height:1.5;}
+.ch-empty-btn{
+  padding:12px 24px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,#f97316,#ef4444);
+  color:#fff;font-size:13px;font-weight:900;
+  cursor:pointer;font-family:inherit;transition:opacity .15s;
+}
+.ch-empty-btn:hover{opacity:.85;}
+
+/* ── Animations ── */
+@keyframes ch-card-in{
+  from{opacity:0;transform:translateY(10px) scale(.95);}
+  to{opacity:1;transform:translateY(0) scale(1);}
+}
+@keyframes ch-check-pop{
+  0%{transform:scale(1);}
+  40%{transform:scale(1.35);}
+  70%{transform:scale(.9);}
+  100%{transform:scale(1);}
+}
+.ch-card.just-tapped .ch-card-check{animation:ch-check-pop .35s ease;}
+@keyframes ch-hero-in{
+  from{opacity:0;transform:translateY(-6px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.ch-hero{animation:ch-hero-in .4s ease both;}
 </style>
 </head>
 <body>
@@ -1301,6 +1560,10 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 <!-- LOCATION BAR -->
 <div class="loc-bar">
+  <!-- Challenge tab: standalone pill, leftmost, only visible when active -->
+  <div class="loc-group" id="ch-tab-group" style="display:none;margin-right:8px">
+    <button class="loc-btn challenge" id="btn-challenge" onclick="goLoc('challenge')">🔥 Challenge</button>
+  </div>
   <div class="loc-group">
     <button class="loc-btn active" id="btn-room" onclick="goLoc('room')">🏠 Your Room</button>
     <button class="loc-btn" id="btn-out" onclick="goLoc('outside')">🌍 Outside</button>
@@ -1456,6 +1719,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
     </div>
     </div>
   </div>
+
+  <!-- CHALLENGE VIEW -->
+  <div class="challenge-wrap" id="view-challenge"><!-- populated by _challengeRender() --></div>
 
   <!-- OUTSIDE VIEW -->
   <div class="outside-wrap" id="view-outside">
@@ -1930,20 +2196,29 @@ function goLoc(loc) {
   const rv = document.getElementById('view-room');
   const ov = document.getElementById('view-outside');
   const kv = document.getElementById('view-kitchen');
+  const cv = document.getElementById('view-challenge');
   const br = document.getElementById('btn-room');
   const bo = document.getElementById('btn-out');
   const bk = document.getElementById('btn-kitchen');
+  const bc = document.getElementById('btn-challenge');
   // hide all
   rv.classList.add('hidden');
   ov.classList.remove('show');
   kv?.classList.remove('show');
-  [br, bo, bk].forEach(b => b?.classList.remove('active'));
+  cv?.classList.remove('show');
+  [br, bo, bk, bc].forEach(b => b?.classList.remove('active'));
+  // Stop challenge countdown when leaving
+  if (typeof _chStopCountdown === 'function') _chStopCountdown();
   // hide kitchen char by default
   const kChar = document.getElementById('k-char');
   if (kChar) kChar.style.display = 'none';
   closeActivityMenu();
 
-  if (loc === 'room') {
+  if (loc === 'challenge') {
+    cv?.classList.add('show'); bc?.classList.add('active');
+    if (typeof _challengeRender === 'function') _challengeRender();
+    if (typeof _chStartCountdown === 'function') _chStartCountdown();
+  } else if (loc === 'room') {
     rv.classList.remove('hidden'); br.classList.add('active');
   } else if (loc === 'outside') {
     ov.classList.add('show'); bo.classList.add('active'); closeZone();
@@ -2772,11 +3047,13 @@ function _renderJournalModal(modal) {
     <div class="j-tabs">
       <button class="j-tab-btn${_jActiveTab==='todo'?' active':''}" onclick="_switchJTab('todo')">📋 To-Do</button>
       <button class="j-tab-btn${_jActiveTab==='journal'?' active':''}" onclick="_switchJTab('journal')">✍️ Journal</button>
+      <button class="j-tab-btn${_jActiveTab==='challenge'?' active':''}" onclick="_switchJTab('challenge')" style="${_jActiveTab==='challenge'?'':''}">🔥 Challenge</button>
     </div>
     <div id="j-tab-content" style="display:flex;flex-direction:column;flex:1;overflow:hidden;"></div>`;
   modal.innerHTML = '';
   modal.appendChild(inner);
   if (_jActiveTab === 'todo') _renderTodoTab();
+  else if (_jActiveTab === 'challenge') _renderChallengeJTab();
   else _renderJournalTab();
 }
 
@@ -3265,7 +3542,8 @@ function saveState() {
   if (!_initDone) return; // never stomp saved state during the init render pass
   try {
     // Which scene is currently visible?
-    const loc = document.getElementById('view-kitchen')?.classList.contains('show') ? 'kitchen'
+    const loc = document.getElementById('view-challenge')?.classList.contains('show') ? 'challenge'
+              : document.getElementById('view-kitchen')?.classList.contains('show') ? 'kitchen'
               : document.getElementById('view-outside')?.classList.contains('show') ? 'outside'
               : 'room';
     // Capture actual CSS classes so they restore exactly
@@ -3368,8 +3646,10 @@ function loadState() {
       _manualStatusTime = Date.now();
     }
 
-    // ── 6. Scene (kitchen / outside override room view) ──
-    if (s.loc === 'kitchen') {
+    // ── 6. Scene (challenge / kitchen / outside override room view) ──
+    if (s.loc === 'challenge' && typeof _chLoad === 'function' && _chLoad().active) {
+      goLoc('challenge');
+    } else if (s.loc === 'kitchen') {
       goLoc('kitchen');
       if (s.kZone && s.kZone !== 'entry') {
         _kZone    = s.kZone;
@@ -3706,6 +3986,558 @@ function showSimToast(msg) {
 
 // Start Firebase if already configured
 if (getSimFbConfig()) initSimFirebase(); else updateSimCloudStatus('off');
+
+// ═══════════════════════════════════════════════════════════
+//  CHALLENGE MODULE
+// ═══════════════════════════════════════════════════════════
+const _CH_KEY     = 'life_sim_challenge';
+const _CH_LOG_KEY = 'life_sim_challenge_log';
+let   _chTimer    = null;
+let   _chLbPhotoIndex = -1; // lightbox current photo index
+
+const CH_DEFAULT_HABITS = [
+  { id:'raw_milk',  label:'Raw Milk',        icon:'🥛', type:'manual' },
+  { id:'eggs',      label:'12 Eggs',          icon:'🥚', type:'manual' },
+  { id:'no_sugar',  label:'No Sugar',         icon:'🚫', type:'manual' },
+  { id:'sleep_8h',  label:'8h Sleep',         icon:'😴', type:'auto'   },
+  { id:'gym',       label:'Gym',              icon:'🏋️', type:'auto'   },
+  { id:'water_3l',  label:'3L Water',         icon:'💧', type:'auto'   },
+  { id:'facial',    label:'Facial Exercises', icon:'💆', type:'auto'   },
+  { id:'hygiene',   label:'Hygiene',          icon:'🧼', type:'manual' },
+];
+
+// ── Data helpers ──────────────────────────────────────────
+function _chLoad() {
+  try { return JSON.parse(localStorage.getItem(_CH_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+function _chSave(ch) {
+  try { localStorage.setItem(_CH_KEY, JSON.stringify(ch)); } catch(e) {}
+}
+function _chLogLoad() {
+  try { return JSON.parse(localStorage.getItem(_CH_LOG_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+function _chLogSave(log) {
+  try { localStorage.setItem(_CH_LOG_KEY, JSON.stringify(log)); } catch(e) {}
+}
+function _chDateKey(d) {
+  return (d || new Date()).toLocaleDateString('en-CA', { timeZone:'Europe/London' });
+}
+function _chCalcSleepHours(bed, wake) {
+  if (!bed || !wake) return null;
+  const [bH,bM] = bed.split(':').map(Number);
+  const [wH,wM] = wake.split(':').map(Number);
+  let mins = (wH*60+wM) - (bH*60+bM);
+  if (mins < 0) mins += 1440;
+  return mins / 60;
+}
+
+// ── Wellness auto-check ───────────────────────────────────
+function _chAutoCheck(habitId, dateStr) {
+  try {
+    const wd = JSON.parse(localStorage.getItem('wellness_data') || '{}');
+    if (habitId === 'sleep_8h') {
+      const s = wd.sleep?.log?.[dateStr];
+      if (!s) return false;
+      const hrs = _chCalcSleepHours(s.bedtime, s.wakeTime);
+      return hrs !== null && hrs >= 8;
+    }
+    if (habitId === 'gym') {
+      const g = wd.gym?.log?.[dateStr];
+      return !!(g && g.exercises && g.exercises.length > 0);
+    }
+    if (habitId === 'water_3l') {
+      const w = wd.hydration?.log?.[dateStr];
+      return typeof w === 'number' && w >= 6;
+    }
+    if (habitId === 'facial') {
+      const f = wd.facialExercises?.log?.[dateStr];
+      const exList = wd.facialExercises?.exercises || [];
+      if (!exList.length) return false;
+      return !!(f && (f.completed||[]).length >= exList.length);
+    }
+  } catch(e) {}
+  return false;
+}
+
+// ── Streak calculator ─────────────────────────────────────
+function _chStreak(habit, challengeLog) {
+  let streak = 0;
+  const d = new Date();
+  for (let i = 0; i < 60; i++) {
+    const key = _chDateKey(d);
+    let done = false;
+    if (habit.type === 'auto') {
+      done = _chAutoCheck(habit.id, key);
+    } else {
+      done = !!(challengeLog[key] && challengeLog[key][habit.id]);
+    }
+    if (done) { streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+// ── Tab visibility ────────────────────────────────────────
+function _chUpdateTabVisibility() {
+  const ch  = _chLoad();
+  const grp = document.getElementById('ch-tab-group');
+  if (grp) grp.style.display = ch.active ? '' : 'none';
+}
+
+// ── Main render ───────────────────────────────────────────
+function _challengeRender() {
+  const wrap = document.getElementById('view-challenge');
+  if (!wrap) return;
+  const ch = _chLoad();
+
+  if (!ch.active) {
+    wrap.innerHTML = `
+      <div class="ch-empty">
+        <div class="ch-empty-icon">🔥</div>
+        <div class="ch-empty-title">No Active Challenge</div>
+        <div class="ch-empty-sub">Start a challenge from the desk journal to begin tracking your habits.</div>
+        <button class="ch-empty-btn" onclick="showJournal({stopPropagation:()=>{}});setTimeout(()=>_switchJTab('challenge'),80)">
+          Open Journal →
+        </button>
+      </div>`;
+    return;
+  }
+
+  const today   = _chDateKey();
+  const log     = _chLogLoad();
+  const todayLog = log[today] || {};
+
+  // Days calculations
+  const startMs   = new Date(ch.startDate + 'T00:00:00').getTime();
+  const endMs     = new Date(ch.endDate   + 'T23:59:59').getTime();
+  const nowMs     = Date.now();
+  const elapsed   = Math.floor((nowMs - startMs) / 86400000);
+  const daysDone  = Math.max(0, Math.min(elapsed, ch.totalDays));
+  const pct       = Math.round((daysDone / ch.totalDays) * 100);
+
+  // Countdown
+  const remaining = Math.max(0, endMs - nowMs);
+  const daysLeft  = Math.floor(remaining / 86400000);
+  const hLeft     = Math.floor((remaining % 86400000) / 3600000);
+  const mLeft     = Math.floor((remaining % 3600000)  / 60000);
+  const sLeft     = Math.floor((remaining % 60000)    / 1000);
+  const clockStr  = [hLeft,mLeft,sLeft].map(n=>String(n).padStart(2,'0')).join(':');
+
+  // Habits status for today
+  const habits = (ch.habits || []).filter(h => h.active !== false);
+  let doneCount = 0;
+  habits.forEach(h => {
+    const done = h.type === 'auto' ? _chAutoCheck(h.id, today) : !!(todayLog[h.id]);
+    if (done) doneCount++;
+  });
+  const allDone = doneCount === habits.length && habits.length > 0;
+
+  // Habit cards HTML
+  const cardsHtml = habits.map((h, i) => {
+    const isDoneAuto   = h.type === 'auto'   && _chAutoCheck(h.id, today);
+    const isDoneManual = h.type === 'manual' && !!(todayLog[h.id]);
+    const isDone = isDoneAuto || isDoneManual;
+    const cls = isDoneAuto ? 'auto-done' : isDoneManual ? 'done' : '';
+    const streak = _chStreak(h, log);
+    const streakStr = streak > 0 ? `🔥 ${streak} day${streak>1?'s':''}` : '';
+    const checkMark = isDone ? '✓' : '';
+    const autoNote  = h.type === 'auto' ? '<div class="ch-card-auto">AUTO</div>' : '';
+    const delay = i * 45;
+    return `
+      <div class="ch-card ${cls}" onclick="_chToggleHabit('${h.id}')" style="animation-delay:${delay}ms">
+        <div class="ch-card-top">
+          <div class="ch-card-icon">${h.icon}</div>
+          <div class="ch-card-check">${checkMark}</div>
+        </div>
+        <div class="ch-card-name">${h.label}</div>
+        ${streakStr ? `<div class="ch-card-streak">${streakStr}</div>` : ''}
+        ${autoNote}
+      </div>`;
+  }).join('');
+
+  // Photos HTML
+  const photos = ch.photos || [];
+  const thumbsHtml = photos.map((p,i) =>
+    `<img class="ch-photo-thumb" src="${p.dataUrl}" alt="photo" onclick="_chOpenLightbox(${i})">`
+  ).join('');
+
+  wrap.innerHTML = `
+    <div class="ch-hero">
+      <div class="ch-top-row">
+        <div class="ch-name-badge">🔥 ${ch.name || '28-Day Challenge'}</div>
+        <button class="ch-settings-btn" onclick="_chOpenSetup()">⚙️</button>
+      </div>
+      <div class="ch-countdown-row">
+        <div class="ch-days-hero" id="ch-days-num">${daysLeft}</div>
+        <div>
+          <div class="ch-days-unit">days</div>
+          <div class="ch-clock" id="ch-clock">${clockStr}</div>
+        </div>
+      </div>
+      <div class="ch-days-label">REMAINING — ${ch.totalDays}-DAY CHALLENGE</div>
+      <div class="ch-prog-wrap">
+        <div class="ch-prog-bar-bg">
+          <div class="ch-prog-bar" style="width:${pct}%"></div>
+        </div>
+        <div class="ch-prog-labels"><span>Day ${daysDone}</span><span>${ch.totalDays} days</span></div>
+      </div>
+    </div>
+    <div class="ch-today-hdr">
+      <div class="ch-today-label">TODAY'S HABITS</div>
+      <div class="ch-today-score">${doneCount}/${habits.length}</div>
+    </div>
+    <div class="ch-all-done-banner ${allDone?'show':''}">🎯 All done today — legend.</div>
+    <div class="ch-habits">${cardsHtml}</div>
+    <div class="ch-add-row">
+      <button class="ch-add-btn" onclick="_chAddCustomHabit()">＋ Add Habit</button>
+    </div>
+    <div class="ch-photos-wrap">
+      <div class="ch-photos-lbl">📸 CHALLENGE PHOTOS</div>
+      <div class="ch-photo-strip">
+        <div class="ch-photo-add" onclick="document.getElementById('ch-photo-input').click()">📷</div>
+        ${thumbsHtml}
+      </div>
+    </div>`;
+}
+
+// ── Countdown tick ─────────────────────────────────────────
+function _chTick() {
+  const ch = _chLoad();
+  if (!ch.active || !ch.endDate) return;
+  const endMs  = new Date(ch.endDate + 'T23:59:59').getTime();
+  const nowMs  = Date.now();
+  const remaining = Math.max(0, endMs - nowMs);
+  const daysLeft = Math.floor(remaining / 86400000);
+  const hLeft  = Math.floor((remaining % 86400000) / 3600000);
+  const mLeft  = Math.floor((remaining % 3600000)  / 60000);
+  const sLeft  = Math.floor((remaining % 60000)    / 1000);
+  const clockEl = document.getElementById('ch-clock');
+  const daysEl  = document.getElementById('ch-days-num');
+  if (clockEl) clockEl.textContent = [hLeft,mLeft,sLeft].map(n=>String(n).padStart(2,'0')).join(':');
+  if (daysEl)  daysEl.textContent  = daysLeft;
+}
+function _chStartCountdown() {
+  _chStopCountdown();
+  _chTimer = setInterval(_chTick, 1000);
+  _chTick(); // immediate first tick
+}
+function _chStopCountdown() {
+  if (_chTimer) { clearInterval(_chTimer); _chTimer = null; }
+}
+
+// ── Habit toggle ──────────────────────────────────────────
+function _chToggleHabit(habitId) {
+  const ch = _chLoad();
+  if (!ch.active) return;
+  const habit = (ch.habits||[]).find(h => h.id === habitId);
+  if (!habit) return;
+  // Auto habits can't be manually toggled
+  if (habit.type === 'auto') {
+    const today  = _chDateKey();
+    const isDone = _chAutoCheck(habitId, today);
+    // Pulse the card anyway to give feedback
+    const cards = document.querySelectorAll('.ch-card');
+    cards.forEach(c => {
+      if (c.onclick && c.onclick.toString().includes(habitId)) {
+        c.classList.add('just-tapped');
+        setTimeout(()=>c.classList.remove('just-tapped'),400);
+      }
+    });
+    // Show a quick tooltip
+    if (!isDone) {
+      const bubble = document.getElementById('char-bubble');
+      if (bubble) {
+        bubble.textContent = 'Log it in Wellness first 💙';
+        setTimeout(()=>{ if(bubble.textContent.includes('Wellness')) bubble.textContent=''; },2200);
+      }
+    }
+    return;
+  }
+  // Manual toggle
+  const today = _chDateKey();
+  const log   = _chLogLoad();
+  if (!log[today]) log[today] = {};
+  log[today][habitId] = !log[today][habitId];
+  _chLogSave(log);
+  _challengeRender();
+}
+
+// ── Add custom habit ──────────────────────────────────────
+function _chAddCustomHabit() {
+  const name = prompt('Habit name (keep it short):');
+  if (!name || !name.trim()) return;
+  const icon = prompt('Pick an emoji for this habit (e.g. 🎯):', '⭐') || '⭐';
+  const ch = _chLoad();
+  ch.habits = ch.habits || [];
+  const id = 'custom_' + Date.now();
+  ch.habits.push({ id, label: name.trim(), icon: icon.trim().slice(0,2), type:'manual', active:true });
+  _chSave(ch);
+  _challengeRender();
+}
+
+// ── Photos ────────────────────────────────────────────────
+function _chPhotoSelected(inp) {
+  const file = inp.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const maxW = 500, maxH = 500;
+      const scale = Math.min(1, maxW/img.width, maxH/img.height);
+      const canvas = document.createElement('canvas');
+      canvas.width  = Math.round(img.width  * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
+      const ch = _chLoad();
+      ch.photos = ch.photos || [];
+      ch.photos.unshift({ dataUrl, ts: Date.now() }); // newest first
+      _chSave(ch);
+      _challengeRender();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  inp.value = '';
+}
+function _chOpenLightbox(idx) {
+  const ch = _chLoad();
+  const photos = ch.photos || [];
+  if (!photos[idx]) return;
+  _chLbPhotoIndex = idx;
+  const lb  = document.getElementById('ch-lightbox');
+  const img = document.getElementById('ch-lightbox-img');
+  if (lb && img) { img.src = photos[idx].dataUrl; lb.classList.add('open'); }
+}
+function _chCloseLightbox() {
+  const lb = document.getElementById('ch-lightbox');
+  if (lb) lb.classList.remove('open');
+  _chLbPhotoIndex = -1;
+}
+function _chDeletePhoto() {
+  if (_chLbPhotoIndex < 0) return;
+  const ch = _chLoad();
+  ch.photos = ch.photos || [];
+  ch.photos.splice(_chLbPhotoIndex, 1);
+  _chSave(ch);
+  _chCloseLightbox();
+  _challengeRender();
+}
+
+// ── Setup / manage sheet ──────────────────────────────────
+function _chOpenSetup() {
+  const ch = _chLoad();
+  const overlay = document.getElementById('ch-setup-overlay');
+  const body    = document.getElementById('ch-setup-body');
+  const title   = document.getElementById('ch-setup-title');
+  if (!overlay || !body) return;
+
+  if (ch.active) {
+    // Manage existing challenge
+    title.textContent = '⚙️ Manage Challenge';
+    const endD = new Date(ch.endDate);
+    const daysLeft = Math.max(0, Math.ceil((endD - new Date()) / 86400000));
+    body.innerHTML = `
+      <div>
+        <div class="ch-setup-lbl">Challenge Name</div>
+        <input class="ch-setup-inp" id="ch-edit-name" value="${ch.name||'28-Day Challenge'}" placeholder="Challenge name">
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="ch-setup-lbl">Progress</div>
+          <div style="font-size:18px;font-weight:900;color:var(--orange)">Day ${Math.min(ch.totalDays, Math.max(1, ch.totalDays - daysLeft))} of ${ch.totalDays}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:2px">${daysLeft} days remaining</div>
+        </div>
+        <div style="font-size:42px">🔥</div>
+      </div>
+      <div class="ch-setup-divider"></div>
+      <div>
+        <div class="ch-setup-lbl">Active Habits</div>
+        <div id="ch-manage-habits">
+          ${(ch.habits||[]).map(h=>`
+            <div class="ch-habit-toggle-row">
+              <span class="ch-ht-icon">${h.icon}</span>
+              <span class="ch-ht-label">${h.label}</span>
+              ${h.type==='auto'?'<span class="ch-ht-auto">AUTO</span>':''}
+              <button class="ch-ht-switch ${h.active!==false?'on':''}" onclick="_chToggleHabitActive('${h.id}',this)" data-id="${h.id}"></button>
+            </div>`).join('')}
+        </div>
+      </div>
+      <button class="ch-setup-start-btn" onclick="_chSaveEdits()">💾 Save Changes</button>
+      <div class="ch-setup-divider"></div>
+      <button class="ch-setup-end-btn" onclick="_chEndChallenge()">🏁 End Challenge</button>
+    `;
+  } else {
+    // Start new challenge
+    title.textContent = '🔥 Start Challenge';
+    const defaultEnd = new Date();
+    defaultEnd.setDate(defaultEnd.getDate() + 27);
+    const endStr = _chDateKey(defaultEnd);
+    body.innerHTML = `
+      <div>
+        <div class="ch-setup-lbl">Challenge Name</div>
+        <input class="ch-setup-inp" id="ch-new-name" value="28-Day Challenge" placeholder="e.g. 28-Day Beast Mode">
+      </div>
+      <div>
+        <div class="ch-setup-lbl">Duration (days)</div>
+        <input class="ch-setup-inp" id="ch-new-days" type="number" value="28" min="7" max="365" style="width:80px">
+      </div>
+      <div>
+        <div class="ch-setup-lbl">End Date</div>
+        <input class="ch-setup-inp" id="ch-new-end" type="date" value="${endStr}">
+      </div>
+      <div>
+        <div class="ch-setup-lbl">Habits to Include</div>
+        <div id="ch-habit-list">
+          ${CH_DEFAULT_HABITS.map(h=>`
+            <div class="ch-habit-toggle-row">
+              <span class="ch-ht-icon">${h.icon}</span>
+              <span class="ch-ht-label">${h.label}</span>
+              ${h.type==='auto'?'<span class="ch-ht-auto">AUTO</span>':''}
+              <button class="ch-ht-switch on" data-id="${h.id}" onclick="this.classList.toggle('on')"></button>
+            </div>`).join('')}
+        </div>
+      </div>
+      <button class="ch-setup-start-btn" onclick="_chStartChallenge()">🔥 Start Challenge</button>
+    `;
+    // Wire up day count ↔ end date
+    const daysInp = document.getElementById('ch-new-days');
+    const endInp  = document.getElementById('ch-new-end');
+    if (daysInp && endInp) {
+      daysInp.addEventListener('input', ()=>{
+        const n = parseInt(daysInp.value)||28;
+        const d = new Date(); d.setDate(d.getDate() + n - 1);
+        endInp.value = _chDateKey(d);
+      });
+      endInp.addEventListener('input', ()=>{
+        const d1 = new Date(); d1.setHours(0,0,0,0);
+        const d2 = new Date(endInp.value + 'T00:00:00');
+        const diff = Math.round((d2-d1)/86400000) + 1;
+        if (diff > 0) daysInp.value = diff;
+      });
+    }
+  }
+  overlay.classList.add('open');
+}
+function _chCloseSetup() {
+  document.getElementById('ch-setup-overlay')?.classList.remove('open');
+}
+function _chToggleHabitActive(habitId, btn) {
+  btn.classList.toggle('on');
+}
+function _chSaveEdits() {
+  const ch   = _chLoad();
+  const name = document.getElementById('ch-edit-name')?.value.trim();
+  if (name) ch.name = name;
+  // Sync active states from toggle buttons
+  const btns = document.querySelectorAll('#ch-manage-habits [data-id]');
+  btns.forEach(b => {
+    const h = (ch.habits||[]).find(x=>x.id===b.dataset.id);
+    if (h) h.active = b.classList.contains('on');
+  });
+  _chSave(ch);
+  _chCloseSetup();
+  _challengeRender();
+}
+function _chStartChallenge() {
+  const name  = (document.getElementById('ch-new-name')?.value||'28-Day Challenge').trim();
+  const days  = parseInt(document.getElementById('ch-new-days')?.value)||28;
+  const endV  = document.getElementById('ch-new-end')?.value;
+  const today = _chDateKey();
+  // Collect selected habits
+  const btns = document.querySelectorAll('#ch-habit-list [data-id]');
+  const habits = [];
+  CH_DEFAULT_HABITS.forEach(h => {
+    const btn = Array.from(btns).find(b=>b.dataset.id===h.id);
+    if (btn && btn.classList.contains('on')) habits.push({...h, active:true});
+  });
+  const ch = {
+    active:    true,
+    name,
+    startDate: today,
+    endDate:   endV || (() => { const d=new Date(); d.setDate(d.getDate()+days-1); return _chDateKey(d); })(),
+    totalDays: days,
+    habits,
+    photos:    [],
+  };
+  _chSave(ch);
+  _chLogSave({});
+  _chCloseSetup();
+  _chUpdateTabVisibility();
+  goLoc('challenge');
+}
+function _chEndChallenge() {
+  if (!confirm('End this challenge? Your log data will be kept.')) return;
+  const ch = _chLoad();
+  ch.active = false;
+  _chSave(ch);
+  _chCloseSetup();
+  _chUpdateTabVisibility();
+  goLoc('room');
+}
+
+// ── Journal challenge tab render ──────────────────────────
+function _renderChallengeJTab() {
+  const content = document.getElementById('j-tab-content');
+  if (!content) return;
+  const ch = _chLoad();
+  if (ch.active) {
+    const today  = _chDateKey();
+    const endMs  = new Date(ch.endDate+'T23:59:59').getTime();
+    const daysLeft = Math.max(0, Math.ceil((endMs - Date.now()) / 86400000));
+    content.innerHTML = `
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;flex:1">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:36px">🔥</div>
+          <div>
+            <div style="font-size:14px;font-weight:900;color:#fff">${ch.name}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:2px">${daysLeft} days remaining</div>
+          </div>
+        </div>
+        <button onclick="goLoc('challenge');document.getElementById('journal-modal')?.remove()"
+          style="width:100%;padding:11px;border-radius:10px;border:none;
+          background:linear-gradient(135deg,#f97316,#ef4444);
+          color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">
+          🔥 Open Challenge Tab
+        </button>
+        <button onclick="_chOpenSetup();document.getElementById('journal-modal')?.remove()"
+          style="width:100%;padding:10px;border-radius:10px;
+          border:1px solid rgba(255,255,255,.1);background:transparent;
+          color:rgba(255,255,255,.5);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
+          ⚙️ Manage / Edit Challenge
+        </button>
+        <button onclick="_chEndChallenge();document.getElementById('journal-modal')?.remove()"
+          style="width:100%;padding:10px;border-radius:10px;
+          border:1px solid rgba(239,68,68,.28);background:rgba(239,68,68,.07);
+          color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
+          🏁 End Challenge
+        </button>
+      </div>`;
+  } else {
+    content.innerHTML = `
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;flex:1">
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:40px;margin-bottom:10px;opacity:.4">🔥</div>
+          <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,.5)">No Active Challenge</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.25);margin-top:6px;line-height:1.5">
+            Start a challenge to track your daily habits and build streaks.
+          </div>
+        </div>
+        <button onclick="_chOpenSetup();document.getElementById('journal-modal')?.remove()"
+          style="width:100%;padding:13px;border-radius:10px;border:none;
+          background:linear-gradient(135deg,#f97316,#ef4444);
+          color:#fff;font-size:13px;font-weight:900;cursor:pointer;font-family:inherit">
+          🔥 Start New Challenge
+        </button>
+      </div>`;
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────
+_chUpdateTabVisibility();
 </script>
 
 <!-- ── FACIAL EXERCISE MODAL ── -->
@@ -3745,6 +4577,26 @@ if (getSimFbConfig()) initSimFirebase(); else updateSimCloudStatus('off');
     <button onclick="saveSimFirebaseConfig()" style="width:100%;padding:11px;background:var(--gold);color:#000;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">☁️ Connect &amp; Sync</button>
     <button onclick="document.getElementById('modal-sim-firebase').style.display='none'" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:8px">Cancel</button>
     <button id="sim-fb-disconnect-btn" onclick="disconnectSimFirebase()" style="display:none;width:100%;padding:10px;background:transparent;border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:13px;color:#ef4444;cursor:pointer">🔌 Disconnect</button>
+  </div>
+</div>
+
+<!-- ── CHALLENGE PHOTO INPUT + LIGHTBOX ── -->
+<input type="file" id="ch-photo-input" accept="image/*" style="display:none" onchange="_chPhotoSelected(this)">
+<div class="ch-lightbox" id="ch-lightbox" onclick="if(event.target===this)_chCloseLightbox()">
+  <button class="ch-lightbox-x" onclick="_chCloseLightbox()">✕</button>
+  <img id="ch-lightbox-img" src="" alt="Challenge photo">
+  <button class="ch-lightbox-del" id="ch-lightbox-del" onclick="_chDeletePhoto()">🗑 Remove Photo</button>
+</div>
+
+<!-- ── CHALLENGE SETUP MODAL ── -->
+<div class="ch-setup-overlay" id="ch-setup-overlay" onclick="if(event.target===this)_chCloseSetup()">
+  <div class="ch-setup-sheet">
+    <div class="ch-setup-handle"></div>
+    <div class="ch-setup-hdr">
+      <span class="ch-setup-title" id="ch-setup-title">🔥 Start Challenge</span>
+      <button class="ch-setup-x" onclick="_chCloseSetup()">✕</button>
+    </div>
+    <div class="ch-setup-body" id="ch-setup-body"><!-- populated by _chOpenSetup() --></div>
   </div>
 </div>
 
