@@ -5623,7 +5623,28 @@ function getLmPhotos(type) {
   try { return JSON.parse(localStorage.getItem('lm_' + type + '_photos') || '[]'); } catch(e) { return []; }
 }
 function saveLmPhotos(type, arr) {
-  localStorage.setItem('lm_' + type + '_photos', JSON.stringify(arr));
+  try {
+    localStorage.setItem('lm_' + type + '_photos', JSON.stringify(arr));
+  } catch(e) {
+    showToast('⚠️ Storage full — photo not saved. Try a smaller image.');
+  }
+}
+
+// Resize image to max 900px wide at JPEG 0.80 quality before storing
+function _resizeLmPhoto(dataUrl) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = function() {
+      const MAX = 900;
+      let w = img.width, h = img.height;
+      if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.80));
+    };
+    img.src = dataUrl;
+  });
 }
 
 function renderLmPhotos() {
@@ -5641,45 +5662,58 @@ function renderLmPhotos() {
         <div class="looksmax-photo-slot" style="cursor:default">
           <img src="${src}" alt="${type} photo ${idx+1}">
           <div class="looksmax-photo-label">${type === 'before' ? 'BEFORE' : 'GOAL'} ${photos.length > 1 ? idx+1 : ''}</div>
-          <button class="lm-delete-btn" onclick="deleteLmPhoto('${type}',${idx})" title="Remove">✕</button>
         </div>`).join('');
     }
   });
 }
 
+// Hidden file inputs anchored in DOM so iOS Safari doesn't block them
+let _lmInputBefore = null, _lmInputGoal = null;
+function _getLmInput(type) {
+  if (type === 'before') {
+    if (!_lmInputBefore) {
+      _lmInputBefore = document.createElement('input');
+      _lmInputBefore.type = 'file'; _lmInputBefore.accept = 'image/*';
+      _lmInputBefore.multiple = true; _lmInputBefore.style.display = 'none';
+      document.body.appendChild(_lmInputBefore);
+    }
+    return _lmInputBefore;
+  } else {
+    if (!_lmInputGoal) {
+      _lmInputGoal = document.createElement('input');
+      _lmInputGoal.type = 'file'; _lmInputGoal.accept = 'image/*';
+      _lmInputGoal.multiple = true; _lmInputGoal.style.display = 'none';
+      document.body.appendChild(_lmInputGoal);
+    }
+    return _lmInputGoal;
+  }
+}
+
 function addLmPhoto(type) {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.multiple = true;
-  input.onchange = function() {
+  const input = _getLmInput(type);
+  // Remove previous listener to avoid double-firing
+  input.onchange = null;
+  input.value = '';
+  input.onchange = async function() {
     const files = Array.from(input.files);
     if (!files.length) return;
     const existing = getLmPhotos(type);
-    let loaded = 0;
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        existing.push(e.target.result);
-        loaded++;
-        if (loaded === files.length) {
-          saveLmPhotos(type, existing);
-          renderLmPhotos();
-          showToast('📸 ' + files.length + ' photo' + (files.length > 1 ? 's' : '') + ' added!');
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    let count = 0;
+    for (const file of files) {
+      const dataUrl = await new Promise(res => {
+        const r = new FileReader();
+        r.onload = e => res(e.target.result);
+        r.readAsDataURL(file);
+      });
+      const resized = await _resizeLmPhoto(dataUrl);
+      existing.push(resized);
+      count++;
+    }
+    saveLmPhotos(type, existing);
+    renderLmPhotos();
+    showToast('📸 ' + count + ' photo' + (count > 1 ? 's' : '') + ' added!');
   };
   input.click();
-}
-
-function deleteLmPhoto(type, idx) {
-  const photos = getLmPhotos(type);
-  photos.splice(idx, 1);
-  saveLmPhotos(type, photos);
-  renderLmPhotos();
-  showToast('🗑️ Photo removed');
 }
 
 // ── Facial exercises on the Exercises tab (shared data with facial page) ──
