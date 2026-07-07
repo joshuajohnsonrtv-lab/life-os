@@ -1960,6 +1960,44 @@
   </div>
 </div>
 
+<!-- SLEEP EDIT MODAL -->
+<div class="modal-overlay" id="sleep-edit-modal">
+  <div class="modal" style="min-width:min(340px,92vw)">
+    <div class="modal-header">
+      <div class="modal-title" id="sleep-edit-title">✏️ Edit Sleep</div>
+      <button class="modal-close" onclick="closeSleepEditModal()">✕</button>
+    </div>
+    <input type="hidden" id="sleep-edit-date">
+    <div class="form-group">
+      <label>Bedtime</label>
+      <input type="time" id="sleep-edit-bedtime">
+    </div>
+    <div class="form-group">
+      <label>Wake Time</label>
+      <input type="time" id="sleep-edit-wake">
+    </div>
+    <div class="form-group">
+      <label>Quality</label>
+      <div class="stars" id="sleep-edit-stars">
+        <span class="star" onclick="setSleepEditStar(1)">★</span>
+        <span class="star" onclick="setSleepEditStar(2)">★</span>
+        <span class="star" onclick="setSleepEditStar(3)">★</span>
+        <span class="star" onclick="setSleepEditStar(4)">★</span>
+        <span class="star" onclick="setSleepEditStar(5)">★</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="sleep-edit-notes" placeholder="How did you sleep?" rows="2" style="resize:vertical"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn btn-primary" style="flex:1" onclick="saveSleepEdit()">Save Changes</button>
+      <button class="btn" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:#ef4444;padding:0 16px"
+        onclick="deleteSleepEntry(document.getElementById('sleep-edit-date').value)">Delete</button>
+    </div>
+  </div>
+</div>
+
 <!-- WORKOUT DETAIL MODAL -->
 <div class="modal-overlay" id="workout-detail-modal">
   <div class="modal">
@@ -2655,13 +2693,19 @@ function renderSleep() {
     const h = calcSleepHours(l.bedtime, l.wakeTime);
     const color = h >= goal ? 'var(--green)' : h >= goal*0.8 ? 'var(--amber)' : 'var(--red)';
     const stars = '⭐'.repeat(l.quality||0);
-    return `<div class="history-item">
+    return `<div class="history-item" style="cursor:default">
       <div class="history-date">${formatDateFull(d)}</div>
-      <div class="history-detail">
+      <div class="history-detail" style="flex:1">
         <span style="font-weight:600;color:${color}">${h ? h+'h' : '?'}</span>
         <span style="font-size:11px;color:var(--muted);margin-left:8px">${l.bedtime||'?'} → ${l.wakeTime||'?'}</span>
         ${stars ? `<span style="font-size:11px;margin-left:8px">${stars}</span>` : ''}
       </div>
+      <button onclick="event.stopPropagation();editSleepEntry('${d}')"
+        style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;
+               padding:2px 5px;border-radius:4px;line-height:1;flex-shrink:0"
+        onmouseover="this.style.color='var(--text)'"
+        onmouseout="this.style.color='var(--muted)'"
+        title="Edit or delete">✏️</button>
     </div>`;
   }).join('');
 }
@@ -2706,6 +2750,62 @@ function saveSleepGoal() {
   data.sleep.goal = parseFloat(document.getElementById('sleep-goal-input').value) || 8;
   saveData(data);
   updateSleepCalc();
+}
+
+// ── Sleep edit / delete ──
+let _sleepEditStarVal = 0;
+
+function editSleepEntry(date) {
+  const data = getData();
+  const log = data.sleep.log[date];
+  if (!log) return;
+  document.getElementById('sleep-edit-date').value     = date;
+  document.getElementById('sleep-edit-title').textContent = '✏️ ' + formatDateFull(date);
+  document.getElementById('sleep-edit-bedtime').value  = log.bedtime  || '';
+  document.getElementById('sleep-edit-wake').value     = log.wakeTime || '';
+  document.getElementById('sleep-edit-notes').value    = log.notes    || '';
+  _sleepEditStarVal = log.quality || 0;
+  setSleepEditStar(_sleepEditStarVal);
+  document.getElementById('sleep-edit-modal').classList.add('open');
+}
+
+function closeSleepEditModal() {
+  document.getElementById('sleep-edit-modal').classList.remove('open');
+}
+
+function setSleepEditStar(n) {
+  _sleepEditStarVal = n;
+  document.querySelectorAll('#sleep-edit-stars .star').forEach((s, i) => {
+    s.classList.toggle('active', i < n);
+  });
+}
+
+function saveSleepEdit() {
+  const date  = document.getElementById('sleep-edit-date').value;
+  const bed   = document.getElementById('sleep-edit-bedtime').value;
+  const wake  = document.getElementById('sleep-edit-wake').value;
+  const notes = document.getElementById('sleep-edit-notes').value;
+  const data  = getData();
+  if (!data.sleep.log[date]) return;
+  data.sleep.log[date] = {
+    ...data.sleep.log[date],
+    bedtime: bed, wakeTime: wake,
+    quality: _sleepEditStarVal, notes,
+    timestamp: new Date().toISOString()
+  };
+  saveData(data);
+  closeSleepEditModal();
+  renderSleep();
+  showToast('😴 Sleep updated!');
+}
+
+function deleteSleepEntry(date) {
+  const data = getData();
+  delete data.sleep.log[date];
+  saveData(data);
+  closeSleepEditModal();
+  renderSleep();
+  showToast('🗑️ Sleep entry deleted');
 }
 
 // ==================== HYDRATION ====================
