@@ -786,6 +786,26 @@
   .lm-tab.active { background:var(--purple); border-color:var(--purple); color:#fff; }
   .lm-section { display:none; }
   .lm-section.active { display:block; }
+  /* ── My Plan tab ── */
+  .lm-assess-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+  .lm-assess-item { background:var(--card2); border-radius:10px; padding:10px 12px; border-left:3px solid var(--purple); }
+  .lm-assess-label { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px; }
+  .lm-assess-value { font-size:13px; font-weight:700; color:var(--text); line-height:1.4; }
+  .lm-assess-note { font-size:11px; color:var(--muted); margin-top:2px; line-height:1.4; }
+  .lm-goal-item { display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); }
+  .lm-goal-item:last-child { border-bottom:none; }
+  .lm-goal-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+  .lm-priority-card { background:var(--card2); border-radius:12px; padding:14px; margin-bottom:10px; border-left:4px solid var(--purple); }
+  .lm-priority-card:last-child { margin-bottom:0; }
+  .lm-priority-num { font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:5px; }
+  .lm-priority-title { font-size:15px; font-weight:700; color:var(--text); margin-bottom:9px; }
+  .lm-priority-items { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:5px; }
+  .lm-priority-items li { font-size:12px; color:var(--muted2); padding-left:16px; position:relative; line-height:1.5; }
+  .lm-priority-items li::before { content:'→'; position:absolute; left:0; color:var(--purple); font-weight:700; }
+  .lm-impact-badge { display:inline-block; font-size:9px; font-weight:800; padding:2px 7px; border-radius:8px; margin-left:6px; vertical-align:middle; letter-spacing:0.04em; }
+  .lm-impact-high { background:rgba(239,68,68,0.15); color:var(--red); }
+  .lm-impact-med { background:rgba(245,158,11,0.15); color:var(--amber); }
+  .lm-impact-sup { background:rgba(34,197,94,0.15); color:var(--green); }
   .lm-shopping-item { display:flex; gap:8px; align-items:center; padding:8px 10px; background:var(--card2); border-radius:var(--radius-sm); margin-bottom:6px; font-size:13px; }
   .lm-shopping-item .qty { font-size:12px; color:var(--amber); font-weight:700; min-width:80px; }
   .lm-shopping-item .item { color:var(--text); }
@@ -1286,6 +1306,7 @@
       <button class="lm-tab active" onclick="switchLmTab('overview')">📸 Overview</button>
       <button class="lm-tab" onclick="switchLmTab('exercises')">✨ Exercises</button>
       <button class="lm-tab" onclick="switchLmTab('guidance')">💡 Guidance</button>
+      <button class="lm-tab" onclick="switchLmTab('plan')">🎯 My Plan</button>
     </div>
 
     <!-- ── OVERVIEW TAB ── -->
@@ -1370,6 +1391,174 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- ── MY PLAN TAB ── -->
+    <div class="lm-section" id="lm-tab-plan">
+
+      <!-- Face Assessment -->
+      <div class="card">
+        <div class="card-title">🔍 Face Assessment</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Your current baseline. Age 20 — still in the remodelling window where consistent habits create genuine visible results.</p>
+        <div class="lm-assess-grid">
+          <div class="lm-assess-item" style="border-left-color:var(--green)">
+            <div class="lm-assess-label">Side Profile</div>
+            <div class="lm-assess-value">Mostly Straight</div>
+            <div class="lm-assess-note">Mild convex at nasal bridge. Balanced overall.</div>
+          </div>
+          <div class="lm-assess-item" style="border-left-color:var(--amber)">
+            <div class="lm-assess-label">Gonial Angle</div>
+            <div class="lm-assess-value">~125–130°</div>
+            <div class="lm-assess-note">Good masculine range. Ideal target: 120–128°.</div>
+          </div>
+          <div class="lm-assess-item" style="border-left-color:var(--red)">
+            <div class="lm-assess-label">Jaw Asymmetry</div>
+            <div class="lm-assess-value">Mild — Right Stronger</div>
+            <div class="lm-assess-note">Chin deviates left. Left masseter weaker.</div>
+          </div>
+          <div class="lm-assess-item" style="border-left-color:var(--cyan)">
+            <div class="lm-assess-label">Hyoid Position</div>
+            <div class="lm-assess-value">Can Be Raised</div>
+            <div class="lm-assess-note">Sharper under-jaw & neck definition achievable.</div>
+          </div>
+        </div>
+        <div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--muted2);line-height:1.65">
+          <strong style="color:var(--purple)">At 20, you're not chasing bone growth.</strong> You're chasing fat loss (reveals structure), muscle (builds frame), and remodelling via consistent pressure habits. The results that matter — angular under-jaw, sharper gonial definition, symmetry — are all achievable without surgery through these protocols.
+        </div>
+      </div>
+
+      <!-- Goals -->
+      <div class="card">
+        <div class="card-title">🎯 Goals</div>
+        <div class="lm-goal-item">
+          <div class="lm-goal-dot" style="background:var(--amber)"></div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)">Sharper gonial angle & jawline</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Target ~120–128° via fat loss + bilateral masseter development</div>
+          </div>
+        </div>
+        <div class="lm-goal-item">
+          <div class="lm-goal-dot" style="background:var(--cyan)"></div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)">Raise hyoid for flat, angular under-jaw</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Mewing + chin tucks + neck work + forward head posture fix</div>
+          </div>
+        </div>
+        <div class="lm-goal-item">
+          <div class="lm-goal-dot" style="background:var(--red)"></div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)">Improve jaw symmetry</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Bias 60–70% of chewing to the left side to even out masseter development</div>
+          </div>
+        </div>
+        <div class="lm-goal-item">
+          <div class="lm-goal-dot" style="background:var(--green)"></div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)">Overall definition — no surgery</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Fat loss is the single biggest lever — it reveals the bone structure that's already there</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Priority Stack -->
+      <div class="card">
+        <div class="card-title">⚡ Priority Stack</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Ordered by impact. Lock in #1 and #2 before overthinking the rest.</p>
+
+        <div class="lm-priority-card" style="border-left-color:var(--red)">
+          <div class="lm-priority-num">#1 <span class="lm-impact-badge lm-impact-high">HIGHEST IMPACT</span></div>
+          <div class="lm-priority-title">🔥 Fat Loss</div>
+          <ul class="lm-priority-items">
+            <li>Moderate calorie deficit — no crash dieting</li>
+            <li>High protein intake to preserve muscle while cutting</li>
+            <li>Strength training 4–5× per week</li>
+            <li>Weekly progress photos: front + side, same lighting</li>
+          </ul>
+        </div>
+
+        <div class="lm-priority-card" style="border-left-color:var(--cyan)">
+          <div class="lm-priority-num">#2 <span class="lm-impact-badge lm-impact-high">HIGH IMPACT</span></div>
+          <div class="lm-priority-title">🏗️ Hyoid & Neck Definition</div>
+          <ul class="lm-priority-items">
+            <li>Mewing all day — full tongue flat on palate, not just tip</li>
+            <li>Chin tucks daily: 3×15, ears directly above shoulders</li>
+            <li>Neck curls & neck extensions for anterior chain</li>
+            <li>Fix forward head posture — phone at eye level</li>
+            <li>Cold exposure on neck & face to tighten skin</li>
+          </ul>
+        </div>
+
+        <div class="lm-priority-card" style="border-left-color:var(--amber)">
+          <div class="lm-priority-num">#3 <span class="lm-impact-badge lm-impact-med">MEDIUM IMPACT</span></div>
+          <div class="lm-priority-title">💪 Jaw Development — Left Side Focus</div>
+          <ul class="lm-priority-items">
+            <li>Start with Falim gum — softer, lower risk for jaw conditioning</li>
+            <li>Progress to Mastic gum once adapted (harder resistance)</li>
+            <li>Bias 60–70% of every chewing session to the left (weaker) side</li>
+            <li>Sessions: 5–10 min to start, build gradually over weeks</li>
+            <li>Take 1–2 rest days per week — jaw muscle needs recovery like any other</li>
+            <li>Stop immediately if jaw pain or TMJ symptoms develop</li>
+          </ul>
+        </div>
+
+        <div class="lm-priority-card" style="border-left-color:var(--purple)">
+          <div class="lm-priority-num">#4 <span class="lm-impact-badge lm-impact-med">MEDIUM IMPACT</span></div>
+          <div class="lm-priority-title">🧴 Skin & Recovery</div>
+          <ul class="lm-priority-items">
+            <li>3–4L water daily — clear to light yellow urine is the target</li>
+            <li>7–9 hours sleep — growth hormone peaks in deep sleep</li>
+            <li>Low inflammation: cut alcohol, avoid processed sodium</li>
+            <li>Facial massage + gua sha under the jaw for lymphatic drainage</li>
+            <li>Consistent skincare routine morning and evening</li>
+          </ul>
+        </div>
+
+        <div class="lm-priority-card" style="border-left-color:var(--green)">
+          <div class="lm-priority-num">#5 <span class="lm-impact-badge lm-impact-sup">SUPPORTING</span></div>
+          <div class="lm-priority-title">⚡ Supporting Habits</div>
+          <ul class="lm-priority-items">
+            <li>Build overall muscle mass — especially shoulders & traps for frame</li>
+            <li>Maintain good posture at all times, not just when you think about it</li>
+            <li>Nasal breathing only — lips sealed, never mouth breathe</li>
+            <li>90-day photo reviews to objectively reassess progress</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 90-Day Tracking -->
+      <div class="card">
+        <div class="card-title">📊 90-Day Tracking Protocol</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Consistency tracking is how you know what's actually working. Log these weekly — your daily perception of your own face will lie to you; data won't.</p>
+        <div class="guidance-tip" style="border-left-color:var(--purple)">
+          <div class="guidance-tip-icon">📸</div>
+          <div class="guidance-tip-body">
+            <div class="guidance-tip-title">Weekly Progress Photos</div>
+            <div class="guidance-tip-text">Same time, same lighting, same angle every week — front and side profile. Upload them in the Overview tab. Comparing week 1 to week 12 is far more revealing than looking in the mirror daily.</div>
+          </div>
+        </div>
+        <div class="guidance-tip" style="border-left-color:var(--amber)">
+          <div class="guidance-tip-icon">⭐</div>
+          <div class="guidance-tip-body">
+            <div class="guidance-tip-title">Weekly Sharpness Self-Rating (1–10)</div>
+            <div class="guidance-tip-text">Rate jaw sharpness, under-jaw definition, and symmetry out of 10 each week. Write it in your journal. You want to see a slow upward trend over 90 days — under-jaw tightness and jaw sharpness will move fastest.</div>
+          </div>
+        </div>
+        <div class="guidance-tip" style="border-left-color:var(--cyan)">
+          <div class="guidance-tip-icon">📋</div>
+          <div class="guidance-tip-body">
+            <div class="guidance-tip-title">Daily Habit Logs</div>
+            <div class="guidance-tip-text">Track: mewing consistency (yes/no each day), gum chewing time (mins), calorie deficit adherence, body weight. Most of this is already covered by your gym, diet, and hydration logs in this dashboard.</div>
+          </div>
+        </div>
+        <div class="guidance-tip" style="border-left-color:var(--green)">
+          <div class="guidance-tip-icon">🔁</div>
+          <div class="guidance-tip-body">
+            <div class="guidance-tip-title">90-Day Reviews</div>
+            <div class="guidance-tip-text">Every 90 days: compare photos side by side, re-rate sharpness, and adjust the protocol. Increase gum resistance, tighten deficit, or shift focus based on what's moved. Real changes at your age take 3–6 months minimum to show clearly in photos — don't panic if the first 30 days feel slow.</div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- ── GUIDANCE TAB ── -->
@@ -5610,7 +5799,7 @@ function renderLooksmax() {
 
 function switchLmTab(tab) {
   document.querySelectorAll('.lm-tab').forEach((b,i) => {
-    b.classList.toggle('active', ['overview','exercises','diet','guidance'][i] === tab);
+    b.classList.toggle('active', ['overview','exercises','guidance','plan'][i] === tab);
   });
   document.querySelectorAll('.lm-section').forEach(s => s.classList.remove('active'));
   const el = document.getElementById('lm-tab-' + tab);
