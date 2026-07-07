@@ -1073,7 +1073,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   overflow:hidden;padding:16px;}
 .kitchen-wrap.show{display:flex;}
 .kitch{position:absolute;inset:0;
-  background:linear-gradient(180deg,#0d0f16 0%,#0f1218 55%,#111420 100%);overflow:hidden;}
+  background:linear-gradient(180deg,#0d0f16 0%,#0f1218 55%,#111420 100%);overflow:hidden;
+  transition:filter 1.5s ease;}
 
 /* upper cabinet strip — top wall, ends at right counter */
 .k-ucab{position:absolute;top:0;left:0;width:358px;height:16px;background:#16140f;
@@ -1188,7 +1189,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 /* kitchen light switch — same style as bedroom */
 .k-light-switch{
-  position:absolute;left:2px;bottom:88px;width:12px;height:20px;z-index:6;
+  position:absolute;left:2px;top:262px;width:12px;height:20px;z-index:6;
   background:#1e1e2a;border:1px solid #2e2e3e;border-radius:3px;
   cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;
 }
@@ -1199,12 +1200,15 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .k-light-switch.on{background:#2a2416;border-color:#7a6020;}
 .k-light-switch.on::after{background:#f0c840;border-color:#e0a820;box-shadow:0 0 6px rgba(240,200,64,.6);}
 
-/* daylight spill from kitchen window */
+/* daylight spill from kitchen window — soft blue glow below the glass */
 .k-win-light{
-  position:absolute;top:16px;left:118px;width:120px;height:90px;z-index:1;
+  position:absolute;top:16px;left:100px;width:158px;height:140px;z-index:4;
   background:radial-gradient(ellipse at 50% 0%,
-    rgba(180,220,255,.18) 0%,rgba(180,220,255,.07) 50%,transparent 80%);
-  pointer-events:none;transition:opacity .7s ease;
+    rgba(160,215,255,.38) 0%,
+    rgba(160,215,255,.18) 38%,
+    rgba(160,215,255,.06) 65%,
+    transparent 88%);
+  pointer-events:none;transition:opacity .9s ease;
 }
 
 /* (knife block and plant removed) */
@@ -1222,8 +1226,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .f-del{color:#ef4444 !important;border-color:rgba(239,68,68,.28) !important;}
 .f-del:hover{background:rgba(239,68,68,.18) !important;border-color:#ef4444 !important;}
 
-/* floor — same warm dark wood as bedroom */
-.k-floor{position:absolute;bottom:0;left:0;right:0;height:185px;
+/* floor — same warm dark wood as bedroom, covers full visible floor zone */
+.k-floor{position:absolute;top:90px;bottom:0;left:0;right:0;
   background-color:#2a1c0e;
   background-image:
     /* depth fade — darker at top (far end of floor), warmer at bottom */
@@ -3003,7 +3007,7 @@ function _scaleContainer(container) {
 //  KITCHEN CHARACTER + INTERACTIONS
 // ─────────────────────────────────────────────
 const K_POS = {
-  entry:  { top:418, left:22  }, // bottom-left spawn / home base
+  entry:  { top:358, left:58  }, // spawn — up + right so bubble isn't clipped
   fridge: { top:140, left:76  }, // in front of left-wall fridge
   cooker: { top:172, left:330 }, // in front of right-counter cooker
   stool0: { top:326, left:156 },
