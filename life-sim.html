@@ -1170,7 +1170,42 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 /* window above sink */
 .k-win{position:absolute;top:0;left:152px;width:54px;height:16px;
-  background:rgba(80,120,200,.06);border:1px solid #1a2030;border-radius:0 0 2px 2px;}
+  background:rgba(180,220,255,.50);border:1px solid rgba(160,210,255,.8);
+  border-radius:0 0 2px 2px;cursor:pointer;
+  transition:background .8s,border-color .8s,box-shadow .8s;
+  box-shadow:inset 0 -1px 6px rgba(160,210,255,.25);}
+/* horizontal pane divider */
+.k-win::after{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(160,210,255,.6);}
+.k-win.curtains{background:rgba(40,22,30,.85);border-color:rgba(70,38,50,.6);box-shadow:none;}
+.k-win.curtains::after{background:rgba(70,38,50,.4);}
+.k-win.night{background:rgba(15,20,45,.45);border-color:rgba(30,40,80,.5);box-shadow:none;}
+.k-win.night::after{background:rgba(30,40,80,.4);}
+
+/* kitchen brightness states — mirrors .room.dim/mid/lit */
+.kitch.dim{filter:brightness(.35) saturate(.3) hue-rotate(22deg);}
+.kitch.mid{filter:brightness(.62) saturate(.95);}
+.kitch.lit{filter:brightness(1.04) saturate(1.18);}
+
+/* kitchen light switch — same style as bedroom */
+.k-light-switch{
+  position:absolute;left:2px;bottom:88px;width:12px;height:20px;z-index:6;
+  background:#1e1e2a;border:1px solid #2e2e3e;border-radius:3px;
+  cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;
+}
+.k-light-switch::after{
+  content:'';width:5px;height:10px;border-radius:2px;
+  background:#2e2e3e;border:1px solid #3e3e50;transition:all .2s;
+}
+.k-light-switch.on{background:#2a2416;border-color:#7a6020;}
+.k-light-switch.on::after{background:#f0c840;border-color:#e0a820;box-shadow:0 0 6px rgba(240,200,64,.6);}
+
+/* daylight spill from kitchen window */
+.k-win-light{
+  position:absolute;top:16px;left:118px;width:120px;height:90px;z-index:1;
+  background:radial-gradient(ellipse at 50% 0%,
+    rgba(180,220,255,.18) 0%,rgba(180,220,255,.07) 50%,transparent 80%);
+  pointer-events:none;transition:opacity .7s ease;
+}
 
 /* (knife block and plant removed) */
 
@@ -1364,7 +1399,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <div class="k-floor"></div>
       <!-- Top wall upper cabinets + window above sink -->
       <div class="k-ucab"></div>
-      <div class="k-win"></div>
+      <div class="k-win" id="k-win" onclick="event.stopPropagation();toggleKCurtains()" title="Draw / open curtains"></div>
+      <div class="k-win-light" id="k-win-light"></div>
       <!-- Top counter (horizontal) -->
       <div class="k-ct"></div>
       <div class="k-lcab"></div>
@@ -1411,6 +1447,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
           <div class="char-body" id="k-body"></div>
         </div>
       </div>
+      <div class="k-light-switch" id="k-light-switch" onclick="event.stopPropagation();toggleKLight()" title="Light switch"></div>
       <button class="k-back" onclick="goLoc('room')">← Back to Room</button>
     </div>
     </div>
@@ -1921,6 +1958,7 @@ function goLoc(loc) {
     kMoveChar('entry');
     const kb = document.getElementById('k-bubble');
     if (kb) kb.textContent = '🍳 In the kitchen';
+    updateKitchen();
   }
 }
 
@@ -2091,8 +2129,10 @@ function calcStreak(log) {
 let _pcOn       = false;
 let _miniOn     = false;
 let _lastDevice = null;   // 'pc' or 'mac' — whichever was turned on last
-let _curtainsDrawn = false;
-let _lightOn    = false;
+let _curtainsDrawn  = false;
+let _lightOn        = false;
+let _kCurtainsDrawn = false;
+let _kLightOn       = false;
 
 function updateRoom() {
   const room = document.getElementById('the-room');
@@ -2125,6 +2165,32 @@ function toggleLight() {
   const sw = document.getElementById('light-switch');
   if (sw) sw.className = 'light-switch' + (_lightOn ? ' on' : '');
   updateRoom();
+  saveState();
+}
+
+function updateKitchen() {
+  const kitch = document.getElementById('the-kitchen');
+  if (!kitch) return;
+  kitch.className = 'kitch' + (_kLightOn ? ' lit' : _kCurtainsDrawn ? ' dim' : ' mid');
+  const h = new Date().getHours();
+  const isNight = h >= 22 || h < 6;
+  const kwin = document.getElementById('k-win');
+  if (kwin) kwin.className = 'k-win' + (_kCurtainsDrawn ? ' curtains' : isNight ? ' night' : '');
+  const kwinLight = document.getElementById('k-win-light');
+  if (kwinLight) kwinLight.style.opacity = (!_kCurtainsDrawn && !isNight) ? '1' : '0';
+  const sw = document.getElementById('k-light-switch');
+  if (sw) sw.className = 'k-light-switch' + (_kLightOn ? ' on' : '');
+}
+
+function toggleKCurtains() {
+  _kCurtainsDrawn = !_kCurtainsDrawn;
+  updateKitchen();
+  saveState();
+}
+
+function toggleKLight() {
+  _kLightOn = !_kLightOn;
+  updateKitchen();
   saveState();
 }
 
@@ -3214,6 +3280,8 @@ function saveState() {
       lastDevice:    _lastDevice,
       curtains:      _curtainsDrawn,
       lightOn:       _lightOn,
+      kCurtains:     _kCurtainsDrawn,
+      kLightOn:      _kLightOn,
       // Scene + char visual (so kitchen/outside + any animation restores)
       loc,
       figClass:   figEl   ? figEl.className   : 'char-figure',
@@ -3235,10 +3303,13 @@ function loadState() {
     if (s.pcOn      !== undefined) _pcOn          = s.pcOn;
     if (s.miniOn    !== undefined) _miniOn        = s.miniOn;
     if (s.lastDevice)              _lastDevice    = s.lastDevice;
-    if (s.curtains  !== undefined) _curtainsDrawn = s.curtains;
-    if (s.lightOn   !== undefined) _lightOn       = s.lightOn;
+    if (s.curtains  !== undefined) _curtainsDrawn  = s.curtains;
+    if (s.lightOn   !== undefined) _lightOn        = s.lightOn;
+    if (s.kCurtains !== undefined) _kCurtainsDrawn = s.kCurtains;
+    if (s.kLightOn  !== undefined) _kLightOn       = s.kLightOn;
     updateDevices();
     updateRoom();
+    updateKitchen();
     const sw = document.getElementById('light-switch');
     if (sw) sw.className = 'light-switch' + (_lightOn ? ' on' : '');
 
