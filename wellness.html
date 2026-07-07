@@ -806,6 +806,20 @@
   .lm-impact-high { background:rgba(239,68,68,0.15); color:var(--red); }
   .lm-impact-med { background:rgba(245,158,11,0.15); color:var(--amber); }
   .lm-impact-sup { background:rgba(34,197,94,0.15); color:var(--green); }
+  /* Big My Plan standalone button */
+  .lm-plan-btn {
+    width:100%; padding:15px 20px; border-radius:14px; margin-bottom:16px;
+    border:2px solid rgba(139,92,246,0.35);
+    background:rgba(139,92,246,0.07);
+    color:var(--purple); font-size:16px; font-weight:800;
+    cursor:pointer; transition:all 0.2s; letter-spacing:0.03em;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .lm-plan-btn.active {
+    background:var(--purple); border-color:var(--purple); color:#fff;
+    box-shadow:0 4px 22px rgba(139,92,246,0.4);
+  }
+  .lm-plan-btn:active { transform:scale(0.99); opacity:0.9; }
   .lm-shopping-item { display:flex; gap:8px; align-items:center; padding:8px 10px; background:var(--card2); border-radius:var(--radius-sm); margin-bottom:6px; font-size:13px; }
   .lm-shopping-item .qty { font-size:12px; color:var(--amber); font-weight:700; min-width:80px; }
   .lm-shopping-item .item { color:var(--text); }
@@ -1306,8 +1320,9 @@
       <button class="lm-tab active" onclick="switchLmTab('overview')">📸 Overview</button>
       <button class="lm-tab" onclick="switchLmTab('exercises')">✨ Exercises</button>
       <button class="lm-tab" onclick="switchLmTab('guidance')">💡 Guidance</button>
-      <button class="lm-tab" onclick="switchLmTab('plan')">🎯 My Plan</button>
     </div>
+    <!-- My Plan — standalone full-width button -->
+    <button class="lm-plan-btn" id="lm-plan-btn" onclick="switchLmTab('plan')">🎯 My Plan</button>
 
     <!-- ── OVERVIEW TAB ── -->
     <div class="lm-section active" id="lm-tab-overview">
@@ -1555,6 +1570,119 @@
           <div class="guidance-tip-body">
             <div class="guidance-tip-title">90-Day Reviews</div>
             <div class="guidance-tip-text">Every 90 days: compare photos side by side, re-rate sharpness, and adjust the protocol. Increase gum resistance, tighten deficit, or shift focus based on what's moved. Real changes at your age take 3–6 months minimum to show clearly in photos — don't panic if the first 30 days feel slow.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Puffy / Chubby Cheeks -->
+      <div class="card">
+        <div class="card-title">🫧 Puffy / Chubby Cheeks</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px">The most common issue at your stage — most of it is fat + water retention, not bone structure. Both are fixable.</p>
+
+        <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Possible Causes</div>
+        <div class="lm-assess-grid" style="margin-bottom:14px">
+          <div class="lm-assess-item" style="border-left-color:var(--red)">
+            <div class="lm-assess-label">Primary</div>
+            <div class="lm-assess-value">Subcutaneous Fat</div>
+            <div class="lm-assess-note">Most common cause. Fat loss is the fix.</div>
+          </div>
+          <div class="lm-assess-item" style="border-left-color:var(--amber)">
+            <div class="lm-assess-label">Secondary</div>
+            <div class="lm-assess-value">Water Retention</div>
+            <div class="lm-assess-note">Sodium, alcohol, poor sleep, high carbs.</div>
+          </div>
+          <div class="lm-assess-item" style="border-left-color:var(--cyan)">
+            <div class="lm-assess-label">Contributing</div>
+            <div class="lm-assess-value">Lymphatic Drainage</div>
+            <div class="lm-assess-note">Poor drainage makes face look swollen.</div>
+          </div>
+          <div class="lm-assess-item" style="border-left-color:var(--purple)">
+            <div class="lm-assess-label">Contributing</div>
+            <div class="lm-assess-value">Weak Buccinator</div>
+            <div class="lm-assess-note">Low muscle tone → puffier appearance.</div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Fixes (priority order)</div>
+
+        <div class="lm-priority-card" style="border-left-color:var(--red);margin-bottom:8px">
+          <div class="lm-priority-title" style="font-size:13px;margin-bottom:6px">🔥 Fat Loss — Primary Fix</div>
+          <ul class="lm-priority-items">
+            <li>Moderate calorie deficit + strength training 4–5×/week</li>
+            <li>High protein: 1.6–2.2g per kg bodyweight</li>
+            <li>High volume vegetables to stay full</li>
+            <li>Moderate carbs, low sodium, no alcohol</li>
+          </ul>
+        </div>
+
+        <div class="lm-priority-card" style="border-left-color:var(--cyan);margin-bottom:8px">
+          <div class="lm-priority-title" style="font-size:13px;margin-bottom:6px">💧 Reduce Water Retention</div>
+          <ul class="lm-priority-items">
+            <li>Keep sodium under 2,300mg/day — avoid processed food</li>
+            <li>3.5–4L water daily (flushes excess sodium)</li>
+            <li>Cut alcohol — it's a direct cause of facial puffiness</li>
+            <li>Better sleep — even one bad night shows in the face by morning</li>
+          </ul>
+        </div>
+
+        <div class="lm-priority-card" style="border-left-color:var(--purple);margin-bottom:8px">
+          <div class="lm-priority-title" style="font-size:13px;margin-bottom:6px">🤲 Lymphatic Drainage & Muscle Tone</div>
+          <ul class="lm-priority-items">
+            <li>Daily facial massage + gua sha — cheeks toward jaw, always downward</li>
+            <li>Mewing consistently — tongue position affects cheek muscle engagement</li>
+            <li>Chew gum with left-side bias (builds buccinator + masseter)</li>
+            <li>Face exercises: cheek puffs, smile holds, fish face — 5–10 min/day</li>
+          </ul>
+        </div>
+
+        <div class="lm-priority-card" style="border-left-color:var(--green);margin-bottom:0">
+          <div class="lm-priority-title" style="font-size:13px;margin-bottom:6px">🧴 Skincare Support</div>
+          <ul class="lm-priority-items">
+            <li>Retinol (nights) for skin tightening and collagen production</li>
+            <li>Niacinamide for pore tightening and inflammation reduction</li>
+            <li>Fix forward head posture — affects how the jaw and cheek area reads</li>
+          </ul>
+        </div>
+
+        <div style="margin-top:12px;background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--muted2);line-height:1.65">
+          <strong style="color:var(--green)">Helpful foods:</strong> cucumber, celery, watermelon, green tea, ginger — all support drainage and reduce bloating. Sample day: Greek yogurt + berries, grilled chicken salad, salmon + roasted veg.
+        </div>
+      </div>
+
+      <!-- Mewing While Sleeping -->
+      <div class="card">
+        <div class="card-title">😴 Mewing While Sleeping</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Nighttime mewing compounds your daytime work. You won't be conscious of it but you can train your resting tongue position over time.</p>
+
+        <div class="guidance-tip" style="border-left-color:var(--purple)">
+          <div class="guidance-tip-icon">🎯</div>
+          <div class="guidance-tip-body">
+            <div class="guidance-tip-title">Pressure Level</div>
+            <div class="guidance-tip-text">Light to moderate comfortable contact — not forceful pushing. The goal is resting position, not active pressure. Forcing it causes tension and won't carry over to sleep.</div>
+          </div>
+        </div>
+
+        <div class="guidance-tip" style="border-left-color:var(--cyan)">
+          <div class="guidance-tip-icon">🌙</div>
+          <div class="guidance-tip-body">
+            <div class="guidance-tip-title">How to Improve Nighttime Mewing</div>
+            <div class="guidance-tip-text">Build a strong daytime habit first — your resting position during the day will eventually carry over to sleep. Do neck exercises and posture correction to relax the throat. Sleep on your back with proper pillow alignment. Consider gentle mouth tape (skin-safe) to keep lips sealed. Pre-bed routine: 5 conscious swallows with tongue on palate to set position before falling asleep.</div>
+          </div>
+        </div>
+
+        <div class="guidance-tip" style="border-left-color:var(--amber)">
+          <div class="guidance-tip-icon">💪</div>
+          <div class="guidance-tip-body">
+            <div class="guidance-tip-title">Tongue Strength & Endurance</div>
+            <div class="guidance-tip-text">Hold tongue flat on palate for increasing durations during the day — start with 5 minutes, build up. Practice tongue sweeps along the full roof of your mouth to increase contact area. Neck training supports overall posture, making the tongue's resting position easier to maintain.</div>
+          </div>
+        </div>
+
+        <div class="guidance-tip" style="border-left-color:var(--green)">
+          <div class="guidance-tip-icon">📋</div>
+          <div class="guidance-tip-body">
+            <div class="guidance-tip-title">Tracking Consistency</div>
+            <div class="guidance-tip-text">Take a morning face photo each day — over weeks you'll see the difference consistent mewing makes to under-jaw definition. Note when you wake up with tongue still on palate (it means your habit is strengthening). Log daytime mewing as yes/no in your journal to hold yourself accountable.</div>
           </div>
         </div>
       </div>
@@ -5799,8 +5927,10 @@ function renderLooksmax() {
 
 function switchLmTab(tab) {
   document.querySelectorAll('.lm-tab').forEach((b,i) => {
-    b.classList.toggle('active', ['overview','exercises','guidance','plan'][i] === tab);
+    b.classList.toggle('active', ['overview','exercises','guidance'][i] === tab);
   });
+  const planBtn = document.getElementById('lm-plan-btn');
+  if (planBtn) planBtn.classList.toggle('active', tab === 'plan');
   document.querySelectorAll('.lm-section').forEach(s => s.classList.remove('active'));
   const el = document.getElementById('lm-tab-' + tab);
   if (el) el.classList.add('active');
