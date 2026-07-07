@@ -206,23 +206,42 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   transition:opacity .7s ease;
 }
 
-/* ── WARDROBES — bottom wall, left + right ── */
+/* ── WARDROBES — built into wall, flush panels ── */
 .ward{
-  position:absolute;bottom:0;width:90px;height:56px;z-index:3;
-  background:linear-gradient(180deg,#20182e 0%,#16101e 100%);
-  border:2px solid #352848;border-radius:2px 2px 0 0;
-  box-shadow:inset 0 1px 0 rgba(180,140,255,.06),0 -2px 8px rgba(0,0,0,.4);
+  position:absolute;bottom:0;width:90px;height:58px;z-index:3;
+  background:linear-gradient(180deg,#1a1228 0%,#130e20 100%);
+  border:1.5px solid #2c1e3e;border-bottom:none;border-radius:1px 1px 0 0;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.025),
+    inset 0 3px 14px rgba(0,0,0,.6),
+    inset 0 -1px 4px rgba(0,0,0,.4);
 }
-/* double-door centre line */
+/* outer reveal frame — thin wall recess edge */
 .ward::before{
-  content:'';position:absolute;top:6px;bottom:0;left:50%;width:1px;
-  background:linear-gradient(180deg,#3a2a50,#241838);
+  content:'';position:absolute;
+  top:5px;left:5px;right:5px;bottom:0;
+  border:1px solid rgba(100,70,150,.25);
+  border-bottom:none;border-radius:1px;
+  /* centre divider via gradient */
+  background:linear-gradient(90deg,
+    transparent calc(50% - .5px),
+    rgba(80,50,120,.35) calc(50% - .5px),
+    rgba(80,50,120,.35) calc(50% + .5px),
+    transparent calc(50% + .5px));
 }
-/* two handles */
+/* door handles — horizontal bars, inner sides of each door */
 .ward::after{
-  content:'';position:absolute;bottom:14px;left:calc(25% - 4px);
-  width:8px;height:8px;border-radius:2px;background:#3a2a50;border:1px solid #4a3860;
-  box-shadow:calc(50% + 4px) 0 0 #3a2a50, calc(50% + 4px) 0 0 1px #4a3860;
+  content:'';position:absolute;
+  bottom:17px;
+  left:29px;   /* left door: inner side */
+  width:12px;height:3px;
+  background:rgba(140,100,200,.5);
+  border-radius:2px;
+  box-shadow:
+    0 1px 0 rgba(0,0,0,.5),
+    /* right door handle */
+    20px 0 0 rgba(140,100,200,.5),
+    20px 1px 0 rgba(0,0,0,.5);
 }
 .ward-l{left:18px;}
 .ward-r{right:18px;}
@@ -440,16 +459,16 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   clip-path:polygon(0% 45%,18% 0%,32% 38%,68% 38%,82% 0%,100% 45%,100% 100%,0% 100%);
   top:-8px;left:0;
 }
-/* tail: sweeps right then curls up at the tip */
+/* tail: attached at bottom-right of body, curves up */
 .cat-body::after{
   content:'';position:absolute;
-  width:13px;height:18px;
+  width:14px;height:20px;
   border:2.5px solid #505050;
-  border-left:none;border-bottom:none;
-  border-radius:0 50% 0 0;
-  right:-12px;top:-10px;
-  transform:rotate(12deg);
-  transform-origin:left bottom;
+  border-left:none;border-top:none;
+  border-radius:0 0 60% 0;
+  right:-13px;bottom:2px;
+  transform:rotate(-15deg);
+  transform-origin:left top;
 }
 @keyframes cat-breathe{
   0%,100%{transform:scaleY(1);}
@@ -463,7 +482,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 }
 .room-cat::after{
   content:'z z';position:absolute;
-  top:-9px;right:1px;
+  top:-12px;left:2px;
   font-size:7px;font-weight:700;letter-spacing:2px;
   color:#7aa8d8;pointer-events:none;
   animation:cat-zzz 2.7s ease-out infinite;
@@ -785,7 +804,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   background:var(--surface);border:1px solid var(--border);border-radius:14px;
   padding:18px 14px;cursor:pointer;transition:all .2s;text-align:center;
 }
-.zone-card:hover,.zone-card.active{border-color:var(--gold);background:rgba(245,197,66,.04);transform:translateY(-2px);}
+.zone-card.active{border-color:var(--gold);background:rgba(245,197,66,.04);transform:translateY(-2px);}
+@media(hover:hover){.zone-card:hover{border-color:var(--gold);background:rgba(245,197,66,.04);transform:translateY(-2px);}}
 .z-icon{font-size:32px;margin-bottom:6px;}
 .z-name{font-size:13px;font-weight:700;margin-bottom:3px;}
 .z-stat{font-size:10px;color:var(--muted);}
@@ -1046,8 +1066,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .j-empty{font-size:12px;color:rgba(255,255,255,.22);padding:10px 2px;}
 .j-tabs{display:flex;gap:0;border-bottom:1px solid #1e1e30;flex-shrink:0;}
 .j-tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;
-  color:rgba(255,255,255,.35);font-size:11px;font-weight:700;padding:9px 4px;cursor:pointer;
-  letter-spacing:.2px;transition:color .15s,border-color .15s;font-family:inherit;}
+  color:rgba(255,255,255,.35);font-size:10px;font-weight:700;padding:9px 2px;cursor:pointer;
+  letter-spacing:.1px;transition:color .15s,border-color .15s;font-family:inherit;white-space:nowrap;}
 .j-tab-btn.active{color:#a855f7;border-bottom-color:#a855f7;}
 .j-tab-btn:last-child.active{color:#f97316;border-bottom-color:#f97316;}
 .j-tab-btn:hover{color:rgba(255,255,255,.65);}
@@ -1203,12 +1223,12 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 /* daylight spill from kitchen window — soft blue glow below the glass */
 .k-win-light{
-  position:absolute;top:16px;left:100px;width:158px;height:140px;z-index:4;
+  position:absolute;top:-10px;left:72px;width:234px;height:230px;z-index:4;
   background:radial-gradient(ellipse at 50% 0%,
-    rgba(160,215,255,.38) 0%,
-    rgba(160,215,255,.18) 38%,
-    rgba(160,215,255,.06) 65%,
-    transparent 88%);
+    rgba(160,215,255,.32) 0%,
+    rgba(160,215,255,.14) 30%,
+    rgba(160,215,255,.04) 55%,
+    transparent 72%);
   pointer-events:none;transition:opacity .9s ease;
 }
 
@@ -1857,6 +1877,14 @@ function calc() {
   const actHustles  = allHustles.filter(h => h.status === 'active' || parseFloat(h.revenue||0) > 0);
   // revenue field = user's target/goal, not necessarily earned — label accordingly
   const hustleRev   = actHustles.reduce((s,h) => s + (parseFloat(h.revenue)||0), 0);
+  // Hustle income: sum income entries from hustle-type sources this month
+  const hustleSrcIds = (M.income?.sources || [])
+    .filter(s => s.type === 'hustle' || /hustle|freelance/i.test(s.name || ''))
+    .map(s => s.id);
+  const hustleGoal = 1000;
+  const hustleIncEarned = incEntries
+    .filter(e => hustleSrcIds.includes(e.sourceId) && e.date >= msStart)
+    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
   // monthTarget: stored in sim's own localStorage, editable in-sim. Default £50k/month.
   const monthTarget = parseFloat(localStorage.getItem('life_sim_month_target')) || 50000;
   const dreamAge    = parseInt(M.delusion?.targetAge) || null;
@@ -1898,8 +1926,8 @@ function calc() {
   if (monthIncome >= 500) score += 10;
   if (monthIncome >= 1500)score += 10;
   if (monthIncome >= 3000)score +=  5;
-  // Hustles (max 25)
-  score += clamp(actHustles.length * 12, 0, 25);
+  // Hustles (max 25) — £1,000/month goal from hustle income sources
+  score += Math.min(25, Math.round((hustleIncEarned / hustleGoal) * 25));
   // Gym (max 22)
   score += clamp(gymSess7 * 4, 0, 22);
   // Sleep (max 10)
@@ -1923,6 +1951,7 @@ function calc() {
     outputPct, emoji, text, col,
     monthIncome, yearIncome, hustleRev,
     actHustles, allHustles,
+    hustleIncEarned, hustleGoal,
     monthTarget,
     dreamAge, curAge,
     gymSess7, gymToday, sleepAvg, hydDays, mealCount,
@@ -2019,7 +2048,7 @@ function render() {
   const gs = document.getElementById('zs-gym');
   if (gs) gs.textContent = s.gymSess7 + ' session' + (s.gymSess7!==1?'s':'') + ' this week';
   const hs = document.getElementById('zs-hustle');
-  if (hs) hs.textContent = s.actHustles.length + ' active hustle' + (s.actHustles.length!==1?'s':'');
+  if (hs) hs.textContent = s.hustleIncEarned > 0 ? fmt(s.hustleIncEarned) + ' earned this month' : 'Log hustle income';
   const ks = document.getElementById('zs-kitchen');
   if (ks) ks.textContent = s.mealCount + ' meal' + (s.mealCount!==1?'s':'') + ' logged today';
 
@@ -2067,7 +2096,7 @@ function renderStats(s) {
       <div class="sblock-title">💰 Money</div>
       <div class="srow"><span>This month</span><span class="sval" style="color:var(--gold)">${fmt(s.monthIncome)}</span></div>
       <div class="srow"><span>This year</span><span class="sval" style="color:var(--gold)">${fmt(s.yearIncome)}</span></div>
-      <div class="srow"><span>Active hustles</span><span class="sval">${s.actHustles.length}</span></div>
+      <div class="srow"><span>Hustle income</span><span class="sval" style="color:var(--green)">${fmt(s.hustleIncEarned)}</span></div>
     </div>
 
     <div class="sblock">
@@ -2113,7 +2142,7 @@ function showProgressModal() {
                   + (s.monthIncome >= 500  ? 10 : 0)
                   + (s.monthIncome >= 1500 ? 10 : 0)
                   + (s.monthIncome >= 3000 ?  5 : 0);
-  const hustlePts = Math.min(s.actHustles.length * 12, 25);
+  const hustlePts = Math.min(25, Math.round((s.hustleIncEarned / s.hustleGoal) * 25));
   const gymPts    = Math.min(s.gymSess7 * 4, 22);
   const sleepPts  = (s.sleepAvg >= 7 && s.sleepAvg <= 9) ? 10 : (s.sleepAvg >= 6 ? 5 : 0);
   const hydroPts  = Math.round((s.hydDays / 7) * 8);
@@ -2125,8 +2154,8 @@ function showProgressModal() {
         ? (s.monthIncome < 500 ? 'Log £500+ to earn +10 pts' : s.monthIncome < 1500 ? 'Log £1,500+ for +10 pts' : s.monthIncome < 3000 ? 'Log £3,000+ for +5 pts' : '')
         : 'Max reached ✓' },
     { emoji:'🚀', label:'Hustles',    pts:hustlePts, max:25,
-      detail: s.actHustles.length + ' active hustle' + (s.actHustles.length!==1?'s':''),
-      next: hustlePts < 25 ? 'Add more hustles for +12 pts each (max 25)' : 'Max reached ✓' },
+      detail: s.hustleIncEarned > 0 ? fmt(s.hustleIncEarned)+' earned this month (goal: £1,000)' : 'No hustle income logged this month',
+      next: hustlePts < 25 ? 'Log hustle income in Money → Income (£'+Math.round(s.hustleGoal - s.hustleIncEarned)+' to reach £1,000)' : 'Goal reached ✓' },
     { emoji:'🏋️', label:'Gym',       pts:gymPts,    max:22,
       detail: s.gymSess7 + '/7 sessions this week',
       next: gymPts < 22 ? (7 - s.gymSess7) + ' more session'+(7-s.gymSess7!==1?'s':'')+' = +'+(Math.min(s.gymSess7+1,5)*4 - gymPts)+' pts' : 'Max reached ✓' },
