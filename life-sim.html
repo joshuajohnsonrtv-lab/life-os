@@ -706,11 +706,11 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .char-figure.face-ex{animation:char-face-ex-body .6s ease-in-out infinite;}
 .char-head.face-ex  {animation:char-face-ex-head .35s ease-in-out infinite;}
 
-/* AT-DESK WORKING — bird's-eye view, typing micro-bounce */
+/* AT-DESK WORKING — front-facing seated, left-right typing shift */
 @keyframes char-desk-type {
-  0%,100%{transform:translateY(0);}
-  25%,75%{transform:translateY(-1px);}
-  50%    {transform:translateY(0);}
+  0%,100%{transform:translateX(0);}
+  25%    {transform:translateX(-0.8px);}
+  75%    {transform:translateX(0.8px);}
 }
 
 /* ── SEATED IDLE (in chair, no activity) ── */
@@ -739,52 +739,39 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   animation:char-post-workout 0.85s ease-in-out 3;
 }
 
-/* ── AT-DESK WORKING (seated, bird's-eye facing UP toward desk) ──
-   Character sits in chair facing the desk (which is above in screen space).
-   We see: back of head → wide shoulders → arms reaching forward (upward). */
+/* ── AT-DESK WORKING — front-facing seated, leaning into keyboard ── */
 .char-figure.at-desk{
-  position:relative;gap:2px;
-  animation:char-desk-type 0.9s ease-in-out infinite;
+  animation:char-desk-type 0.75s ease-in-out infinite;
 }
-/* Back of head — slightly wider oval from above */
+/* Head nods a hair toward the screen */
 .char-figure.at-desk .char-head{
-  width:13px;height:11px;border-radius:50%;
-  flex-shrink:0;
-  position:relative;z-index:2; /* head renders over the arms behind it */
+  transform:translateY(1px);
 }
-/* Neck hidden — body connects directly */
-.char-figure.at-desk .char-neck{display:none;}
-/* Upper back / shoulders from above — wider than head */
+/* Seated body — same clipped legs as seated-idle */
 .char-figure.at-desk .char-body{
-  width:22px;height:9px;
-  clip-path:none;
-  background:linear-gradient(180deg,#111 0%,#1a1a1a 100%);
-  border-radius:50%;
+  clip-path:polygon(0% 0%,100% 0%,82% 52%,96% 80%,4% 80%,18% 52%);
   overflow:visible;
-  position:relative;z-index:1;
-  margin-top:0;
+  position:relative;
 }
-/* Left arm reaches UPWARD (toward desk, which is above in screen space).
-   Bottom of arm is anchored near top of body; arm extends up past the head. */
+/* Left forearm — short bar extending out-and-up (typing on desk) */
 .char-figure.at-desk .char-body::before{
   content:'';position:absolute;
-  bottom:4px;left:1px;      /* start near top of 9px-tall body */
-  width:6px;height:22px;    /* tall enough to extend past the head */
-  background:#111;border-radius:3px 3px 2px 2px;
-  transform:rotate(-9deg);transform-origin:bottom center;
+  top:8%;left:-10px;
+  width:11px;height:4px;
+  background:#111;border-radius:2px;
+  transform:rotate(-18deg);transform-origin:right center;
 }
-/* Right arm — mirror */
+/* Right forearm — mirror */
 .char-figure.at-desk .char-body::after{
   content:'';position:absolute;
-  bottom:4px;right:1px;
-  width:6px;height:22px;
-  background:#111;border-radius:3px 3px 2px 2px;
-  transform:rotate(9deg);transform-origin:bottom center;
+  top:8%;right:-10px;
+  width:11px;height:4px;
+  background:#111;border-radius:2px;
+  transform:rotate(18deg);transform-origin:left center;
 }
-/* Chair rotated so back faces viewer (into working position) */
+/* Chair stays upright — just gold-highlight the frame */
 .chair.at-desk{
-  transform:scaleY(-1);
-  transform-origin:center center;
+  transform:none;
 }
 .chair.at-desk .chair-back,.chair.at-desk .chair-seat{border-color:var(--gold);}
 
