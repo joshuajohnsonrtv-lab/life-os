@@ -1400,29 +1400,27 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   transition:all .2s;font-family:inherit;
 }
 .ch-add-btn:hover{border-color:var(--orange);color:var(--orange);}
-.ch-photos-wrap{padding:0 16px 28px;flex-shrink:0;}
+.ch-photos-wrap{padding:0 16px 32px;flex-shrink:0;}
 .ch-photos-lbl{
   font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;
-  color:rgba(255,255,255,.22);margin-bottom:8px;
+  color:rgba(255,255,255,.22);margin-bottom:10px;
 }
-.ch-photo-strip{
-  display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;
-  padding-bottom:4px;scrollbar-width:none;
+.ch-photo-stack{display:flex;flex-direction:column;gap:10px;}
+.ch-photo-thumb{
+  width:100%;aspect-ratio:4/3;object-fit:cover;
+  border-radius:12px;border:1px solid rgba(255,255,255,.08);
+  cursor:pointer;display:block;transition:opacity .2s;
 }
-.ch-photo-strip::-webkit-scrollbar{display:none;}
+.ch-photo-thumb:hover{opacity:.88;}
 .ch-photo-add{
-  width:68px;height:68px;border-radius:10px;flex-shrink:0;
+  width:100%;height:54px;border-radius:10px;
   border:1.5px dashed rgba(255,255,255,.13);
   background:rgba(255,255,255,.025);
   display:flex;align-items:center;justify-content:center;
-  font-size:22px;cursor:pointer;transition:all .2s;
+  gap:8px;font-size:14px;font-weight:700;color:rgba(255,255,255,.3);
+  cursor:pointer;transition:all .2s;margin-top:2px;
 }
-.ch-photo-add:hover{border-color:var(--orange);background:rgba(249,115,22,.05);}
-.ch-photo-thumb{
-  width:68px;height:68px;object-fit:cover;border-radius:10px;flex-shrink:0;
-  border:1px solid rgba(255,255,255,.1);cursor:pointer;transition:transform .2s;
-}
-.ch-photo-thumb:hover{transform:scale(1.05);}
+.ch-photo-add:hover{border-color:var(--orange);color:var(--orange);background:rgba(249,115,22,.05);}
 
 /* ── Lightbox ── */
 .ch-lightbox{
@@ -4157,10 +4155,10 @@ function _challengeRender() {
       </div>`;
   }).join('');
 
-  // Photos HTML
+  // Photos HTML — oldest first (index 0 = oldest, last = newest)
   const photos = ch.photos || [];
   const thumbsHtml = photos.map((p,i) =>
-    `<img class="ch-photo-thumb" src="${p.dataUrl}" alt="photo" onclick="_chOpenLightbox(${i})">`
+    `<img class="ch-photo-thumb" src="${p.dataUrl}" alt="Challenge photo" onclick="_chOpenLightbox(${i})">`
   ).join('');
 
   wrap.innerHTML = `
@@ -4195,9 +4193,11 @@ function _challengeRender() {
     </div>
     <div class="ch-photos-wrap">
       <div class="ch-photos-lbl">📸 CHALLENGE PHOTOS</div>
-      <div class="ch-photo-strip">
-        <div class="ch-photo-add" onclick="document.getElementById('ch-photo-input').click()">📷</div>
+      <div class="ch-photo-stack">
         ${thumbsHtml}
+        <div class="ch-photo-add" onclick="document.getElementById('ch-photo-input').click()">
+          📷 Add Photo
+        </div>
       </div>
     </div>`;
 }
@@ -4294,7 +4294,7 @@ function _chPhotoSelected(inp) {
       const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
       const ch = _chLoad();
       ch.photos = ch.photos || [];
-      ch.photos.unshift({ dataUrl, ts: Date.now() }); // newest first
+      ch.photos.push({ dataUrl, ts: Date.now() }); // oldest first
       _chSave(ch);
       _challengeRender();
     };
