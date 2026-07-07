@@ -4580,6 +4580,25 @@ function _chScrollTo(pos) {
   else                  wrap.scrollTo({ top: 0,                 behavior: 'smooth' });
 }
 
+// ── Migrate saved habit labels to latest defaults ─────────
+(function _chMigrateLabels() {
+  try {
+    const ch = _chLoad();
+    if (!ch.habits) return;
+    const labelMap = {};
+    CH_DEFAULT_HABITS.forEach(h => { labelMap[h.id] = { label: h.label, icon: h.icon }; });
+    let changed = false;
+    ch.habits.forEach(h => {
+      if (labelMap[h.id] && (h.label !== labelMap[h.id].label || h.icon !== labelMap[h.id].icon)) {
+        h.label = labelMap[h.id].label;
+        h.icon  = labelMap[h.id].icon;
+        changed = true;
+      }
+    });
+    if (changed) _chSave(ch);
+  } catch(e) {}
+})();
+
 // ── Init ──────────────────────────────────────────────────
 _chUpdateTabVisibility();
 </script>
