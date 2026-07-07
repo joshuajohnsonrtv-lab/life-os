@@ -2669,8 +2669,8 @@ function showJournal(e) {
   modal.className = 'journal-modal';
   modal.id = 'journal-modal';
   modal.onclick = ev => { if (ev.target === modal) modal.remove(); };
+  document.body.appendChild(modal);  // must be in DOM before _renderTodoTab's getElementById runs
   _renderJournalModal(modal);
-  document.body.appendChild(modal);
 }
 
 function _switchJTab(tab) {
