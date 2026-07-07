@@ -2433,8 +2433,8 @@ function stopActivity(e) {
   clearActivityTimer();
 
   // ── Sleep → Wellness auto-log ──
-  // Capture before we null them out below
-  const _wasSleep = (_activityName || '').startsWith('😴') || (_activityName || '').startsWith('💤');
+  // Only proper sleep (😴), not naps (💤), and only if 2+ hours
+  const _wasSleep = (_activityName || '').startsWith('😴') && dur >= 7200;
   if (_wasSleep && _activityStart) {
     try {
       const sleepStartDate = new Date(_activityStart);
