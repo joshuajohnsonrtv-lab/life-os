@@ -1046,8 +1046,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .j-empty{font-size:12px;color:rgba(255,255,255,.22);padding:10px 2px;}
 .j-tabs{display:flex;gap:0;border-bottom:1px solid #1e1e30;flex-shrink:0;}
 .j-tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;
-  color:rgba(255,255,255,.35);font-size:12px;font-weight:700;padding:10px 6px;cursor:pointer;
-  letter-spacing:.3px;transition:color .15s,border-color .15s;font-family:inherit;}
+  color:rgba(255,255,255,.35);font-size:11px;font-weight:700;padding:9px 4px;cursor:pointer;
+  letter-spacing:.2px;transition:color .15s,border-color .15s;font-family:inherit;}
 .j-tab-btn.active{color:#a855f7;border-bottom-color:#a855f7;}
 .j-tab-btn:last-child.active{color:#f97316;border-bottom-color:#f97316;}
 .j-tab-btn:hover{color:rgba(255,255,255,.65);}
@@ -1259,6 +1259,39 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   border:1px solid #2a3048;border-radius:14px;display:flex;flex-direction:column;overflow:hidden;}
 .kf-hdr{padding:13px 16px 9px;border-bottom:1px solid #1e2038;
   display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+/* fridge tabs */
+.kf-tabs{display:flex;border-bottom:1px solid #1e2038;flex-shrink:0;}
+.kf-tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;
+  margin-bottom:-1px;color:rgba(255,255,255,.32);font-size:12px;font-weight:700;
+  padding:9px 6px;cursor:pointer;font-family:inherit;transition:color .15s,border-color .15s;}
+.kf-tab-btn.active{color:#4d9eff;border-bottom-color:#4d9eff;}
+/* shopping list */
+.sl-body{overflow-y:auto;flex:1;padding:10px 14px;display:flex;flex-direction:column;gap:6px;}
+.sl-item{display:flex;align-items:center;gap:8px;padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);}
+.sl-item:last-child{border-bottom:none;}
+.sl-check{width:18px;height:18px;border-radius:5px;border:1.5px solid rgba(255,255,255,.2);
+  background:transparent;flex-shrink:0;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;font-size:10px;transition:all .15s;}
+.sl-item.done .sl-check{background:var(--green);border-color:var(--green);color:#000;}
+.sl-text{flex:1;font-size:12px;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;}
+.sl-item.done .sl-text{text-decoration:line-through;color:rgba(255,255,255,.28);}
+.sl-del{background:none;border:none;color:rgba(255,255,255,.18);font-size:14px;
+  cursor:pointer;padding:0 2px;line-height:1;transition:color .15s;}
+.sl-del:hover{color:#ef4444;}
+.sl-add{display:flex;gap:6px;padding:10px 14px;border-top:1px solid #1e2038;flex-shrink:0;}
+.sl-add input{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:8px 10px;color:#fff;font-size:12px;outline:none;font-family:inherit;}
+.sl-add input:focus{border-color:rgba(77,158,255,.5);}
+.sl-add-btn{background:#4d9eff;border:none;color:#fff;padding:8px 12px;
+  border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;transition:background .15s;}
+.sl-add-btn:hover{background:#3b8ae8;}
+.sl-clear-btn{padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);
+  background:transparent;color:rgba(255,255,255,.3);font-size:11px;font-weight:700;
+  cursor:pointer;font-family:inherit;align-self:flex-end;margin:0 14px 8px;
+  transition:all .15s;flex-shrink:0;}
+.sl-clear-btn:hover{border-color:#ef4444;color:#ef4444;}
+.sl-empty{font-size:12px;color:rgba(255,255,255,.22);padding:10px 2px;}
 .kf-title{font-size:13px;font-weight:800;color:#e0e8ff;letter-spacing:.5px;}
 .kf-x{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;font-size:22px;line-height:1;padding:0;}
 .kf-body{overflow-y:auto;flex:1;padding:6px 14px;}
@@ -3052,12 +3085,14 @@ function _renderJournalModal(modal) {
     <div class="j-tabs">
       <button class="j-tab-btn${_jActiveTab==='todo'?' active':''}" onclick="_switchJTab('todo')">📋 To-Do</button>
       <button class="j-tab-btn${_jActiveTab==='journal'?' active':''}" onclick="_switchJTab('journal')">✍️ Journal</button>
-      <button class="j-tab-btn${_jActiveTab==='challenge'?' active':''}" onclick="_switchJTab('challenge')" style="${_jActiveTab==='challenge'?'':''}">🔥 Challenge</button>
+      <button class="j-tab-btn${_jActiveTab==='shopping'?' active':''}" onclick="_switchJTab('shopping')">🛒 Shopping</button>
+      <button class="j-tab-btn${_jActiveTab==='challenge'?' active':''}" onclick="_switchJTab('challenge')">🔥 Challenge</button>
     </div>
     <div id="j-tab-content" style="display:flex;flex-direction:column;flex:1;overflow:hidden;"></div>`;
   modal.innerHTML = '';
   modal.appendChild(inner);
   if (_jActiveTab === 'todo') _renderTodoTab();
+  else if (_jActiveTab === 'shopping') _renderShoppingTab();
   else if (_jActiveTab === 'challenge') _renderChallengeJTab();
   else _renderJournalTab();
 }
@@ -3405,7 +3440,7 @@ function showFridgeInventory() {
 
 function _renderFridgeModal(modal) {
   const food = _getFood();
-  const rows = food.map((f,i) => `
+  const stockRows = food.map((f,i) => `
     <div class="food-row">
       <span class="f-name">${f.name}</span>
       <button class="f-btn" onclick="_foodAdj(${i},-1)">−</button>
@@ -3414,19 +3449,38 @@ function _renderFridgeModal(modal) {
       <button class="f-btn" onclick="_foodAdj(${i},1)">+</button>
       <button class="f-btn f-del" onclick="_foodDel(${i})" title="Remove">×</button>
     </div>`).join('');
+
+  const stockTab = _kFridgeTab === 'stock';
+  const stockContent = stockTab ? `
+    <div class="kf-body">${stockRows || '<p style="color:rgba(255,255,255,.3);font-size:12px;padding:10px 0">Fridge is empty — add items below.</p>'}</div>
+    <div class="kf-add">
+      <input id="f-inp-name" placeholder="Item name…" onkeydown="if(event.key==='Enter')_foodAdd()">
+      <input id="f-inp-unit" placeholder="Unit" style="max-width:70px" onkeydown="if(event.key==='Enter')_foodAdd()">
+      <button class="kf-add-btn" onclick="_foodAdd()">+</button>
+    </div>` : '';
+
+  const shopContent = !stockTab
+    ? _shopBodyHtml('sl-fridge-inp', '_shopAddFromFridge()', 'fridge')
+    : '';
+
   modal.innerHTML = `
     <div class="k-fridge-inner" onclick="event.stopPropagation()">
       <div class="kf-hdr">
-        <div class="kf-title">🧊 Food Stock</div>
+        <div class="kf-title">${stockTab ? '🧊 Fridge' : '🛒 Shopping List'}</div>
         <button class="kf-x" onclick="document.getElementById('k-fridge-modal').remove()">×</button>
       </div>
-      <div class="kf-body">${rows || '<p style="color:rgba(255,255,255,.3);font-size:12px;padding:10px 0">Fridge is empty — add items below.</p>'}</div>
-      <div class="kf-add">
-        <input id="f-inp-name" placeholder="Item name…" onkeydown="if(event.key==='Enter')_foodAdd()">
-        <input id="f-inp-unit" placeholder="Unit" style="max-width:70px" onkeydown="if(event.key==='Enter')_foodAdd()">
-        <button class="kf-add-btn" onclick="_foodAdd()">+</button>
+      <div class="kf-tabs">
+        <button class="kf-tab-btn${stockTab?' active':''}" onclick="_kSetFridgeTab('stock')">🧊 Stock</button>
+        <button class="kf-tab-btn${!stockTab?' active':''}" onclick="_kSetFridgeTab('shopping')">🛒 Shopping</button>
       </div>
+      ${stockContent}${shopContent}
     </div>`;
+}
+
+function _kSetFridgeTab(tab) {
+  _kFridgeTab = tab;
+  const m = document.getElementById('k-fridge-modal');
+  if (m) _renderFridgeModal(m);
 }
 
 function _foodAdj(i, d) {
@@ -3987,6 +4041,91 @@ function showSimToast(msg) {
   t.textContent = msg; t.style.opacity = '1';
   clearTimeout(t._to);
   t._to = setTimeout(function() { t.style.opacity = '0'; }, 2400);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SHOPPING LIST
+// ═══════════════════════════════════════════════════════════
+const _SL_KEY = 'life_sim_shopping';
+let _kFridgeTab = 'stock'; // active fridge modal tab
+
+function _shopLoad() {
+  try { return JSON.parse(localStorage.getItem(_SL_KEY) || '[]'); } catch(e) { return []; }
+}
+function _shopSave(list) {
+  try { localStorage.setItem(_SL_KEY, JSON.stringify(list)); } catch(e) {}
+}
+function _shopAdd(text) {
+  if (!text || !text.trim()) return;
+  const list = _shopLoad();
+  list.push({ id: Date.now(), text: text.trim(), done: false });
+  _shopSave(list);
+}
+function _shopToggle(id) {
+  const list = _shopLoad();
+  const item = list.find(i => i.id === id);
+  if (item) item.done = !item.done;
+  _shopSave(list);
+}
+function _shopDelete(id) {
+  _shopSave(_shopLoad().filter(i => i.id !== id));
+}
+function _shopClearDone() {
+  _shopSave(_shopLoad().filter(i => !i.done));
+}
+
+// ── Shared inner HTML for shopping list body ──────────────
+function _shopBodyHtml(inputId, addFn, context) {
+  const list = _shopLoad();
+  const hasDone = list.some(i => i.done);
+  const rows = list.length
+    ? list.map(item => `
+        <div class="sl-item${item.done?' done':''}">
+          <div class="sl-check" onclick="_shopToggle(${item.id});_shopRerender('${context}')">${item.done?'✓':''}</div>
+          <div class="sl-text" onclick="_shopToggle(${item.id});_shopRerender('${context}')">${item.text}</div>
+          <button class="sl-del" onclick="_shopDelete(${item.id});_shopRerender('${context}')">×</button>
+        </div>`).join('')
+    : '<div class="sl-empty">Nothing on the list yet.</div>';
+  return `
+    <div class="sl-body">${rows}</div>
+    ${hasDone ? `<button class="sl-clear-btn" onclick="_shopClearDone();_shopRerender('${context}')">Clear done</button>` : ''}
+    <div class="sl-add">
+      <input id="${inputId}" placeholder="Add item…" onkeydown="if(event.key==='Enter')${addFn}">
+      <button class="sl-add-btn" onclick="${addFn}">+</button>
+    </div>`;
+}
+
+function _shopRerender(context) {
+  if (context === 'journal') {
+    const content = document.getElementById('j-tab-content');
+    if (content) content.innerHTML = _shopBodyHtml('sl-journal-inp', '_shopAddFromJournal()', 'journal');
+  } else if (context === 'fridge') {
+    const m = document.getElementById('k-fridge-modal');
+    if (m) _renderFridgeModal(m);
+  }
+}
+function _shopAddFromJournal() {
+  const inp = document.getElementById('sl-journal-inp');
+  _shopAdd(inp?.value);
+  if (inp) inp.value = '';
+  _shopRerender('journal');
+}
+function _shopAddFromFridge() {
+  const inp = document.getElementById('sl-fridge-inp');
+  _shopAdd(inp?.value);
+  if (inp) inp.value = '';
+  _shopRerender('fridge');
+}
+
+// ── Journal shopping tab render ───────────────────────────
+function _renderShoppingTab() {
+  const content = document.getElementById('j-tab-content');
+  if (!content) return;
+  content.style.display = 'flex';
+  content.style.flexDirection = 'column';
+  content.style.flex = '1';
+  content.style.overflow = 'hidden';
+  content.innerHTML = _shopBodyHtml('sl-journal-inp', '_shopAddFromJournal()', 'journal');
 }
 
 // Start Firebase if already configured
