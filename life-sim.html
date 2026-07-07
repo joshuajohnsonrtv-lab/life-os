@@ -4381,13 +4381,21 @@ function _chOpenSetup() {
         <div class="ch-setup-lbl">Challenge Name</div>
         <input class="ch-setup-inp" id="ch-new-name" value="28-Day Challenge" placeholder="e.g. 28-Day Beast Mode">
       </div>
-      <div>
-        <div class="ch-setup-lbl">Duration (days)</div>
-        <input class="ch-setup-inp" id="ch-new-days" type="number" value="28" min="7" max="365" style="width:80px">
+      <div style="display:flex;gap:10px;align-items:flex-end">
+        <div style="flex:0 0 auto">
+          <div class="ch-setup-lbl">Duration (days)</div>
+          <input class="ch-setup-inp" id="ch-new-days" type="number" value="28" min="1" max="365" style="width:74px">
+        </div>
       </div>
-      <div>
-        <div class="ch-setup-lbl">End Date</div>
-        <input class="ch-setup-inp" id="ch-new-end" type="date" value="${endStr}">
+      <div style="display:flex;gap:10px">
+        <div style="flex:1">
+          <div class="ch-setup-lbl">Start Date</div>
+          <input class="ch-setup-inp" id="ch-new-start" type="date" value="${_chDateKey()}">
+        </div>
+        <div style="flex:1">
+          <div class="ch-setup-lbl">End Date</div>
+          <input class="ch-setup-inp" id="ch-new-end" type="date" value="${endStr}">
+        </div>
       </div>
       <div>
         <div class="ch-setup-lbl">Habits to Include</div>
@@ -4403,20 +4411,37 @@ function _chOpenSetup() {
       </div>
       <button class="ch-setup-start-btn" onclick="_chStartChallenge()">🔥 Start Challenge</button>
     `;
-    // Wire up day count ↔ end date
-    const daysInp = document.getElementById('ch-new-days');
-    const endInp  = document.getElementById('ch-new-end');
-    if (daysInp && endInp) {
-      daysInp.addEventListener('input', ()=>{
-        const n = parseInt(daysInp.value)||28;
-        const d = new Date(); d.setDate(d.getDate() + n - 1);
-        endInp.value = _chDateKey(d);
-      });
-      endInp.addEventListener('input', ()=>{
-        const d1 = new Date(); d1.setHours(0,0,0,0);
+    // Three-way link: days ↔ startDate ↔ endDate
+    // Rule: changing days   → recalculate startDate (endDate is anchor)
+    //       changing start  → recalculate days       (endDate is anchor)
+    //       changing end    → recalculate days       (startDate is anchor)
+    const daysInp  = document.getElementById('ch-new-days');
+    const startInp = document.getElementById('ch-new-start');
+    const endInp   = document.getElementById('ch-new-end');
+    if (daysInp && startInp && endInp) {
+      daysInp.addEventListener('input', () => {
+        const n  = parseInt(daysInp.value) || 28;
         const d2 = new Date(endInp.value + 'T00:00:00');
-        const diff = Math.round((d2-d1)/86400000) + 1;
-        if (diff > 0) daysInp.value = diff;
+        if (!isNaN(d2)) {
+          const d1 = new Date(d2); d1.setDate(d2.getDate() - (n - 1));
+          startInp.value = _chDateKey(d1);
+        }
+      });
+      startInp.addEventListener('input', () => {
+        const d1 = new Date(startInp.value + 'T00:00:00');
+        const d2 = new Date(endInp.value   + 'T00:00:00');
+        if (!isNaN(d1) && !isNaN(d2)) {
+          const diff = Math.round((d2 - d1) / 86400000) + 1;
+          if (diff > 0) daysInp.value = diff;
+        }
+      });
+      endInp.addEventListener('input', () => {
+        const d1 = new Date(startInp.value + 'T00:00:00');
+        const d2 = new Date(endInp.value   + 'T00:00:00');
+        if (!isNaN(d1) && !isNaN(d2)) {
+          const diff = Math.round((d2 - d1) / 86400000) + 1;
+          if (diff > 0) daysInp.value = diff;
+        }
       });
     }
   }
@@ -4443,10 +4468,10 @@ function _chSaveEdits() {
   _challengeRender();
 }
 function _chStartChallenge() {
-  const name  = (document.getElementById('ch-new-name')?.value||'28-Day Challenge').trim();
-  const days  = parseInt(document.getElementById('ch-new-days')?.value)||28;
-  const endV  = document.getElementById('ch-new-end')?.value;
-  const today = _chDateKey();
+  const name     = (document.getElementById('ch-new-name')?.value||'28-Day Challenge').trim();
+  const days     = parseInt(document.getElementById('ch-new-days')?.value)||28;
+  const startV   = document.getElementById('ch-new-start')?.value || _chDateKey();
+  const endV     = document.getElementById('ch-new-end')?.value;
   // Collect selected habits
   const btns = document.querySelectorAll('#ch-habit-list [data-id]');
   const habits = [];
@@ -4457,8 +4482,8 @@ function _chStartChallenge() {
   const ch = {
     active:    true,
     name,
-    startDate: today,
-    endDate:   endV || (() => { const d=new Date(); d.setDate(d.getDate()+days-1); return _chDateKey(d); })(),
+    startDate: startV,
+    endDate:   endV || (() => { const d=new Date(startV+'T00:00:00'); d.setDate(d.getDate()+days-1); return _chDateKey(d); })(),
     totalDays: days,
     habits,
     photos:    [],
