@@ -1187,10 +1187,21 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .f-del{color:#ef4444 !important;border-color:rgba(239,68,68,.28) !important;}
 .f-del:hover{background:rgba(239,68,68,.18) !important;border-color:#ef4444 !important;}
 
-/* floor tile hint */
+/* floor — same warm dark wood as bedroom */
 .k-floor{position:absolute;bottom:0;left:0;right:0;height:185px;
-  background:repeating-linear-gradient(90deg,rgba(255,255,255,.007),rgba(255,255,255,.007) 1px,transparent 1px,transparent 60px),
-  repeating-linear-gradient(0deg,rgba(255,255,255,.007),rgba(255,255,255,.007) 1px,transparent 1px,transparent 60px);}
+  background-color:#2a1c0e;
+  background-image:
+    /* depth fade — darker at top (far end of floor), warmer at bottom */
+    linear-gradient(180deg,rgba(0,0,0,.45) 0%,transparent 55%),
+    /* vertical plank dividers */
+    repeating-linear-gradient(90deg,
+      transparent 0px,transparent 38px,
+      rgba(0,0,0,.2) 38px,rgba(0,0,0,.2) 39px),
+    /* horizontal grain lines */
+    repeating-linear-gradient(0deg,
+      transparent 0px,transparent 27px,
+      rgba(255,255,255,.022) 27px,rgba(255,255,255,.022) 28px);
+  background-size:auto,39px 28px,39px 28px;}
 
 /* back button */
 .k-back{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
