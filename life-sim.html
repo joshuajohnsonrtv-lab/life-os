@@ -1845,18 +1845,24 @@ function toDate(d) { return new Date(d).toISOString().slice(0,10); }
 // Use London timezone to match wellness dashboard date keys
 function today() { return new Date().toLocaleDateString('en-CA',{timeZone:'Europe/London'}); }
 function daysAgo(n) { const d=new Date(); d.setDate(d.getDate()-n); return d.toLocaleDateString('en-CA',{timeZone:'Europe/London'}); }
-// Parse wellness sleep entry {bedtime:'HH:MM', wakeTime:'HH:MM'} → hours
+// Parse wellness sleep entry → hours. Handles every format wellness has ever used.
 function _calcSleepHrs(entry) {
   if (!entry) return 0;
-  if (typeof entry === 'number') return entry;
-  if (entry.hours) return parseFloat(entry.hours)||0;
-  if (entry.value) return parseFloat(entry.value)||0;
-  if (entry.bedtime && entry.wakeTime) {
-    const [bh,bm] = entry.bedtime.split(':').map(Number);
-    const [wh,wm] = entry.wakeTime.split(':').map(Number);
-    let mins = (wh*60+wm)-(bh*60+bm);
-    if (mins<0) mins += 1440;
-    return +(mins/60).toFixed(1);
+  if (typeof entry === 'number') return parseFloat(entry)||0;
+  // Pre-computed field (bridge / legacy)
+  const pre = parseFloat(entry.hours||entry.value||0);
+  if (pre > 0) return pre;
+  // Standard wellness format: { bedtime:'HH:MM', wakeTime:'HH:MM' }
+  const bed  = entry.bedtime  || entry.bed  || '';
+  const wake = entry.wakeTime || entry.wake || entry.wakeup || '';
+  if (bed && wake) {
+    const bp = bed.split(':').map(Number);
+    const wp = wake.split(':').map(Number);
+    if (bp.length===2 && wp.length===2 && !isNaN(bp[0]) && !isNaN(wp[0])) {
+      let mins = (wp[0]*60+wp[1]) - (bp[0]*60+bp[1]);
+      if (mins <= 0) mins += 1440;
+      return Math.round(mins/60*10)/10;
+    }
   }
   return 0;
 }
@@ -1913,22 +1919,23 @@ function calc() {
   const dietLog  = W.diet?.log  || {};
   const hydGoal  = W.hydration?.goal || 8;
 
-  let gymSess7=0, sleepTotal=0, sleepDays=0, hydDays=0;
+  const sleepGoal = W.sleep?.goal || 8;
+  let gymSess7=0, hydDays=0, sleepTotal=0, sleepDays=0;
   for (let i=0;i<7;i++) {
     const d = daysAgo(i);
     if (gymLog[d]) gymSess7++;
     const sl = sleepLog[d];
-    if (sl) {
-      const hrs = _calcSleepHrs(sl);
-      if (hrs > 0) { sleepTotal += hrs; sleepDays++; }
-    }
+    if (sl) { const h=_calcSleepHrs(sl); if(h>0){sleepTotal+=h;sleepDays++;} }
     const hy = hydLog[d];
     if (hy !== undefined && hy !== null) {
-      const glasses = typeof hy === 'object' ? (hy.cups||hy.count||hy.glasses||hy.value||0) : (parseFloat(hy)||0);
+      const glasses = typeof hy==='object' ? (hy.cups||hy.count||hy.glasses||hy.value||0) : (parseFloat(hy)||0);
       if (glasses >= hydGoal) hydDays++;
     }
   }
-  const sleepAvg   = sleepDays > 0 ? sleepTotal/sleepDays : 0;
+  // Sleep: score from TODAY directly — logged 8h+ today → 20 pts, full stop
+  const sleepTodayEntry = sleepLog[tod];
+  const sleepTodayHrs   = _calcSleepHrs(sleepTodayEntry);
+  const sleepAvg        = sleepDays > 0 ? sleepTotal/sleepDays : 0;
   const gymToday   = !!gymLog[tod];
   const todayDiet  = dietLog[tod];
   const mealCount  = todayDiet
@@ -1946,8 +1953,10 @@ function calc() {
   score += Math.min(20, Math.round((hustleIncEarned / hustleGoal) * 20));
   // Gym (max 20) — 5 sessions per week = max
   score += Math.min(20, gymSess7 * 4);
-  // Sleep (max 20) — 7–9h average = max
-  score += (sleepAvg >= 7 && sleepAvg <= 9) ? 20 : (sleepAvg >= 6 ? 10 : 0);
+  // Sleep (max 20) — today's hours vs goal
+  score += sleepTodayHrs >= sleepGoal ? 20
+         : sleepTodayHrs >= 6 ? Math.round((sleepTodayHrs / sleepGoal) * 20)
+         : 0;
   // Hydration (max 20) — hit daily goal all 7 days = max
   score += Math.round((hydDays / 7) * 20);
 
@@ -1969,7 +1978,7 @@ function calc() {
     hustleIncEarned, hustleGoal,
     monthTarget,
     dreamAge, curAge,
-    gymSess7, gymToday, sleepAvg, hydDays, mealCount,
+    gymSess7, gymToday, sleepAvg, sleepTodayHrs, sleepGoal, hydDays, mealCount,
     gymLog, dietLog, M, W
   };
 }
@@ -2159,7 +2168,10 @@ function showProgressModal() {
                   + (s.monthIncome >=3000 ?  5 : 0);
   const hustlePts = Math.min(20, Math.round((s.hustleIncEarned / s.hustleGoal) * 20));
   const gymPts    = Math.min(20, s.gymSess7 * 4);
-  const sleepPts  = (s.sleepAvg >= 7 && s.sleepAvg <= 9) ? 20 : (s.sleepAvg >= 6 ? 10 : 0);
+  const sleepGoalPts = s.sleepGoal || 8;
+  const sleepPts  = s.sleepTodayHrs >= sleepGoalPts ? 20
+                  : s.sleepTodayHrs >= 6 ? Math.round((s.sleepTodayHrs / sleepGoalPts) * 20)
+                  : 0;
   const hydroPts  = Math.round((s.hydDays / 7) * 20);
 
   const cats = [
@@ -2175,8 +2187,8 @@ function showProgressModal() {
       detail: s.gymSess7 + '/7 sessions this week',
       next: gymPts < 20 ? (5 - Math.min(5,s.gymSess7)) + ' more session'+(5-Math.min(5,s.gymSess7)!==1?'s':'')+' to max (5/week)' : 'Max reached ✓' },
     { emoji:'😴', label:'Sleep',     pts:sleepPts,  max:20,
-      detail: s.sleepAvg > 0 ? s.sleepAvg.toFixed(1)+'h avg this week' : 'No sleep logged — log via Wellness → Sleep',
-      next: sleepPts < 20 ? (s.sleepAvg < 6 ? 'Log 6h+ sleep for 10 pts, 7–9h for full 20' : 'You\'re on 6–7h — hit 7h+ consistently for full 20 pts') : 'Max reached ✓' },
+      detail: s.sleepTodayHrs > 0 ? s.sleepTodayHrs.toFixed(1)+'h logged today' : 'No sleep logged today — log via Wellness → Sleep',
+      next: sleepPts < 20 ? (s.sleepTodayHrs < 6 ? 'Log 6h+ sleep for partial pts' : 'Log '+sleepGoalPts+'h+ to max sleep (20 pts)') : 'Goal hit ✓' },
     { emoji:'💧', label:'Hydration', pts:hydroPts,  max:20,
       detail: s.hydDays + '/7 days hitting daily goal this week',
       next: hydroPts < 20 ? (7 - s.hydDays)+' more day'+(7-s.hydDays!==1?'s':'')+' hitting water goal = full 20 pts' : 'Max reached ✓' },
