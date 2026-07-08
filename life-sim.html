@@ -1842,8 +1842,24 @@ function getWellness() {
 //  HELPERS
 // ─────────────────────────────────────────────
 function toDate(d) { return new Date(d).toISOString().slice(0,10); }
-function today() { return new Date().toISOString().slice(0,10); }
-function daysAgo(n) { const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); }
+// Use London timezone to match wellness dashboard date keys
+function today() { return new Date().toLocaleDateString('en-CA',{timeZone:'Europe/London'}); }
+function daysAgo(n) { const d=new Date(); d.setDate(d.getDate()-n); return d.toLocaleDateString('en-CA',{timeZone:'Europe/London'}); }
+// Parse wellness sleep entry {bedtime:'HH:MM', wakeTime:'HH:MM'} → hours
+function _calcSleepHrs(entry) {
+  if (!entry) return 0;
+  if (typeof entry === 'number') return entry;
+  if (entry.hours) return parseFloat(entry.hours)||0;
+  if (entry.value) return parseFloat(entry.value)||0;
+  if (entry.bedtime && entry.wakeTime) {
+    const [bh,bm] = entry.bedtime.split(':').map(Number);
+    const [wh,wm] = entry.wakeTime.split(':').map(Number);
+    let mins = (wh*60+wm)-(bh*60+bm);
+    if (mins<0) mins += 1440;
+    return +(mins/60).toFixed(1);
+  }
+  return 0;
+}
 function fmt(n) {
   if (!n || isNaN(n)) return '£0';
   if (n >= 1e6) return '£' + (n/1e6).toFixed(1) + 'M';
@@ -1902,14 +1918,14 @@ function calc() {
     const d = daysAgo(i);
     if (gymLog[d]) gymSess7++;
     const sl = sleepLog[d];
-    if (sl !== undefined && sl !== null) {
-      const hrs = typeof sl === 'object' ? (parseFloat(sl.hours||sl.value||0)) : parseFloat(sl)||0;
+    if (sl) {
+      const hrs = _calcSleepHrs(sl);
       if (hrs > 0) { sleepTotal += hrs; sleepDays++; }
     }
     const hy = hydLog[d];
-    if (hy !== undefined) {
-      const cups = typeof hy === 'object' ? (hy.cups||hy.count||hy.value||0) : (hy||0);
-      if (parseFloat(cups) >= hydGoal) hydDays++;
+    if (hy !== undefined && hy !== null) {
+      const glasses = typeof hy === 'object' ? (hy.cups||hy.count||hy.glasses||hy.value||0) : (parseFloat(hy)||0);
+      if (glasses >= hydGoal) hydDays++;
     }
   }
   const sleepAvg   = sleepDays > 0 ? sleepTotal/sleepDays : 0;
@@ -1919,22 +1935,21 @@ function calc() {
     ? (Array.isArray(todayDiet) ? todayDiet.length : (typeof todayDiet === 'object' ? Object.keys(todayDiet).length : 1))
     : 0;
 
-  // ── Score (0–100) ─────────────────────────
+  // ── Score (0–100) — 5 equal categories × 20 pts ──
   let score = 0;
-  // Income (max 35)
-  if (monthIncome > 0)    score += 10;
-  if (monthIncome >= 500) score += 10;
-  if (monthIncome >= 1500)score += 10;
-  if (monthIncome >= 3000)score +=  5;
-  // Hustles (max 25) — £1,000/month goal from hustle income sources
-  score += Math.min(25, Math.round((hustleIncEarned / hustleGoal) * 25));
-  // Gym (max 22)
-  score += clamp(gymSess7 * 4, 0, 22);
-  // Sleep (max 10)
-  if (sleepAvg >= 7 && sleepAvg <= 9) score += 10;
-  else if (sleepAvg >= 6)              score +=  5;
-  // Hydration (max 8)
-  score += Math.round((hydDays/7)*8);
+  // Income (max 20) — £3,000/month hits all 4 tiers
+  score += (monthIncome >    0 ?  5 : 0)
+         + (monthIncome >= 500 ?  5 : 0)
+         + (monthIncome >=1500 ?  5 : 0)
+         + (monthIncome >=3000 ?  5 : 0);
+  // Hustles (max 20) — £1,000/month goal
+  score += Math.min(20, Math.round((hustleIncEarned / hustleGoal) * 20));
+  // Gym (max 20) — 5 sessions per week = max
+  score += Math.min(20, gymSess7 * 4);
+  // Sleep (max 20) — 7–9h average = max
+  score += (sleepAvg >= 7 && sleepAvg <= 9) ? 20 : (sleepAvg >= 6 ? 10 : 0);
+  // Hydration (max 20) — hit daily goal all 7 days = max
+  score += Math.round((hydDays / 7) * 20);
 
   const outputPct = clamp(Math.round(score), 0, 100);
 
@@ -2137,34 +2152,34 @@ function showProgressModal() {
         </div>`).join('')
     : `<div style="font-size:10px;color:var(--muted)">None active — add one in Money → Hustles.</div>`;
 
-  // Score per category (matches calc() formula exactly)
-  const incomePts = (s.monthIncome > 0 ? 10 : 0)
-                  + (s.monthIncome >= 500  ? 10 : 0)
-                  + (s.monthIncome >= 1500 ? 10 : 0)
-                  + (s.monthIncome >= 3000 ?  5 : 0);
-  const hustlePts = Math.min(25, Math.round((s.hustleIncEarned / s.hustleGoal) * 25));
-  const gymPts    = Math.min(s.gymSess7 * 4, 22);
-  const sleepPts  = (s.sleepAvg >= 7 && s.sleepAvg <= 9) ? 10 : (s.sleepAvg >= 6 ? 5 : 0);
-  const hydroPts  = Math.round((s.hydDays / 7) * 8);
+  // Score per category — 5 equal categories × 20 pts (matches calc() exactly)
+  const incomePts = (s.monthIncome >    0 ?  5 : 0)
+                  + (s.monthIncome >= 500 ?  5 : 0)
+                  + (s.monthIncome >=1500 ?  5 : 0)
+                  + (s.monthIncome >=3000 ?  5 : 0);
+  const hustlePts = Math.min(20, Math.round((s.hustleIncEarned / s.hustleGoal) * 20));
+  const gymPts    = Math.min(20, s.gymSess7 * 4);
+  const sleepPts  = (s.sleepAvg >= 7 && s.sleepAvg <= 9) ? 20 : (s.sleepAvg >= 6 ? 10 : 0);
+  const hydroPts  = Math.round((s.hydDays / 7) * 20);
 
   const cats = [
-    { emoji:'💰', label:'Income',     pts:incomePts, max:35,
+    { emoji:'💰', label:'Income',    pts:incomePts, max:20,
       detail: s.monthIncome > 0 ? fmt(s.monthIncome)+' this month' : 'No income logged',
-      next: incomePts < 35
-        ? (s.monthIncome < 500 ? 'Log £500+ to earn +10 pts' : s.monthIncome < 1500 ? 'Log £1,500+ for +10 pts' : s.monthIncome < 3000 ? 'Log £3,000+ for +5 pts' : '')
+      next: incomePts < 20
+        ? (s.monthIncome < 500 ? 'Log £500+ for +5 pts' : s.monthIncome < 1500 ? 'Log £1,500+ for +5 pts' : s.monthIncome < 3000 ? 'Log £3,000+ for full 20 pts' : '')
         : 'Max reached ✓' },
-    { emoji:'🚀', label:'Hustles',    pts:hustlePts, max:25,
+    { emoji:'🚀', label:'Hustles',   pts:hustlePts, max:20,
       detail: s.hustleIncEarned > 0 ? fmt(s.hustleIncEarned)+' earned this month (goal: £1,000)' : 'No hustle income logged this month',
-      next: hustlePts < 25 ? 'Log hustle income in Money → Income (£'+Math.round(s.hustleGoal - s.hustleIncEarned)+' to reach £1,000)' : 'Goal reached ✓' },
-    { emoji:'🏋️', label:'Gym',       pts:gymPts,    max:22,
+      next: hustlePts < 20 ? '£'+Math.round(s.hustleGoal - s.hustleIncEarned)+' more to reach £1,000 goal' : 'Goal reached ✓' },
+    { emoji:'🏋️', label:'Gym',      pts:gymPts,    max:20,
       detail: s.gymSess7 + '/7 sessions this week',
-      next: gymPts < 22 ? (7 - s.gymSess7) + ' more session'+(7-s.gymSess7!==1?'s':'')+' = +'+(Math.min(s.gymSess7+1,5)*4 - gymPts)+' pts' : 'Max reached ✓' },
-    { emoji:'😴', label:'Sleep',      pts:sleepPts,  max:10,
-      detail: s.sleepAvg > 0 ? s.sleepAvg.toFixed(1)+'h avg (7d)' : 'No sleep logged',
-      next: sleepPts < 10 ? (s.sleepAvg < 6 ? 'Log 6h+ sleep for +5 pts' : 'Aim for 7–9h for +10 pts') : 'Max reached ✓' },
-    { emoji:'💧', label:'Hydration',  pts:hydroPts,  max:8,
-      detail: s.hydDays + '/7 days hitting goal',
-      next: hydroPts < 8 ? 'Hit daily water goal more days this week' : 'Max reached ✓' },
+      next: gymPts < 20 ? (5 - Math.min(5,s.gymSess7)) + ' more session'+(5-Math.min(5,s.gymSess7)!==1?'s':'')+' to max (5/week)' : 'Max reached ✓' },
+    { emoji:'😴', label:'Sleep',     pts:sleepPts,  max:20,
+      detail: s.sleepAvg > 0 ? s.sleepAvg.toFixed(1)+'h avg this week' : 'No sleep logged — log via Wellness → Sleep',
+      next: sleepPts < 20 ? (s.sleepAvg < 6 ? 'Log 6h+ sleep for 10 pts, 7–9h for full 20' : 'You\'re on 6–7h — hit 7h+ consistently for full 20 pts') : 'Max reached ✓' },
+    { emoji:'💧', label:'Hydration', pts:hydroPts,  max:20,
+      detail: s.hydDays + '/7 days hitting daily goal this week',
+      next: hydroPts < 20 ? (7 - s.hydDays)+' more day'+(7-s.hydDays!==1?'s':'')+' hitting water goal = full 20 pts' : 'Max reached ✓' },
   ];
 
   const factorHTML = cats.map(c => {
