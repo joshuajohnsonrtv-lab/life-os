@@ -1920,19 +1920,22 @@ function calc() {
   const hydGoal  = W.hydration?.goal || 8;
 
   const sleepGoal = W.sleep?.goal || 8;
-  let gymSess7=0, hydDays=0, sleepTotal=0, sleepDays=0;
+  let gymSess7=0, hydDays=0, sleepGoodDays=0, sleepTotal=0, sleepDays=0;
   for (let i=0;i<7;i++) {
     const d = daysAgo(i);
     if (gymLog[d]) gymSess7++;
     const sl = sleepLog[d];
-    if (sl) { const h=_calcSleepHrs(sl); if(h>0){sleepTotal+=h;sleepDays++;} }
+    if (sl) {
+      const h = _calcSleepHrs(sl);
+      if (h > 0) { sleepTotal += h; sleepDays++; }
+      if (h >= sleepGoal) sleepGoodDays++;
+    }
     const hy = hydLog[d];
     if (hy !== undefined && hy !== null) {
       const glasses = typeof hy==='object' ? (hy.cups||hy.count||hy.glasses||hy.value||0) : (parseFloat(hy)||0);
       if (glasses >= hydGoal) hydDays++;
     }
   }
-  // Sleep: score from TODAY directly — logged 8h+ today → 20 pts, full stop
   const sleepTodayEntry = sleepLog[tod];
   const sleepTodayHrs   = _calcSleepHrs(sleepTodayEntry);
   const sleepAvg        = sleepDays > 0 ? sleepTotal/sleepDays : 0;
@@ -1944,20 +1947,15 @@ function calc() {
 
   // ── Score (0–100) — 5 equal categories × 20 pts ──
   let score = 0;
-  // Income (max 20) — £3,000/month hits all 4 tiers
-  score += (monthIncome >    0 ?  5 : 0)
-         + (monthIncome >= 500 ?  5 : 0)
-         + (monthIncome >=1500 ?  5 : 0)
-         + (monthIncome >=3000 ?  5 : 0);
-  // Hustles (max 20) — £1,000/month goal
+  // Income (max 20) — linear, £2,000/month = full 20
+  score += Math.min(20, Math.round((monthIncome / 2000) * 20));
+  // Hustles (max 20) — £1,000/month from hustle sources = full 20
   score += Math.min(20, Math.round((hustleIncEarned / hustleGoal) * 20));
-  // Gym (max 20) — 5 sessions per week = max
-  score += Math.min(20, gymSess7 * 4);
-  // Sleep (max 20) — today's hours vs goal
-  score += sleepTodayHrs >= sleepGoal ? 20
-         : sleepTodayHrs >= 6 ? Math.round((sleepTodayHrs / sleepGoal) * 20)
-         : 0;
-  // Hydration (max 20) — hit daily goal all 7 days = max
+  // Gym (max 20) — 7 sessions per week = full 20
+  score += Math.min(20, Math.round((gymSess7 / 7) * 20));
+  // Sleep (max 20) — nights this week with ≥ sleep goal, 7/7 = full 20
+  score += Math.round((sleepGoodDays / 7) * 20);
+  // Hydration (max 20) — hit 3L daily goal all 7 days = full 20
   score += Math.round((hydDays / 7) * 20);
 
   const outputPct = clamp(Math.round(score), 0, 100);
@@ -1978,7 +1976,7 @@ function calc() {
     hustleIncEarned, hustleGoal,
     monthTarget,
     dreamAge, curAge,
-    gymSess7, gymToday, sleepAvg, sleepTodayHrs, sleepGoal, hydDays, mealCount,
+    gymSess7, gymToday, sleepAvg, sleepTodayHrs, sleepGoodDays, sleepGoal, hydDays, mealCount,
     gymLog, dietLog, M, W
   };
 }
@@ -2162,36 +2160,28 @@ function showProgressModal() {
     : `<div style="font-size:10px;color:var(--muted)">None active — add one in Money → Hustles.</div>`;
 
   // Score per category — 5 equal categories × 20 pts (matches calc() exactly)
-  const incomePts = (s.monthIncome >    0 ?  5 : 0)
-                  + (s.monthIncome >= 500 ?  5 : 0)
-                  + (s.monthIncome >=1500 ?  5 : 0)
-                  + (s.monthIncome >=3000 ?  5 : 0);
+  const incomePts = Math.min(20, Math.round((s.monthIncome / 2000) * 20));
   const hustlePts = Math.min(20, Math.round((s.hustleIncEarned / s.hustleGoal) * 20));
-  const gymPts    = Math.min(20, s.gymSess7 * 4);
-  const sleepGoalPts = s.sleepGoal || 8;
-  const sleepPts  = s.sleepTodayHrs >= sleepGoalPts ? 20
-                  : s.sleepTodayHrs >= 6 ? Math.round((s.sleepTodayHrs / sleepGoalPts) * 20)
-                  : 0;
+  const gymPts    = Math.min(20, Math.round((s.gymSess7 / 7) * 20));
+  const sleepPts  = Math.round((s.sleepGoodDays / 7) * 20);
   const hydroPts  = Math.round((s.hydDays / 7) * 20);
 
   const cats = [
     { emoji:'💰', label:'Income',    pts:incomePts, max:20,
-      detail: s.monthIncome > 0 ? fmt(s.monthIncome)+' this month' : 'No income logged',
-      next: incomePts < 20
-        ? (s.monthIncome < 500 ? 'Log £500+ for +5 pts' : s.monthIncome < 1500 ? 'Log £1,500+ for +5 pts' : s.monthIncome < 3000 ? 'Log £3,000+ for full 20 pts' : '')
-        : 'Max reached ✓' },
+      detail: s.monthIncome > 0 ? fmt(s.monthIncome)+' this month' : 'Nothing logged yet',
+      next: incomePts < 20 ? 'Log £2,000 this month' : '£2,000 hit ✓' },
     { emoji:'🚀', label:'Hustles',   pts:hustlePts, max:20,
-      detail: s.hustleIncEarned > 0 ? fmt(s.hustleIncEarned)+' earned this month (goal: £1,000)' : 'No hustle income logged this month',
-      next: hustlePts < 20 ? '£'+Math.round(s.hustleGoal - s.hustleIncEarned)+' more to reach £1,000 goal' : 'Goal reached ✓' },
+      detail: s.hustleIncEarned > 0 ? fmt(s.hustleIncEarned)+' from hustles' : 'Nothing logged yet',
+      next: hustlePts < 20 ? 'Log £1,000 from hustles' : '£1,000 hit ✓' },
     { emoji:'🏋️', label:'Gym',      pts:gymPts,    max:20,
       detail: s.gymSess7 + '/7 sessions this week',
-      next: gymPts < 20 ? (5 - Math.min(5,s.gymSess7)) + ' more session'+(5-Math.min(5,s.gymSess7)!==1?'s':'')+' to max (5/week)' : 'Max reached ✓' },
+      next: gymPts < 20 ? '7 sessions a week' : '7 sessions ✓' },
     { emoji:'😴', label:'Sleep',     pts:sleepPts,  max:20,
-      detail: s.sleepTodayHrs > 0 ? s.sleepTodayHrs.toFixed(1)+'h logged today' : 'No sleep logged today — log via Wellness → Sleep',
-      next: sleepPts < 20 ? (s.sleepTodayHrs < 6 ? 'Log 6h+ sleep for partial pts' : 'Log '+sleepGoalPts+'h+ to max sleep (20 pts)') : 'Goal hit ✓' },
+      detail: s.sleepGoodDays + '/7 nights at ' + (s.sleepGoal||8) + 'h+',
+      next: sleepPts < 20 ? '7 nights of 8h+' : '7 nights ✓' },
     { emoji:'💧', label:'Hydration', pts:hydroPts,  max:20,
-      detail: s.hydDays + '/7 days hitting daily goal this week',
-      next: hydroPts < 20 ? (7 - s.hydDays)+' more day'+(7-s.hydDays!==1?'s':'')+' hitting water goal = full 20 pts' : 'Max reached ✓' },
+      detail: s.hydDays + '/7 days hitting goal',
+      next: hydroPts < 20 ? '3L a day, 7 days' : '7 days ✓' },
   ];
 
   const factorHTML = cats.map(c => {
