@@ -823,6 +823,71 @@
   .lm-shopping-item { display:flex; gap:8px; align-items:center; padding:8px 10px; background:var(--card2); border-radius:var(--radius-sm); margin-bottom:6px; font-size:13px; }
   .lm-shopping-item .qty { font-size:12px; color:var(--amber); font-weight:700; min-width:80px; }
   .lm-shopping-item .item { color:var(--text); }
+
+  /* ── MEAL PLANNER ── */
+  .mp-week-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
+  .mp-week-label{font-size:13px;font-weight:800;color:var(--text);text-align:center;flex:1;}
+  .mp-week-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--muted);cursor:pointer;font-size:13px;font-weight:700;transition:all .15s;font-family:inherit;}
+  .mp-week-btn:hover{border-color:var(--purple);color:var(--purple);}
+  .mp-scroll-outer{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;}
+  .mp-scroll-outer::-webkit-scrollbar{height:3px;}
+  .mp-scroll-outer::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .mp-grid{display:grid;grid-template-columns:46px repeat(7,1fr);min-width:420px;border-left:1px solid var(--border);border-top:1px solid var(--border);}
+  .mp-corner{background:var(--surface);border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .mp-day-hdr{padding:7px 4px;text-align:center;background:var(--surface);border-right:1px solid var(--border);border-bottom:1px solid var(--border);cursor:default;}
+  .mp-day-hdr.today{background:rgba(139,92,246,.12);}
+  .mp-day-hdr .mp-day-name{font-size:9px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);}
+  .mp-day-hdr .mp-day-num{font-size:17px;font-weight:900;color:var(--text);line-height:1.2;}
+  .mp-day-hdr.today .mp-day-num{color:var(--purple);}
+  .mp-row-label{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 2px;background:var(--surface);border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .mp-row-label .mp-rl-icon{font-size:14px;line-height:1;}
+  .mp-row-label .mp-rl-text{font-size:8px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);writing-mode:initial;}
+  .mp-cell{min-height:62px;padding:5px 5px 4px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;display:flex;flex-direction:column;gap:2px;position:relative;}
+  .mp-cell:hover{background:rgba(255,255,255,.04);}
+  .mp-cell:active{background:rgba(139,92,246,.08);}
+  .mp-cell.today{background:rgba(139,92,246,.04);}
+  .mp-cell.filled{background:rgba(255,255,255,.02);}
+  .mp-cell-name{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.75);line-height:1.3;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .mp-cell-add{font-size:18px;color:rgba(255,255,255,.1);line-height:1;margin:auto;display:flex;align-items:center;justify-content:center;height:100%;transition:color .15s;}
+  .mp-cell:hover .mp-cell-add{color:rgba(255,255,255,.25);}
+  .mp-prep-dot{position:absolute;bottom:4px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--green);}
+  .mp-cell.breakfast .mp-cell-name{color:rgba(251,191,36,.85);}
+  .mp-cell.lunch .mp-cell-name{color:rgba(74,222,128,.85);}
+  .mp-cell.dinner .mp-cell-name{color:rgba(167,139,250,.85);}
+  .mp-cell.breakfast.filled{border-top:2px solid rgba(251,191,36,.35);}
+  .mp-cell.lunch.filled{border-top:2px solid rgba(74,222,128,.3);}
+  .mp-cell.dinner.filled{border-top:2px solid rgba(167,139,250,.3);}
+  /* Prep summary section */
+  .mp-prep-section{padding:16px 14px 8px;}
+  .mp-prep-hdr{font-size:11px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+  .mp-prep-progress{font-size:11px;font-weight:700;color:var(--green);}
+  .mp-prep-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all .15s;}
+  .mp-prep-item:hover{border-color:var(--green);}
+  .mp-prep-item.done{background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.3);}
+  .mp-prep-check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all .2s;}
+  .mp-prep-item.done .mp-prep-check{background:var(--green);border-color:var(--green);color:#000;font-weight:900;}
+  .mp-prep-name{flex:1;font-size:13px;font-weight:700;color:var(--text);}
+  .mp-prep-item.done .mp-prep-name{color:var(--muted);text-decoration:line-through;}
+  .mp-prep-count{font-size:11px;font-weight:700;color:var(--muted);background:var(--card);padding:2px 8px;border-radius:20px;}
+  .mp-empty-week{text-align:center;padding:24px 16px;color:var(--muted);font-size:13px;}
+  /* Meal edit modal */
+  .mp-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+  .mp-modal-overlay.open{opacity:1;pointer-events:auto;}
+  .mp-modal-sheet{width:min(460px,100%);background:var(--surface);border-radius:18px 18px 0 0;border:1px solid var(--border);padding:0;overflow:hidden;transform:translateY(40px);transition:transform .25s ease;}
+  .mp-modal-overlay.open .mp-modal-sheet{transform:translateY(0);}
+  .mp-modal-header{padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .mp-modal-title{font-size:14px;font-weight:900;color:var(--text);}
+  .mp-modal-subtitle{font-size:11px;color:var(--muted);margin-top:2px;}
+  .mp-modal-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:2px 6px;line-height:1;}
+  .mp-modal-body{padding:16px 18px;}
+  .mp-modal-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+  .mp-modal-actions{padding:12px 18px 24px;display:flex;gap:10px;}
+  .mp-modal-save{flex:1;padding:12px;background:var(--purple);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;transition:opacity .15s;}
+  .mp-modal-save:hover{opacity:.88;}
+  .mp-modal-clear{padding:12px 16px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .mp-modal-clear:hover{background:rgba(239,68,68,.18);}
+  .mp-copy-btn{display:flex;align-items:center;gap:7px;padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;margin:10px 14px 0;}
+  .mp-copy-btn:hover{border-color:var(--purple);color:var(--purple);}
 </style>
 </head>
 <body>
@@ -861,6 +926,7 @@
     <button class="mob-grid-card" onclick="showPage('hydration');closeMobileMenu()"><span class="mob-grid-emoji">💧</span><span class="mob-grid-label">Hydration</span></button>
     <button class="mob-grid-card" onclick="showPage('diet');closeMobileMenu()"><span class="mob-grid-emoji">🥗</span><span class="mob-grid-label">Diet</span></button>
     <button class="mob-grid-card" onclick="showPage('mealideas');closeMobileMenu()"><span class="mob-grid-emoji">🍽️</span><span class="mob-grid-label">Meal Ideas</span></button>
+    <button class="mob-grid-card" onclick="showPage('mealplan');closeMobileMenu()"><span class="mob-grid-emoji">📅</span><span class="mob-grid-label">Meal Planner</span></button>
 
     <div class="mob-menu-section-full">🧴 Routine</div>
     <button class="mob-grid-card" onclick="showPage('skincare');closeMobileMenu()"><span class="mob-grid-emoji">🧴</span><span class="mob-grid-label">Skincare</span></button>
@@ -921,6 +987,9 @@
   </div>
   <div class="nav-item" onclick="showPage('mealideas')" id="nav-mealideas">
     <span class="icon">🍽️</span><span>Meal Ideas</span>
+  </div>
+  <div class="nav-item" onclick="showPage('mealplan')" id="nav-mealplan">
+    <span class="icon">📅</span><span>Meal Planner</span>
   </div>
   <div class="nav-section-label">Insights</div>
   <div class="nav-item" onclick="showPage('measurements')" id="nav-measurements">
@@ -2026,6 +2095,39 @@
     </div>
   </div>
 
+  <!-- ========== MEAL PLANNER ========== -->
+  <div class="page" id="page-mealplan">
+    <div id="mp-root"></div>
+    <!-- Meal edit modal -->
+    <div class="mp-modal-overlay" id="mp-modal" onclick="if(event.target===this)closeMpModal()">
+      <div class="mp-modal-sheet">
+        <div class="mp-modal-header">
+          <div>
+            <div class="mp-modal-title" id="mp-modal-title">Add Meal</div>
+            <div class="mp-modal-subtitle" id="mp-modal-subtitle"></div>
+          </div>
+          <button class="mp-modal-close" onclick="closeMpModal()">✕</button>
+        </div>
+        <div class="mp-modal-body">
+          <div class="mp-modal-label">Meal name</div>
+          <input id="mp-meal-name" type="text" placeholder="e.g. Chicken & rice, Oats, Salmon..." style="width:100%;box-sizing:border-box;margin-bottom:12px">
+          <div class="mp-modal-label">Notes (optional)</div>
+          <input id="mp-meal-notes" type="text" placeholder="e.g. Add honey, 400g portions..." style="width:100%;box-sizing:border-box;margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleMpPrepped()">
+            <div id="mp-prepped-toggle" style="width:40px;height:22px;border-radius:11px;background:var(--border);position:relative;transition:background .2s;flex-shrink:0">
+              <div id="mp-prepped-knob" style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;"></div>
+            </div>
+            <span style="font-size:13px;font-weight:700;color:var(--text)">Mark as Prepped <span style="color:var(--muted);font-weight:400">(batch cooked ✓)</span></span>
+          </div>
+        </div>
+        <div class="mp-modal-actions">
+          <button class="mp-modal-clear" onclick="clearMpCell()">🗑 Clear</button>
+          <button class="mp-modal-save" onclick="saveMpCell()">Save Meal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ========== NA:K FOODS (standalone page removed — merged into Meal Ideas above) ========== -->
   <!-- ========== ALL RECORDS ========== -->
   <div class="page" id="page-allrecords">
@@ -2350,7 +2452,8 @@ const DEFAULT_DATA = {
   gym: { log: {} },
   measurements: { log: {} },
   journal: { log: {} },
-  retention: { startDate: null, log: {} }
+  retention: { startDate: null, log: {} },
+  mealPlan: {}
 };
 
 function getData() {
@@ -2459,7 +2562,8 @@ const PAGE_NAMES = {
   retention:'🔒 SR Tracker', mealideas:'🍽️ Meal Ideas',
   nafoods:'🧂 Na:K Foods', measurements:'📏 Measurements', trends:'📈 Trends',
   journal:'✍️ Journal', allrecords:'📋 All Records',
-  looksmax:'🪞 Looksmaxxing'
+  looksmax:'🪞 Looksmaxxing',
+  mealplan:'📅 Meal Planner'
 };
 
 function showPage(page) {
@@ -2525,7 +2629,8 @@ function renderPage(page) {
     mealideas: renderMealIdeas,
     retention: renderRetention,
     measurements: renderMeasurements,
-    looksmax: renderLooksmax
+    looksmax: renderLooksmax,
+    mealplan: renderMealPlan
   };
   if(fns[page]) fns[page]();
 }
@@ -6207,6 +6312,239 @@ function renderNaKFoods() {
       <td style="font-size:12px;color:var(--muted2);max-width:180px">${f.bestFor}</td>
     </tr>`;
   }).join('');
+}
+
+// ==================== MEAL PLANNER ====================
+let _mpWeekOffset = 0; // 0 = current week, -1 = last week, +1 = next week
+let _mpEditing = null; // { date, slot } being edited
+
+function _mpGetWeekDates(offset) {
+  // Returns array of 7 Date objects starting Monday
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun … 6=Sat
+  const mon = new Date(now);
+  mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1) + offset * 7);
+  mon.setHours(0,0,0,0);
+  return Array.from({length:7}, (_,i) => {
+    const d = new Date(mon);
+    d.setDate(mon.getDate() + i);
+    return d;
+  });
+}
+
+function _mpDateKey(d) {
+  return d.toLocaleDateString('en-CA', {timeZone:'Europe/London'});
+}
+
+function _mpTodayKey() {
+  return new Date().toLocaleDateString('en-CA', {timeZone:'Europe/London'});
+}
+
+function _mpFmtRange(dates) {
+  const opts1 = {day:'numeric', month:'short'};
+  const opts2 = {day:'numeric', month:'short'};
+  return dates[0].toLocaleDateString('en-GB', opts1) + ' – ' + dates[6].toLocaleDateString('en-GB', opts2);
+}
+
+const MP_SLOTS = [
+  { id:'breakfast', label:'Break', icon:'🌅', cls:'breakfast' },
+  { id:'lunch',     label:'Lunch', icon:'☀️', cls:'lunch' },
+  { id:'dinner',    label:'Dinner', icon:'🌙', cls:'dinner' },
+];
+const MP_DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+function renderMealPlan() {
+  const root = document.getElementById('mp-root');
+  if (!root) return;
+  const data = getData();
+  if (!data.mealPlan) data.mealPlan = {};
+  const dates = _mpGetWeekDates(_mpWeekOffset);
+  const todayKey = _mpTodayKey();
+
+  // ── Week nav ──
+  const rangeLabel = _mpFmtRange(dates);
+  const isCurrentWeek = _mpWeekOffset === 0;
+
+  // ── Build grid ──
+  // header row: corner + 7 day headers
+  let headerCells = `<div class="mp-corner"></div>`;
+  dates.forEach((d, i) => {
+    const dk = _mpDateKey(d);
+    const isToday = dk === todayKey;
+    headerCells += `<div class="mp-day-hdr${isToday?' today':''}">
+      <div class="mp-day-name">${MP_DAY_NAMES[i]}</div>
+      <div class="mp-day-num">${d.getDate()}</div>
+    </div>`;
+  });
+
+  // meal rows
+  let rowCells = '';
+  MP_SLOTS.forEach(slot => {
+    rowCells += `<div class="mp-row-label">
+      <span class="mp-rl-icon">${slot.icon}</span>
+      <span class="mp-rl-text">${slot.label}</span>
+    </div>`;
+    dates.forEach(d => {
+      const dk = _mpDateKey(d);
+      const isToday = dk === todayKey;
+      const meal = data.mealPlan[dk]?.[slot.id];
+      const hasMeal = meal && meal.name && meal.name.trim();
+      rowCells += `<div class="mp-cell ${slot.cls}${hasMeal?' filled':''}${isToday?' today':''}" onclick="openMpModal('${dk}','${slot.id}')">
+        ${hasMeal
+          ? `<div class="mp-cell-name">${meal.name}</div>${meal.prepped ? '<div class="mp-prep-dot"></div>' : ''}`
+          : `<div class="mp-cell-add">+</div>`
+        }
+      </div>`;
+    });
+  });
+
+  // ── Prep summary ──
+  const mealCounts = {};
+  const preppedSet = new Set();
+  dates.forEach(d => {
+    const dk = _mpDateKey(d);
+    MP_SLOTS.forEach(slot => {
+      const meal = data.mealPlan[dk]?.[slot.id];
+      if (meal && meal.name && meal.name.trim()) {
+        const key = meal.name.trim().toLowerCase();
+        mealCounts[key] = mealCounts[key] || { name: meal.name.trim(), count: 0, prepped: meal.prepped };
+        mealCounts[key].count++;
+        if (meal.prepped) preppedSet.add(key);
+      }
+    });
+  });
+
+  const uniqueMeals = Object.values(mealCounts).sort((a,b) => b.count - a.count);
+  const plannedCount = dates.reduce((s,d) => {
+    const dk = _mpDateKey(d);
+    return s + MP_SLOTS.filter(sl => data.mealPlan[dk]?.[sl.id]?.name?.trim()).length;
+  }, 0);
+  const preppedCount = uniqueMeals.filter(m => preppedSet.has(m.name.toLowerCase())).length;
+
+  const prepItems = uniqueMeals.length
+    ? uniqueMeals.map(m => {
+        const key = m.name.toLowerCase();
+        const done = preppedSet.has(key);
+        return `<div class="mp-prep-item${done?' done':''}" onclick="toggleMpPrepAll('${m.name.replace(/'/g,"\\'")}',${!done})">
+          <div class="mp-prep-check">${done ? '✓' : ''}</div>
+          <div class="mp-prep-name">${m.name}</div>
+          <div class="mp-prep-count">${m.count}×</div>
+        </div>`;
+      }).join('')
+    : `<div class="mp-empty-week">No meals planned this week yet.<br>Tap any slot above to add one.</div>`;
+
+  // ── Render ──
+  root.innerHTML = `
+    <div class="mp-week-nav">
+      <button class="mp-week-btn" onclick="_mpNav(-1)">← Back</button>
+      <div class="mp-week-label">${rangeLabel}</div>
+      <button class="mp-week-btn" onclick="_mpNav(1)">Forward →</button>
+    </div>
+    ${!isCurrentWeek ? `<button class="mp-copy-btn" onclick="_mpGoToday()">↩ Back to this week</button>` : ''}
+    <div class="mp-scroll-outer">
+      <div class="mp-grid">
+        ${headerCells}
+        ${rowCells}
+      </div>
+    </div>
+    <div class="mp-prep-section">
+      <div class="mp-prep-hdr">
+        📋 MEAL PREP LIST
+        ${uniqueMeals.length ? `<span class="mp-prep-progress">${preppedCount}/${uniqueMeals.length} prepped</span>` : ''}
+      </div>
+      ${prepItems}
+    </div>`;
+}
+
+function _mpNav(dir) {
+  _mpWeekOffset += dir;
+  renderMealPlan();
+}
+
+function _mpGoToday() {
+  _mpWeekOffset = 0;
+  renderMealPlan();
+}
+
+// ── Modal open/close ──
+function openMpModal(dateKey, slot) {
+  _mpEditing = { dateKey, slot };
+  const data = getData();
+  const meal = data.mealPlan?.[dateKey]?.[slot] || {};
+  // Build title
+  const slotMeta = MP_SLOTS.find(s => s.id === slot);
+  const d = new Date(dateKey + 'T12:00:00');
+  const dayLabel = d.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'});
+  document.getElementById('mp-modal-title').textContent = `${slotMeta.icon} ${slotMeta.label.charAt(0).toUpperCase() + slotMeta.label.slice(1)} — ${dayLabel}`;
+  document.getElementById('mp-modal-subtitle').textContent = meal.name ? 'Edit or clear this meal' : 'Add a meal for this slot';
+  document.getElementById('mp-meal-name').value = meal.name || '';
+  document.getElementById('mp-meal-notes').value = meal.notes || '';
+  _mpSetPreppedUI(!!meal.prepped);
+  document.getElementById('mp-modal').classList.add('open');
+  setTimeout(() => document.getElementById('mp-meal-name').focus(), 100);
+}
+
+function closeMpModal() {
+  document.getElementById('mp-modal').classList.remove('open');
+  _mpEditing = null;
+}
+
+function _mpSetPreppedUI(on) {
+  const toggle = document.getElementById('mp-prepped-toggle');
+  const knob   = document.getElementById('mp-prepped-knob');
+  toggle.style.background = on ? 'var(--green)' : 'var(--border)';
+  knob.style.left = on ? '21px' : '3px';
+  toggle.dataset.on = on ? '1' : '0';
+}
+
+function toggleMpPrepped() {
+  const cur = document.getElementById('mp-prepped-toggle').dataset.on === '1';
+  _mpSetPreppedUI(!cur);
+}
+
+function saveMpCell() {
+  if (!_mpEditing) return;
+  const { dateKey, slot } = _mpEditing;
+  const name  = document.getElementById('mp-meal-name').value.trim();
+  const notes = document.getElementById('mp-meal-notes').value.trim();
+  const prepped = document.getElementById('mp-prepped-toggle').dataset.on === '1';
+  const data = getData();
+  if (!data.mealPlan) data.mealPlan = {};
+  if (!data.mealPlan[dateKey]) data.mealPlan[dateKey] = {};
+  data.mealPlan[dateKey][slot] = { name, notes, prepped };
+  saveData(data);
+  closeMpModal();
+  renderMealPlan();
+}
+
+function clearMpCell() {
+  if (!_mpEditing) return;
+  const { dateKey, slot } = _mpEditing;
+  const data = getData();
+  if (data.mealPlan?.[dateKey]?.[slot]) {
+    delete data.mealPlan[dateKey][slot];
+    saveData(data);
+  }
+  closeMpModal();
+  renderMealPlan();
+}
+
+// ── Toggle "prepped" for ALL instances of a meal across the week ──
+function toggleMpPrepAll(mealName, prepped) {
+  const data = getData();
+  if (!data.mealPlan) return;
+  const dates = _mpGetWeekDates(_mpWeekOffset);
+  dates.forEach(d => {
+    const dk = _mpDateKey(d);
+    MP_SLOTS.forEach(slot => {
+      const m = data.mealPlan[dk]?.[slot.id];
+      if (m && m.name && m.name.trim().toLowerCase() === mealName.trim().toLowerCase()) {
+        data.mealPlan[dk][slot.id].prepped = prepped;
+      }
+    });
+  });
+  saveData(data);
+  renderMealPlan();
 }
 
 // ==================== ALL RECORDS ====================
