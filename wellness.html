@@ -888,6 +888,27 @@
   .mp-modal-clear:hover{background:rgba(239,68,68,.18);}
   .mp-copy-btn{display:flex;align-items:center;gap:7px;padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;margin:10px 14px 0;}
   .mp-copy-btn:hover{border-color:var(--purple);color:var(--purple);}
+  /* Search results in modal */
+  .mp-search-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;cursor:pointer;border:1px solid var(--border);background:var(--surface);margin-bottom:5px;transition:all .15s;}
+  .mp-search-item:hover{border-color:var(--purple);background:rgba(139,92,246,.07);}
+  .mp-search-emoji{font-size:18px;flex-shrink:0;}
+  .mp-search-info{flex:1;min-width:0;}
+  .mp-search-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .mp-search-macros{font-size:10px;color:var(--muted);margin-top:1px;}
+  .mp-search-macro-cal{color:var(--amber);}
+  .mp-search-macro-pro{color:var(--green);}
+  /* Nutrition chips in grid cells */
+  .mp-cell-cal{font-size:8.5px;font-weight:800;color:rgba(251,191,36,.6);line-height:1;margin-top:1px;}
+  /* Nutrition summary section */
+  .mp-nutr-section{padding:4px 14px 14px;}
+  .mp-nutr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .mp-nutr-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;}
+  .mp-nutr-val{font-size:18px;font-weight:900;line-height:1;margin-bottom:3px;}
+  .mp-nutr-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+  .mp-nutr-sub{font-size:9px;color:var(--muted);margin-top:2px;}
+  /* Plan button on meal ideas cards */
+  .mic-plan-btn{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);border-radius:7px;padding:5px 10px;color:var(--purple);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;}
+  .mic-plan-btn:hover{background:var(--purple);color:#fff;}
 </style>
 </head>
 <body>
@@ -2108,11 +2129,40 @@
           </div>
           <button class="mp-modal-close" onclick="closeMpModal()">✕</button>
         </div>
-        <div class="mp-modal-body">
+        <div class="mp-modal-body" style="max-height:72vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+          <!-- Search from Meal Ideas -->
+          <div class="mp-modal-label">Search from Meal Ideas</div>
+          <div style="position:relative;margin-bottom:4px;">
+            <input id="mp-search-input" type="text" placeholder="🔍  Chicken rice, Oats, Salmon..." style="width:100%;box-sizing:border-box;" oninput="renderMpSearch()" autocomplete="off">
+          </div>
+          <div id="mp-search-results" style="margin-bottom:12px;"></div>
+          <!-- Meal name -->
           <div class="mp-modal-label">Meal name</div>
-          <input id="mp-meal-name" type="text" placeholder="e.g. Chicken & rice, Oats, Salmon..." style="width:100%;box-sizing:border-box;margin-bottom:12px">
+          <input id="mp-meal-name" type="text" placeholder="Or type a custom meal name..." style="width:100%;box-sizing:border-box;margin-bottom:12px">
+          <!-- Nutrition row -->
+          <div class="mp-modal-label">Nutrition <span style="font-weight:400;color:var(--muted)">(per serving — auto-fills from Meal Ideas)</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+            <div>
+              <div style="font-size:10px;color:var(--amber);font-weight:700;margin-bottom:4px;">🔥 Calories (kcal)</div>
+              <input id="mp-cal" type="number" min="0" placeholder="0" style="width:100%;box-sizing:border-box;">
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--green);font-weight:700;margin-bottom:4px;">💪 Protein (g)</div>
+              <input id="mp-protein" type="number" min="0" placeholder="0" style="width:100%;box-sizing:border-box;">
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--cyan,#06b6d4);font-weight:700;margin-bottom:4px;">🌾 Carbs (g)</div>
+              <input id="mp-carbs" type="number" min="0" placeholder="0" style="width:100%;box-sizing:border-box;">
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--purple);font-weight:700;margin-bottom:4px;">🫒 Fat (g)</div>
+              <input id="mp-fat" type="number" min="0" placeholder="0" style="width:100%;box-sizing:border-box;">
+            </div>
+          </div>
+          <!-- Notes -->
           <div class="mp-modal-label">Notes (optional)</div>
           <input id="mp-meal-notes" type="text" placeholder="e.g. Add honey, 400g portions..." style="width:100%;box-sizing:border-box;margin-bottom:14px">
+          <!-- Prepped toggle -->
           <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleMpPrepped()">
             <div id="mp-prepped-toggle" style="width:40px;height:22px;border-radius:11px;background:var(--border);position:relative;transition:background .2s;flex-shrink:0">
               <div id="mp-prepped-knob" style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;"></div>
@@ -5541,6 +5591,7 @@ function renderMealIdeas() {
       </div>
       <div class="mic-footer">
         <button class="btn btn-primary btn-sm" style="flex:1" onclick="_logMeal(${idx})">+ Log</button>
+        <button class="mic-plan-btn" onclick="_planMeal(${idx})" title="Add to Meal Planner">📅</button>
         <button class="btn btn-outline btn-sm" onclick="openMealRecipe(${idx})" title="${hasIns ? 'View recipe' : 'Add recipe instructions'}">📖 ${hasIns ? 'Recipe' : '+ Recipe'}</button>
         ${editBtns}
       </div>
@@ -5551,6 +5602,17 @@ function renderMealIdeas() {
 // Safe index-based wrappers (avoid passing large JSON in onclick)
 let _renderedMeals = [];
 function _logMeal(idx)  { const m = _renderedMeals[idx]; if(m) logMealIdea(m); }
+function _planMeal(idx) {
+  const m = _renderedMeals[idx];
+  if (!m) return;
+  // Switch to meal planner tab and pre-fill modal with today's date + matching slot
+  showPage('mealplan');
+  const todayKey = new Date().toLocaleDateString('en-CA', {timeZone:'Europe/London'});
+  // Pick slot by meal type (fallback to breakfast)
+  const slotMap = { breakfast:'breakfast', lunch:'lunch', dinner:'dinner', snack:'breakfast' };
+  const slot = slotMap[m.type] || 'breakfast';
+  setTimeout(() => openMpModalWithMeal(m, todayKey, slot), 60);
+}
 function _copyMeal(idx) {
   const m = _renderedMeals[idx]; if(!m) return;
   const text = `${m.emoji||''} ${m.name}\n${m.desc||''}\n\nCalories: ${m.cal||0}kcal | Protein: ${m.protein||0}g | Carbs: ${m.carbs||0}g | Fat: ${m.fat||0}g`;
@@ -6360,24 +6422,28 @@ function renderMealPlan() {
   if (!data.mealPlan) data.mealPlan = {};
   const dates = _mpGetWeekDates(_mpWeekOffset);
   const todayKey = _mpTodayKey();
-
-  // ── Week nav ──
   const rangeLabel = _mpFmtRange(dates);
   const isCurrentWeek = _mpWeekOffset === 0;
 
+  // ── Day calorie totals (for header) ──
+  const dayCals = dates.map(d => {
+    const dk = _mpDateKey(d);
+    return MP_SLOTS.reduce((s, sl) => s + (data.mealPlan[dk]?.[sl.id]?.cal || 0), 0);
+  });
+
   // ── Build grid ──
-  // header row: corner + 7 day headers
   let headerCells = `<div class="mp-corner"></div>`;
   dates.forEach((d, i) => {
     const dk = _mpDateKey(d);
     const isToday = dk === todayKey;
+    const cals = dayCals[i];
     headerCells += `<div class="mp-day-hdr${isToday?' today':''}">
       <div class="mp-day-name">${MP_DAY_NAMES[i]}</div>
       <div class="mp-day-num">${d.getDate()}</div>
+      ${cals > 0 ? `<div style="font-size:8px;font-weight:800;color:rgba(251,191,36,.65);margin-top:1px;">${cals}k</div>` : ''}
     </div>`;
   });
 
-  // meal rows
   let rowCells = '';
   MP_SLOTS.forEach(slot => {
     rowCells += `<div class="mp-row-label">
@@ -6391,12 +6457,59 @@ function renderMealPlan() {
       const hasMeal = meal && meal.name && meal.name.trim();
       rowCells += `<div class="mp-cell ${slot.cls}${hasMeal?' filled':''}${isToday?' today':''}" onclick="openMpModal('${dk}','${slot.id}')">
         ${hasMeal
-          ? `<div class="mp-cell-name">${meal.name}</div>${meal.prepped ? '<div class="mp-prep-dot"></div>' : ''}`
+          ? `<div class="mp-cell-name">${meal.name}</div>
+             ${meal.cal > 0 ? `<div class="mp-cell-cal">${meal.cal} kcal</div>` : ''}
+             ${meal.prepped ? '<div class="mp-prep-dot"></div>' : ''}`
           : `<div class="mp-cell-add">+</div>`
         }
       </div>`;
     });
   });
+
+  // ── Weekly nutrition totals ──
+  let wCal=0, wPro=0, wCarbs=0, wFat=0, plannedCount=0;
+  dates.forEach(d => {
+    const dk = _mpDateKey(d);
+    MP_SLOTS.forEach(sl => {
+      const m = data.mealPlan[dk]?.[sl.id];
+      if (m && m.name && m.name.trim()) {
+        plannedCount++;
+        wCal   += (m.cal     || 0);
+        wPro   += (m.protein || 0);
+        wCarbs += (m.carbs   || 0);
+        wFat   += (m.fat     || 0);
+      }
+    });
+  });
+  const daysWithData = dates.filter(d => dayCals[dates.indexOf(d)] > 0).length || 1;
+  const avgCal = plannedCount > 0 ? Math.round(wCal / dates.length) : 0;
+
+  const nutrSection = plannedCount > 0 ? `
+    <div class="mp-nutr-section">
+      <div class="mp-prep-hdr" style="margin-bottom:10px;">📊 WEEKLY NUTRITION</div>
+      <div class="mp-nutr-grid">
+        <div class="mp-nutr-card">
+          <div class="mp-nutr-val" style="color:var(--amber)">${wCal.toLocaleString()}</div>
+          <div class="mp-nutr-label">Total kcal</div>
+          <div class="mp-nutr-sub">~${avgCal}/day avg</div>
+        </div>
+        <div class="mp-nutr-card">
+          <div class="mp-nutr-val" style="color:var(--green)">${wPro}g</div>
+          <div class="mp-nutr-label">Protein</div>
+          <div class="mp-nutr-sub">${Math.round(wPro/dates.length)}g/day</div>
+        </div>
+        <div class="mp-nutr-card">
+          <div class="mp-nutr-val" style="color:#06b6d4">${wCarbs}g</div>
+          <div class="mp-nutr-label">Carbs</div>
+          <div class="mp-nutr-sub">${Math.round(wCarbs/dates.length)}g/day</div>
+        </div>
+        <div class="mp-nutr-card">
+          <div class="mp-nutr-val" style="color:var(--purple)">${wFat}g</div>
+          <div class="mp-nutr-label">Fat</div>
+          <div class="mp-nutr-sub">${Math.round(wFat/dates.length)}g/day</div>
+        </div>
+      </div>
+    </div>` : '';
 
   // ── Prep summary ──
   const mealCounts = {};
@@ -6407,7 +6520,7 @@ function renderMealPlan() {
       const meal = data.mealPlan[dk]?.[slot.id];
       if (meal && meal.name && meal.name.trim()) {
         const key = meal.name.trim().toLowerCase();
-        mealCounts[key] = mealCounts[key] || { name: meal.name.trim(), count: 0, prepped: meal.prepped };
+        if (!mealCounts[key]) mealCounts[key] = { name: meal.name.trim(), count: 0 };
         mealCounts[key].count++;
         if (meal.prepped) preppedSet.add(key);
       }
@@ -6415,10 +6528,6 @@ function renderMealPlan() {
   });
 
   const uniqueMeals = Object.values(mealCounts).sort((a,b) => b.count - a.count);
-  const plannedCount = dates.reduce((s,d) => {
-    const dk = _mpDateKey(d);
-    return s + MP_SLOTS.filter(sl => data.mealPlan[dk]?.[sl.id]?.name?.trim()).length;
-  }, 0);
   const preppedCount = uniqueMeals.filter(m => preppedSet.has(m.name.toLowerCase())).length;
 
   const prepItems = uniqueMeals.length
@@ -6433,7 +6542,6 @@ function renderMealPlan() {
       }).join('')
     : `<div class="mp-empty-week">No meals planned this week yet.<br>Tap any slot above to add one.</div>`;
 
-  // ── Render ──
   root.innerHTML = `
     <div class="mp-week-nav">
       <button class="mp-week-btn" onclick="_mpNav(-1)">← Back</button>
@@ -6447,6 +6555,7 @@ function renderMealPlan() {
         ${rowCells}
       </div>
     </div>
+    ${nutrSection}
     <div class="mp-prep-section">
       <div class="mp-prep-hdr">
         📋 MEAL PREP LIST
@@ -6467,21 +6576,47 @@ function _mpGoToday() {
 }
 
 // ── Modal open/close ──
+function _mpSetModalTitle(dateKey, slot) {
+  const slotMeta = MP_SLOTS.find(s => s.id === slot);
+  const d = new Date(dateKey + 'T12:00:00');
+  const dayLabel = d.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'short'});
+  document.getElementById('mp-modal-title').textContent = `${slotMeta.icon} ${slotMeta.label.charAt(0).toUpperCase() + slotMeta.label.slice(1)} — ${dayLabel}`;
+}
+
 function openMpModal(dateKey, slot) {
   _mpEditing = { dateKey, slot };
   const data = getData();
   const meal = data.mealPlan?.[dateKey]?.[slot] || {};
-  // Build title
-  const slotMeta = MP_SLOTS.find(s => s.id === slot);
-  const d = new Date(dateKey + 'T12:00:00');
-  const dayLabel = d.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'});
-  document.getElementById('mp-modal-title').textContent = `${slotMeta.icon} ${slotMeta.label.charAt(0).toUpperCase() + slotMeta.label.slice(1)} — ${dayLabel}`;
+  _mpSetModalTitle(dateKey, slot);
   document.getElementById('mp-modal-subtitle').textContent = meal.name ? 'Edit or clear this meal' : 'Add a meal for this slot';
+  document.getElementById('mp-search-input').value = '';
+  document.getElementById('mp-search-results').innerHTML = '';
   document.getElementById('mp-meal-name').value = meal.name || '';
   document.getElementById('mp-meal-notes').value = meal.notes || '';
+  document.getElementById('mp-cal').value     = meal.cal     || '';
+  document.getElementById('mp-protein').value = meal.protein || '';
+  document.getElementById('mp-carbs').value   = meal.carbs   || '';
+  document.getElementById('mp-fat').value     = meal.fat     || '';
   _mpSetPreppedUI(!!meal.prepped);
   document.getElementById('mp-modal').classList.add('open');
-  setTimeout(() => document.getElementById('mp-meal-name').focus(), 100);
+  setTimeout(() => document.getElementById('mp-search-input').focus(), 100);
+}
+
+// Pre-fill from a Meal Ideas entry (called from 📅 Plan button or search pick)
+function openMpModalWithMeal(meal, dateKey, slot) {
+  _mpEditing = { dateKey, slot };
+  _mpSetModalTitle(dateKey, slot);
+  document.getElementById('mp-modal-subtitle').textContent = `From Meal Ideas — edit if needed`;
+  document.getElementById('mp-search-input').value = '';
+  document.getElementById('mp-search-results').innerHTML = '';
+  document.getElementById('mp-meal-name').value = meal.name || '';
+  document.getElementById('mp-meal-notes').value = meal.desc ? meal.desc.slice(0, 80) : '';
+  document.getElementById('mp-cal').value     = meal.cal     || '';
+  document.getElementById('mp-protein').value = meal.protein || '';
+  document.getElementById('mp-carbs').value   = meal.carbs   || '';
+  document.getElementById('mp-fat').value     = meal.fat     || '';
+  _mpSetPreppedUI(false);
+  document.getElementById('mp-modal').classList.add('open');
 }
 
 function closeMpModal() {
@@ -6489,9 +6624,62 @@ function closeMpModal() {
   _mpEditing = null;
 }
 
+// ── Meal Ideas search inside modal ──
+function renderMpSearch() {
+  const q = (document.getElementById('mp-search-input')?.value || '').toLowerCase().trim();
+  const el = document.getElementById('mp-search-results');
+  if (!q) { el.innerHTML = ''; return; }
+
+  // Search built-in MEALS + custom meals
+  let pool = [];
+  try { pool = [...MEALS, ...getCustomMeals()]; } catch(e) { pool = []; }
+
+  const results = pool.filter(m =>
+    m.name.toLowerCase().includes(q) ||
+    (m.desc || '').toLowerCase().includes(q)
+  ).slice(0, 6);
+
+  if (!results.length) {
+    el.innerHTML = `<div style="font-size:12px;color:var(--muted);padding:6px 2px;">No meals found — type a name below to add a custom one.</div>`;
+    return;
+  }
+
+  el.innerHTML = results.map((m, i) => {
+    const macros = [
+      m.cal     ? `<span class="mp-search-macro-cal">${m.cal} kcal</span>` : '',
+      m.protein ? `<span class="mp-search-macro-pro">${m.protein}g protein</span>` : '',
+    ].filter(Boolean).join(' · ');
+    return `<div class="mp-search-item" onclick="_mpPickSearchResult(${i})" data-idx="${i}">
+      <div class="mp-search-emoji">${m.emoji || '🍽️'}</div>
+      <div class="mp-search-info">
+        <div class="mp-search-name">${m.name}</div>
+        ${macros ? `<div class="mp-search-macros">${macros}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  // store results so we can access them by index
+  el._mpResults = results;
+}
+
+function _mpPickSearchResult(i) {
+  const el = document.getElementById('mp-search-results');
+  const results = el._mpResults;
+  if (!results || !results[i]) return;
+  const m = results[i];
+  document.getElementById('mp-search-input').value = '';
+  el.innerHTML = `<div style="font-size:11px;color:var(--green);padding:4px 2px;font-weight:700;">✓ ${m.name} selected</div>`;
+  document.getElementById('mp-meal-name').value = m.name;
+  document.getElementById('mp-cal').value     = m.cal     || '';
+  document.getElementById('mp-protein').value = m.protein || '';
+  document.getElementById('mp-carbs').value   = m.carbs   || '';
+  document.getElementById('mp-fat').value     = m.fat     || '';
+  document.getElementById('mp-meal-notes').value = m.desc ? m.desc.slice(0, 80) : '';
+}
+
 function _mpSetPreppedUI(on) {
   const toggle = document.getElementById('mp-prepped-toggle');
   const knob   = document.getElementById('mp-prepped-knob');
+  if (!toggle || !knob) return;
   toggle.style.background = on ? 'var(--green)' : 'var(--border)';
   knob.style.left = on ? '21px' : '3px';
   toggle.dataset.on = on ? '1' : '0';
@@ -6505,13 +6693,17 @@ function toggleMpPrepped() {
 function saveMpCell() {
   if (!_mpEditing) return;
   const { dateKey, slot } = _mpEditing;
-  const name  = document.getElementById('mp-meal-name').value.trim();
-  const notes = document.getElementById('mp-meal-notes').value.trim();
+  const name    = document.getElementById('mp-meal-name').value.trim();
+  const notes   = document.getElementById('mp-meal-notes').value.trim();
+  const cal     = parseInt(document.getElementById('mp-cal').value)     || 0;
+  const protein = parseInt(document.getElementById('mp-protein').value) || 0;
+  const carbs   = parseInt(document.getElementById('mp-carbs').value)   || 0;
+  const fat     = parseInt(document.getElementById('mp-fat').value)     || 0;
   const prepped = document.getElementById('mp-prepped-toggle').dataset.on === '1';
   const data = getData();
   if (!data.mealPlan) data.mealPlan = {};
   if (!data.mealPlan[dateKey]) data.mealPlan[dateKey] = {};
-  data.mealPlan[dateKey][slot] = { name, notes, prepped };
+  data.mealPlan[dateKey][slot] = { name, notes, cal, protein, carbs, fat, prepped };
   saveData(data);
   closeMpModal();
   renderMealPlan();
