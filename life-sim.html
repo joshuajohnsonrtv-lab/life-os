@@ -1348,6 +1348,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .challenge-wrap{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
   display:none;flex-direction:column;
+  min-height:0;background:var(--bg);
 }
 .challenge-wrap.show{display:flex;}
 
@@ -1465,10 +1466,10 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   color:rgba(255,255,255,.32);cursor:pointer;transition:all .2s;font-family:inherit;
 }
 .ch-jump-btn:hover{border-color:var(--orange);color:var(--orange);}
-.ch-photo-stack{display:flex;flex-direction:column;gap:10px;}
+.ch-photo-stack{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .ch-photo-thumb{
-  width:100%;aspect-ratio:4/3;object-fit:cover;
-  border-radius:12px;border:1px solid rgba(255,255,255,.08);
+  width:100%;aspect-ratio:1/1;object-fit:cover;
+  border-radius:10px;border:1px solid rgba(255,255,255,.08);
   cursor:pointer;display:block;transition:opacity .2s;
 }
 .ch-photo-thumb:hover{opacity:.88;}
@@ -4387,16 +4388,16 @@ function _challengeRender() {
     </div>
     <div class="ch-photos-wrap">
       <div class="ch-photos-hdr">
-        <div class="ch-photos-lbl">📸 CHALLENGE PHOTOS</div>
-        ${photos.length > 2 ? `<button class="ch-jump-btn" onclick="_chScrollTo('bottom')">↓ Oldest</button>` : ''}
+        <div class="ch-photos-lbl">📸 CHALLENGE PHOTOS${photos.length > 0 ? ` (${photos.length})` : ''}</div>
+        ${photos.length > 4 ? `<button class="ch-jump-btn" onclick="_chScrollTo('bottom')">↓ Oldest</button>` : ''}
       </div>
-      <div class="ch-photo-add" onclick="document.getElementById('ch-photo-input').click()" style="margin-bottom:10px">
+      <div class="ch-photo-add" onclick="_chAddPhoto()" style="margin-bottom:10px">
         📷 Add Photo
       </div>
       <div class="ch-photo-stack">
         ${thumbsHtml}
       </div>
-      ${photos.length > 2 ? `<button class="ch-jump-btn" style="width:100%;margin-top:10px" onclick="_chScrollTo('top')">↑ Back to Latest</button>` : ''}
+      ${photos.length > 4 ? `<button class="ch-jump-btn" style="width:100%;margin-top:10px" onclick="_chScrollTo('top')">↑ Back to Latest</button>` : ''}
     </div>`;
 }
 
@@ -4476,6 +4477,24 @@ function _chAddCustomHabit() {
 }
 
 // ── Photos ────────────────────────────────────────────────
+let _chPhotoInput = null;
+function _chGetPhotoInput() {
+  // Persistent DOM-anchored input for iOS Safari compatibility
+  if (!_chPhotoInput || !document.body.contains(_chPhotoInput)) {
+    _chPhotoInput = document.createElement('input');
+    _chPhotoInput.type = 'file';
+    _chPhotoInput.accept = 'image/*';
+    _chPhotoInput.style.cssText = 'position:fixed;opacity:0;width:1px;height:1px;top:-9999px;left:-9999px;';
+    _chPhotoInput.addEventListener('change', function() { _chPhotoSelected(this); });
+    document.body.appendChild(_chPhotoInput);
+  }
+  return _chPhotoInput;
+}
+function _chAddPhoto() {
+  const inp = _chGetPhotoInput();
+  inp.value = '';
+  inp.click();
+}
 function _chPhotoSelected(inp) {
   const file = inp.files[0];
   if (!file) return;
@@ -4483,18 +4502,22 @@ function _chPhotoSelected(inp) {
   reader.onload = function(e) {
     const img = new Image();
     img.onload = function() {
-      const maxW = 500, maxH = 500;
+      const maxW = 600, maxH = 600;
       const scale = Math.min(1, maxW/img.width, maxH/img.height);
       const canvas = document.createElement('canvas');
       canvas.width  = Math.round(img.width  * scale);
       canvas.height = Math.round(img.height * scale);
       canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.80);
       const ch = _chLoad();
       ch.photos = ch.photos || [];
       ch.photos.unshift({ dataUrl, ts: Date.now() }); // newest first (top)
       _chSave(ch);
+      // Re-render and scroll to top to show new photo
+      const wrap = document.getElementById('view-challenge');
+      const prevScroll = wrap ? wrap.scrollTop : 0;
       _challengeRender();
+      if (wrap) wrap.scrollTop = 0; // newest photo is at top
     };
     img.src = e.target.result;
   };
@@ -4831,7 +4854,7 @@ _chUpdateTabVisibility();
 </div>
 
 <!-- ── CHALLENGE PHOTO INPUT + LIGHTBOX ── -->
-<input type="file" id="ch-photo-input" accept="image/*" style="display:none" onchange="_chPhotoSelected(this)">
+<!-- ch-photo-input is created programmatically to be iOS-safe; see _chGetPhotoInput() -->
 <div class="ch-lightbox" id="ch-lightbox" onclick="if(event.target===this)_chCloseLightbox()">
   <button class="ch-lightbox-x" onclick="_chCloseLightbox()">✕</button>
   <img id="ch-lightbox-img" src="" alt="Challenge photo">
