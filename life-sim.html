@@ -949,51 +949,70 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 }
 /* ── POSTER MODAL / GALLERY ── */
 .poster-modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:2000;
+  position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:2000;
   display:flex;align-items:center;justify-content:center;gap:12px;padding:14px;
 }
 .poster-card{
-  width:min(278px,84vw);min-height:360px;border-radius:14px;
-  border:1px solid rgba(255,255,255,.12);
+  width:min(294px,86vw);min-height:380px;border-radius:16px;
+  border:1px solid rgba(255,255,255,.1);
   position:relative;overflow:hidden;
   display:flex;flex-direction:column;flex-shrink:0;
 }
-.poster-art{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
-.poster-body{
-  position:relative;z-index:1;flex:1;
-  display:flex;flex-direction:column;
-  padding:26px 20px 14px;text-align:center;
+/* Dark gradient overlay — sits above art, below text body */
+.poster-card::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(
+    to top,
+    rgba(0,0,0,.95) 0%,
+    rgba(0,0,0,.78) 38%,
+    rgba(0,0,0,.38) 68%,
+    rgba(0,0,0,.08) 100%
+  );
+  z-index:1;
 }
-.p-counter{font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.28);
-  text-transform:uppercase;margin-bottom:8px;}
-.p-src{font-size:9px;letter-spacing:2px;text-transform:uppercase;
-  font-weight:800;margin-bottom:20px;}
-.p-quote{font-size:14.5px;font-weight:700;color:rgba(255,255,255,.92);
-  line-height:1.68;letter-spacing:.15px;flex:1;
-  display:flex;align-items:center;justify-content:center;}
-.p-by{font-size:10px;font-weight:600;letter-spacing:1.5px;
-  text-transform:uppercase;margin-top:18px;opacity:.75;}
+.poster-art{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;
+  opacity:.35; /* tone down art so text pops */
+}
+.poster-body{
+  position:relative;z-index:2;flex:1;
+  display:flex;flex-direction:column;
+  padding:30px 22px 16px;text-align:center;
+}
+.p-counter{font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.3);
+  text-transform:uppercase;margin-bottom:10px;}
+.p-src{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;
+  font-weight:900;margin-bottom:22px;}
+.p-quote{
+  font-size:15.5px;font-weight:700;color:#fff;
+  line-height:1.72;letter-spacing:.2px;flex:1;
+  display:flex;align-items:center;justify-content:center;
+  text-shadow:0 2px 14px rgba(0,0,0,1),0 1px 4px rgba(0,0,0,.95);
+}
+.p-by{font-size:10px;font-weight:700;letter-spacing:1.8px;
+  text-transform:uppercase;margin-top:20px;
+  text-shadow:0 1px 6px rgba(0,0,0,.9);}
 .p-close{
-  position:relative;z-index:1;margin:12px 20px 18px;
-  background:transparent;border:1px solid rgba(255,255,255,.16);
-  color:rgba(255,255,255,.34);padding:7px 0;border-radius:20px;
+  position:relative;z-index:2;margin:12px 22px 20px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.18);
+  color:rgba(255,255,255,.42);padding:8px 0;border-radius:20px;
   cursor:pointer;font-size:10px;letter-spacing:2px;text-transform:uppercase;
   transition:all .2s;
 }
-.p-close:hover{border-color:rgba(255,255,255,.42);color:rgba(255,255,255,.6);}
+.p-close:hover{border-color:rgba(255,255,255,.5);color:rgba(255,255,255,.75);background:rgba(255,255,255,.1);}
 .p-nav{
-  width:42px;height:42px;border-radius:50%;flex-shrink:0;
-  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);
-  color:white;font-size:26px;cursor:pointer;
+  width:44px;height:44px;border-radius:50%;flex-shrink:0;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.2);
+  color:white;font-size:28px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:background .15s;line-height:1;padding:0 0 2px;
 }
-.p-nav:hover{background:rgba(255,255,255,.2);}
+.p-nav:hover{background:rgba(255,255,255,.22);}
 @media(max-width:480px){
   .poster-modal{gap:8px;padding:10px;}
   .p-nav{width:34px;height:34px;font-size:20px;}
-  .poster-body{padding:20px 15px 10px;}
-  .p-quote{font-size:13px;}
+  .poster-body{padding:22px 16px 12px;}
+  .p-quote{font-size:14px;}
 }
 
 /* ── MOBILE — scale the whole room as one unit ── */
@@ -2917,39 +2936,68 @@ const _PWR = `<svg viewBox="0 0 300 440" xmlns="http://www.w3.org/2000/svg" styl
   <circle cx="150" cy="220" r="4" fill="white" opacity=".3"/>
 </svg>`;
 
+// Jagged dark energy burst — Berserk, Tokyo Ghoul, darker shows
+const _DARK = `<svg viewBox="0 0 300 440" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+  <g stroke="white" stroke-width=".9" fill="none" opacity=".2">
+    <polygon points="150,30 172,155 248,72 196,198 288,152 214,238 292,276 218,294 258,368 188,308 196,412 150,326 104,412 112,308 42,368 82,294 8,276 86,238 12,152 104,198 52,72 128,155"/>
+  </g>
+  <g stroke="white" stroke-width=".6" fill="none" opacity=".13">
+    <polygon points="150,68 167,168 228,108 192,206 262,172 208,238 272,268 206,282 240,352 182,300 188,392 150,312 112,392 118,300 60,352 94,282 28,268 92,238 38,172 108,206 72,108 133,168"/>
+  </g>
+  <circle cx="150" cy="220" r="26" fill="white" opacity=".06"/>
+  <circle cx="150" cy="220" r="5" fill="white" opacity=".24"/>
+</svg>`;
+
+// Geometric eye / mandala — strategic, calculating characters
+const _EYE = `<svg viewBox="0 0 300 440" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+  <g stroke="white" fill="none" opacity=".2">
+    <path d="M 35,220 Q 150,112 265,220 Q 150,328 35,220 Z"/>
+    <path d="M 58,220 Q 150,138 242,220 Q 150,302 58,220 Z" opacity=".7"/>
+    <circle cx="150" cy="220" r="52"/>
+    <circle cx="150" cy="220" r="30"/>
+  </g>
+  <g stroke="white" opacity=".12" stroke-width=".8">
+    <line x1="150" y1="0" x2="150" y2="440"/>
+    <line x1="0" y1="220" x2="300" y2="220"/>
+    <line x1="0" y1="70" x2="300" y2="370"/>
+    <line x1="0" y1="370" x2="300" y2="70"/>
+  </g>
+  <circle cx="150" cy="220" r="8" fill="white" opacity=".28"/>
+</svg>`;
+
 const POSTERS = [
-  { bg:'#100828', ac:'#9b7fff', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'Don\'t believe in yourself. Believe in me! Believe in the Kamina who believes in you!' },
-  { bg:'#0e2008', ac:'#5dca5d', art:_GL, src:'Gurren Lagann', by:'Kamina',
-    q:'Your drill is the drill that will pierce the heavens!' },
-  { bg:'#0d1e3a', ac:'#4d9eff', art:_GL, src:'Gurren Lagann', by:'Simon',
-    q:'Who the hell do you think I am?!' },
-  { bg:'#1a0800', ac:'#ff7722', art:_PWR, src:'Dragon Ball Z', by:'Vegeta',
-    q:'I do not fear this new challenge. I will rise to meet it.' },
-  { bg:'#200808', ac:'#ff4444', art:_PWR, src:'Dragon Ball Z', by:'Vegeta',
-    q:'Every time I reach a new level of power, a greater one appears.' },
-  { bg:'#080f1a', ac:'#4488ff', art:_PWR, src:'Dragon Ball Z', by:'Goku',
-    q:'Power comes in response to a need, not a desire.' },
-  { bg:'#0a1010', ac:'#f5c542', art:_PWR, src:'Dragon Ball Z', by:'Goku',
-    q:'I am the hope of the universe.' },
-  { bg:'#0e0814', ac:'#cc88ff', art:_PWR, src:'Dragon Ball Super', by:'Jiren',
-    q:'Power comes from resolve. Not emotion.' },
-  { bg:'#140a00', ac:'#ff8c00', art:_PWR, src:'Bleach', by:'Kenpachi Zaraki',
-    q:'If you don\'t risk your life, you can\'t find a way forward.' },
-  { bg:'#001214', ac:'#00ddcc', art:_PWR, src:'Black Clover', by:'Asta',
-    q:'My magic is never giving up!' },
-  { bg:'#0e0808', ac:'#cc3333', art:_PWR, src:'Berserk', by:'Guts',
-    q:'You\'re going to die someday… so live while you can.' },
-  { bg:'#080e14', ac:'#4488cc', art:_PWR, src:'Attack on Titan', by:'Erwin Smith',
-    q:'If you regret your decisions, you weaken your future choices.' },
-  { bg:'#0e0e08', ac:'#ccaa44', art:_PWR, src:'Attack on Titan', by:'Eren Yeager',
-    q:'If you win, you live. If you lose, you die. If you don\'t fight, you can\'t win.' },
-  { bg:'#060e0e', ac:'#44cccc', art:_PWR, src:'Attack on Titan', by:'Levi Ackerman',
-    q:'The only thing we\'re allowed to do is believe we won\'t regret our choice.' },
-  { bg:'#00081e', ac:'#3366ff', art:_PWR, src:'Kuroko no Basket', by:'Aomine Daiki',
-    q:'The only one who can beat me… is me.' },
-  { bg:'#081408', ac:'#66cc44', art:_PWR, src:'Hunter x Hunter', by:'Netero',
-    q:'You should appreciate the challenges that push you to grow.' },
+  { bg:'#0c1020', ac:'#cc2222', art:_GL,   src:'Attack on Titan', by:'Erwin Smith',
+    q:'My soldiers, rage! My soldiers, scream! My soldiers, FIGHT!' },
+  { bg:'#0a0a0c', ac:'#8b1a1a', art:_DARK, src:'Berserk', by:'Guts',
+    q:'In this world, is the destiny of mankind controlled by some transcendental entity? At least it is true — man has no control, even over his own will.' },
+  { bg:'#120818', ac:'#cc3344', art:_EYE,  src:'Naruto Shippuden', by:'Itachi Uchiha',
+    q:'People\'s lives don\'t end when they die. It ends when they lose faith.' },
+  { bg:'#080c1e', ac:'#8844cc', art:_EYE,  src:'Code Geass', by:'Lelouch vi Britannia',
+    q:'The only ones who should kill are those who are prepared to be killed.' },
+  { bg:'#100820', ac:'#9966ff', art:_GL,   src:'Gurren Lagann', by:'Simon',
+    q:'Reject common sense. Defy reality. Kick reason to the curb. That is how Team Dai-Gurren rolls.' },
+  { bg:'#100c08', ac:'#c8a860', art:_PWR,  src:'Vinland Saga', by:'Thorfinn',
+    q:'I have no enemies. No one has the right to take the life of another.' },
+  { bg:'#080808', ac:'#4455cc', art:_DARK, src:'The Eminence in Shadow', by:'Shadow',
+    q:'While the world chases the light, I have already decided the outcome from the darkness.' },
+  { bg:'#0e0e10', ac:'#6699bb', art:_PWR,  src:'Attack on Titan', by:'Levi Ackermann',
+    q:'The only thing we\'re allowed to do is believe that we won\'t regret the choice we made.' },
+  { bg:'#120a1e', ac:'#aa66ff', art:_EYE,  src:'Hunter x Hunter', by:'Meruem',
+    q:'Even if I can no longer move these hands... there is something here that refuses to fade.' },
+  { bg:'#0c0c10', ac:'#aaaacc', art:_DARK, src:'Tokyo Ghoul', by:'Ken Kaneki',
+    q:'I\'m not the protagonist of a novel or anything. But if you were to write a story with me — it would certainly be a tragedy.' },
+  { bg:'#100808', ac:'#dd2233', art:_EYE,  src:'Death Note', by:'Light Yagami',
+    q:'I am Justice. I am the one who will become the god of a new world that everyone fears.' },
+  { bg:'#140408', ac:'#aa1122', art:_DARK, src:'Hellsing Ultimate', by:'Alucard',
+    q:'The Bird of Hermes is my name — eating my own wings to make me tame.' },
+  { bg:'#0a0c14', ac:'#aabbcc', art:_PWR,  src:'Berserk', by:'Griffith',
+    q:'No matter how much strength you accumulate — to defeat a monster you must first be willing to become one.' },
+  { bg:'#0e0c08', ac:'#cc7722', art:_GL,   src:'One Punch Man', by:'Garou',
+    q:'No matter how monstrous I become — I will become something that can never be stopped.' },
+  { bg:'#0a0818', ac:'#7733bb', art:_EYE,  src:'Naruto Shippuden', by:'Pain',
+    q:'Just by living, people hurt others without even realising it. So long as humanity exists, hate will also exist. There is no peace in this cursed world.' },
+  { bg:'#0c0c0a', ac:'#887744', art:_GL,   src:'Fate/Zero', by:'Kiritsugu Emiya',
+    q:'I kill people every day. I destroy them with these hands. Not because I want to — but because someone has to.' },
 ];
 
 let _posterIdx = parseInt(localStorage.getItem('life_sim_poster') || '0');
