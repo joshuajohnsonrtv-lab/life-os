@@ -3131,57 +3131,75 @@ function _navPoster(dir) {
 // ─────────────────────────────────────────────
 
 const _TR_SCENES = [
-  /* 0 — scale of existence */
+  /* 0 — scale */
   `<div style="letter-spacing:7px;font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:20px;font-weight:600">The universe is</div>
    <div class="tr-big" style="font-size:clamp(38px,11vw,88px)">13.8 billion<br>years old.</div>`,
 
   /* 1 — you were born */
   `<div class="tr-main">And in all that time —<br>all that space,<br>all those trillion, trillion stars —</div>
    <div class="tr-big" style="color:#a78bfa;margin-top:6px;font-size:clamp(28px,8vw,62px)">you were born.</div>
-   <div class="tr-sub" style="margin-top:22px;color:rgba(255,255,255,.38)">That is not an accident.</div>`,
+   <div class="tr-sub" style="margin-top:22px;color:rgba(255,255,255,.35)">That is not an accident.</div>`,
 
-  /* 2 — your lineage */
+  /* 2 — unbroken chain */
   `<div class="tr-main">Your ancestors survived<br>ice ages, plagues, famines, and wars —</div>
-   <div class="tr-sub" style="margin-top:18px;font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.72);font-weight:500;line-height:1.62">every single day for <strong style="color:#fff">300,000 years straight.</strong><br><br>Not one of them gave up.<br><br>You are the end result of the most unbroken chain of survivors in history.</div>`,
+   <div class="tr-sub" style="margin-top:18px;font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.72);font-weight:500;line-height:1.65">every single day for <strong style="color:#fff">300,000 years straight.</strong><br><br>Not one of them gave up.<br><br>You are the end result of the most unbroken chain of survivors in history.</div>`,
 
   /* 3 — ocean in a drop */
-  `<div class="tr-big" style="font-size:clamp(26px,7vw,54px);margin-bottom:20px;color:rgba(255,255,255,.72)">You are not a drop<br>in the ocean.</div>
-   <div class="tr-big" style="color:#a78bfa;font-size:clamp(28px,8vw,62px)">You are the ocean<br>in a drop.</div>`,
+  `<div class="tr-big" style="font-size:clamp(24px,7vw,50px);margin-bottom:18px;color:rgba(255,255,255,.65)">You are not a drop<br>in the ocean.</div>
+   <div class="tr-big" style="color:#a78bfa;font-size:clamp(28px,8vw,60px)">You are the ocean<br>in a drop.</div>`,
 
-  /* 4 — kings and conquerors */
+  /* 4 — the forgetting */
+  `<div class="tr-main" style="margin-bottom:22px">Some days you&rsquo;ll wake up<br>and you&rsquo;ll know.</div>
+   <div class="tr-sub" style="font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.68);line-height:1.78">And some days you&rsquo;ll wake up<br>and forget everything.<br><br>Both happen. Both are fine.<br><br><strong style="color:rgba(255,255,255,.92)">That&rsquo;s why you come back here.</strong><br><br><span style="color:rgba(255,255,255,.38)">The forgetting is not failure.<br>The forgetting is human.<br>Coming back is the whole game.</span></div>`,
+
+  /* 5 — kings went anyway */
   `<div class="tr-main">Every king. Every conqueror.<br>Every person who ever changed the world.</div>
-   <div class="tr-sub" style="margin-top:22px;font-size:clamp(14px,4vw,19px);color:rgba(255,255,255,.65);line-height:1.72">They woke up with the same doubt you feel.<br>They had no idea if it would work.<br><br><strong style="color:rgba(255,255,255,.92);font-size:1.08em">And they went anyway.</strong></div>`,
+   <div class="tr-sub" style="margin-top:22px;font-size:clamp(14px,4vw,19px);color:rgba(255,255,255,.65);line-height:1.75">They woke up with the same doubt you feel.<br>They had no idea if it would work.<br>Some days they forgot what they were even doing and why.<br><br><strong style="color:rgba(255,255,255,.92);font-size:1.08em">And they went anyway.</strong></div>`,
 
-  /* 5 — 37 trillion cells */
+  /* 6 — if one human has done it */
+  `<div class="tr-big" style="font-size:clamp(24px,6.5vw,52px);margin-bottom:20px">If one human being<br>has done it —</div>
+   <div class="tr-sub" style="font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.72);line-height:1.78">built that empire from nothing,<br>escaped the life everyone said was permanent,<br>became the person they said only existed in films —<br><br><strong style="color:#a78bfa;font-size:1.06em">the laws of physics already proved it&rsquo;s possible.</strong><br><br>The biology is the same.<br>The universe is the same.<br>The only variable left is <strong style="color:#fff">you.</strong></div>`,
+
+  /* 7 — 37 trillion cells */
   `<div class="tr-main" style="margin-bottom:20px">Right now — this exact second —</div>
-   <div class="tr-sub" style="font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.78);font-weight:500;line-height:1.68"><strong style="color:#fff;font-size:1.15em">37 trillion cells</strong> in your body<br>are running chemical reactions<br>just to keep you alive.<br><br>Your own body is fighting for you.<br><br>The only question is: <strong style="color:#a78bfa">are you?</strong></div>`,
+   <div class="tr-sub" style="font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.78);font-weight:500;line-height:1.68"><strong style="color:#fff;font-size:1.15em">37 trillion cells</strong> in your body<br>are running chemical reactions<br>just to keep you alive.<br><br>Your own body is fighting for you.<br>The only question is: <strong style="color:#a78bfa">are you?</strong></div>`,
 
-  /* 6 — limits are not walls */
-  `<div class="tr-big" style="font-size:clamp(28px,8vw,60px);margin-bottom:20px">The limits you feel<br>are not walls.</div>
-   <div class="tr-sub" style="font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.62);line-height:1.75">They are directions.<br><br>Every ceiling you believe in was invented by a person — usually someone with far less potential <strong style="color:rgba(255,255,255,.9)">than you.</strong></div>`,
+  /* 8 — hatred is the engine */
+  `<div class="tr-main" style="margin-bottom:10px">You wake up and hate<br>how it&rsquo;s turned out so far?</div>
+   <div class="tr-big" style="color:#a78bfa;margin:10px 0 18px;font-size:clamp(44px,12vw,90px);text-shadow:0 0 60px rgba(167,139,250,.8)">Good.</div>
+   <div class="tr-sub" style="font-size:clamp(13px,3.8vw,18px);color:rgba(255,255,255,.62);line-height:1.78">That rage is not your problem.<br>That is your fuel.<br><br>Comfort never built anything.<br>The people who changed their lives,<br>their cities, their generations —<br>they were not at peace.<br><br><strong style="color:rgba(255,255,255,.92)">They were burning.<br>And they used every last bit of it.</strong></div>`,
 
-  /* 7 — no ceiling */
+  /* 9 — limits are directions */
+  `<div class="tr-big" style="font-size:clamp(26px,7.5vw,58px);margin-bottom:20px">The limits you feel<br>are not walls.</div>
+   <div class="tr-sub" style="font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.62);line-height:1.75">They are directions.<br><br>Every ceiling you believe in was invented by a person — usually someone with far less potential <strong style="color:rgba(255,255,255,.92)">than you.</strong><br><br><span style="color:rgba(255,255,255,.35)">And they were wrong.</span></div>`,
+
+  /* 10 — no ceiling */
   `<div class="tr-big" style="font-size:clamp(44px,13vw,102px);color:#a78bfa;text-shadow:0 0 80px rgba(167,139,250,.9),0 0 160px rgba(100,60,220,.5);line-height:1.05">There is<br>no ceiling.</div>`,
 
-  /* 8 — you will die */
+  /* 11 — you will die */
   `<div class="tr-big" style="font-size:clamp(34px,10vw,80px);margin-bottom:22px">You will die.</div>
    <div class="tr-sub" style="font-size:clamp(13px,3.6vw,17px);color:rgba(255,255,255,.52);line-height:1.8">Not today. But eventually.<br><br>And when that moment comes, the only question that will matter is:<br><br><strong style="color:rgba(255,255,255,.88);font-size:1.08em">did you become what you were capable of?</strong></div>`,
 
-  /* 9 — stop waiting */
-  `<div class="tr-main" style="line-height:1.82;font-size:clamp(16px,5vw,29px)">
+  /* 12 — the rocket */
+  `<div class="tr-main" style="margin-bottom:22px;line-height:1.65">Stop softening yourself.<br>Stop hedging.<br>Stop making yourself smaller<br>so other people stay comfortable.</div>
+   <div class="tr-sub" style="font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.72);line-height:1.75">Go like you mean it.<br><br><strong style="color:#fff;font-size:1.1em">Absolute. Unapologetic.</strong><br><br>Like a rocket with no reverse gear<br>and nothing left to lose.<br><br><span style="color:rgba(255,255,255,.38)">Your vision. Your pace. Your terms.<br>Block out every voice that isn&rsquo;t yours.</span></div>`,
+
+  /* 13 — stop waiting */
+  `<div class="tr-main" style="line-height:1.85;font-size:clamp(16px,5vw,28px)">
      Stop waiting for the right time.<br>
      Stop asking for permission.<br>
-     <span style="color:rgba(255,255,255,.45)">Stop pretending you're not that guy.</span>
+     Stop waiting to feel ready.<br>
+     <span style="color:rgba(255,255,255,.38)">Stop pretending you&rsquo;re not that guy.</span>
    </div>`,
 
-  /* 10 — YOU ARE THAT GUY */
+  /* 14 — YOU ARE THAT GUY */
   `<div class="tr-big" style="font-size:clamp(34px,10vw,86px);letter-spacing:1px;
      text-shadow:0 0 80px rgba(167,139,250,.95),0 0 200px rgba(100,50,220,.7)">
      YOU ARE<br>THAT GUY.
    </div>`,
 
-  /* 11 — Now. Go. */
-  `<div class="tr-main" style="font-size:clamp(18px,5vw,30px);margin-bottom:6px;color:rgba(255,255,255,.62)">Now.</div>
+  /* 15 — Now. Go. */
+  `<div class="tr-main" style="font-size:clamp(18px,5vw,30px);margin-bottom:6px;color:rgba(255,255,255,.55)">Now.</div>
    <div class="tr-big" style="font-size:clamp(62px,16vw,120px);text-shadow:0 0 70px rgba(167,139,250,.8)">Go.</div>
    <button class="tr-go-btn" onclick="event.stopPropagation();document.getElementById('transcend-modal')?.remove()">I&rsquo;M READY</button>`,
 ];
@@ -3234,8 +3252,8 @@ function _trShowScene(idx) {
   }
 
   // Speed up canvas on final scenes
-  if (idx >= 10 && window._trSetSpeed) window._trSetSpeed(5);
-  else if (idx >= 7 && window._trSetSpeed) window._trSetSpeed(2.5);
+  if (idx >= 14 && window._trSetSpeed) window._trSetSpeed(5);
+  else if (idx >= 10 && window._trSetSpeed) window._trSetSpeed(2.5);
   else if (window._trSetSpeed) window._trSetSpeed(1);
 
   // Hide hint on last scene
