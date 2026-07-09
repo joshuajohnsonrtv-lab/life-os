@@ -443,9 +443,36 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   position:absolute;top:389px;left:186px;
   width:38px;height:22px;
   z-index:5;pointer-events:auto;cursor:pointer;
-  transition:filter .2s;
+  transition:filter .25s;
 }
 .room-cat:hover{filter:brightness(1.5) drop-shadow(0 0 6px rgba(167,139,250,.7));}
+/* cat eyes — sit on head area (head ::before is top:-8px of .cat-body) */
+.cat-eye{
+  position:absolute;top:-5px;
+  width:2.5px;height:1px;
+  background:#888;border-radius:50%;
+  transition:all .35s cubic-bezier(.34,1.56,.64,1);
+  opacity:0;
+}
+.cat-eye-l{left:3px;}
+.cat-eye-r{left:8px;}
+/* awake state — eyes open, full glow */
+.room-cat.cat-awake .cat-eye{
+  width:2.5px;height:2.5px;opacity:1;
+  background:radial-gradient(circle,#fff 30%,#c4b5fd 100%);
+  box-shadow:0 0 4px 2px rgba(196,181,253,.9),0 0 10px rgba(167,139,250,.7);
+}
+.room-cat.cat-awake{
+  filter:brightness(2.4) drop-shadow(0 0 12px rgba(200,170,255,1)) drop-shadow(0 0 28px rgba(130,70,230,.8));
+  animation:cat-awaken-pulse .55s ease-out 1;
+}
+/* ZZZ gone when awake */
+.room-cat.cat-awake::after{opacity:0;animation:none;}
+@keyframes cat-awaken-pulse{
+  0%{filter:brightness(1);}
+  40%{filter:brightness(4) drop-shadow(0 0 30px rgba(255,255,255,.9));}
+  100%{filter:brightness(2.4) drop-shadow(0 0 12px rgba(200,170,255,1));}
+}
 .cat-body{
   position:relative;width:30px;height:14px;
   background:#2f2f2f;border-radius:50%;
@@ -1016,6 +1043,15 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   .poster-body{padding:22px 16px 12px;}
   .p-quote{font-size:14px;}
 }
+
+/* ── TRANSCENDENCE FLASH ENTRANCE ── */
+.tr-flash{
+  position:fixed;inset:0;z-index:9997;pointer-events:none;
+  opacity:0;transform:scale(0.05);
+  transition:transform .5s cubic-bezier(.18,.89,.32,1.2),opacity .4s ease;
+}
+.tr-flash.tr-expand{opacity:1;transform:scale(3.5);}
+.tr-flash.tr-fade{opacity:0;transform:scale(4);transition:opacity .65s,transform .65s;}
 
 /* ── TRANSCENDENCE MODAL ── */
 #transcend-modal{
@@ -1787,7 +1823,12 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <!-- Futon -->
       <div class="futon" onclick="showFutonMenu(event)" title="Rest on futon"></div>
       <div class="pillow"></div>
-      <div class="room-cat" onclick="event.stopPropagation();showTranscendence()" title="..."><div class="cat-body"></div></div>
+      <div class="room-cat" onclick="event.stopPropagation();showTranscendence()" title="...">
+        <div class="cat-body">
+          <div class="cat-eye cat-eye-l"></div>
+          <div class="cat-eye cat-eye-r"></div>
+        </div>
+      </div>
 
       <!-- Dumbbell — between door and fan -->
       <div class="dumbbell" onclick="showDumbbellMenu(event)" title="Train">
@@ -3169,22 +3210,40 @@ const _TR_SCENES = [
    <div class="tr-big" style="color:#a78bfa;margin:10px 0 18px;font-size:clamp(44px,12vw,90px);text-shadow:0 0 60px rgba(167,139,250,.8)">Good.</div>
    <div class="tr-sub" style="font-size:clamp(13px,3.8vw,18px);color:rgba(255,255,255,.62);line-height:1.78">That rage is not your problem.<br>That is your fuel.<br><br>Comfort never built anything.<br>The people who changed their lives,<br>their cities, their generations —<br>they were not at peace.<br><br><strong style="color:rgba(255,255,255,.92)">They were burning.<br>And they used every last bit of it.</strong></div>`,
 
-  /* 9 — limits are directions */
+  /* 9 — stop bitching */
+  `<div class="tr-big" style="font-size:clamp(44px,12vw,96px);letter-spacing:2px;margin-bottom:20px">Stop.<br>Bitching.</div>
+   <div class="tr-sub" style="font-size:clamp(13px,3.8vw,18px);color:rgba(255,255,255,.65);line-height:1.8">You are becoming a man.<br>Not a victim of your circumstances.<br>Not someone who was dealt a bad hand.<br><br><strong style="color:rgba(255,255,255,.92);font-size:1.06em">A man.</strong><br><br>Men don&rsquo;t sit and ask the universe why.<br>They decide what&rsquo;s next.<br>And they go.</div>`,
+
+  /* 10 — fuck your excuses */
+  `<div class="tr-main" style="margin-bottom:14px;color:rgba(255,255,255,.72)">You don&rsquo;t have what you want yet?</div>
+   <div class="tr-big" style="color:#a78bfa;font-size:clamp(30px,8.5vw,66px);margin-bottom:20px">So what.<br>Go get it.</div>
+   <div class="tr-sub" style="font-size:clamp(13px,3.6vw,17px);color:rgba(255,255,255,.58);line-height:1.8">Excuses are not you.<br>Defending your wrongs? Not you.<br>Sitting comfortable in where you are? Not you.<br><br><strong style="color:rgba(255,255,255,.9)">Losing is not in your blood.<br>Your bones are excellent.<br>You need to work.<br>Show yourself what you actually are.</strong></div>`,
+
+  /* 11 — limits are directions */
   `<div class="tr-big" style="font-size:clamp(26px,7.5vw,58px);margin-bottom:20px">The limits you feel<br>are not walls.</div>
    <div class="tr-sub" style="font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.62);line-height:1.75">They are directions.<br><br>Every ceiling you believe in was invented by a person — usually someone with far less potential <strong style="color:rgba(255,255,255,.92)">than you.</strong><br><br><span style="color:rgba(255,255,255,.35)">And they were wrong.</span></div>`,
 
-  /* 10 — no ceiling */
+  /* 12 — no ceiling */
   `<div class="tr-big" style="font-size:clamp(44px,13vw,102px);color:#a78bfa;text-shadow:0 0 80px rgba(167,139,250,.9),0 0 160px rgba(100,60,220,.5);line-height:1.05">There is<br>no ceiling.</div>`,
 
-  /* 11 — you will die */
+  /* 13 — you will die */
   `<div class="tr-big" style="font-size:clamp(34px,10vw,80px);margin-bottom:22px">You will die.</div>
    <div class="tr-sub" style="font-size:clamp(13px,3.6vw,17px);color:rgba(255,255,255,.52);line-height:1.8">Not today. But eventually.<br><br>And when that moment comes, the only question that will matter is:<br><br><strong style="color:rgba(255,255,255,.88);font-size:1.08em">did you become what you were capable of?</strong></div>`,
 
-  /* 12 — the rocket */
+  /* 14 — meant to be */
+  `<div class="tr-main" style="margin-bottom:22px">Think of every time something<br>could have gone permanently wrong.</div>
+   <div class="tr-sub" style="font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.7);line-height:1.78">Every near miss. Every thing that could have taken you out —<br>and didn&rsquo;t.<br><br>That wasn&rsquo;t luck.<br><br><strong style="color:#a78bfa;font-size:1.06em">That was you being meant to be here.</strong><br><br>Meant to do this.<br>Meant to become what you&rsquo;re becoming.<br><br><span style="color:rgba(255,255,255,.35)">Don&rsquo;t you dare waste that.</span></div>`,
+
+  /* 15 — the rocket */
   `<div class="tr-main" style="margin-bottom:22px;line-height:1.65">Stop softening yourself.<br>Stop hedging.<br>Stop making yourself smaller<br>so other people stay comfortable.</div>
    <div class="tr-sub" style="font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.72);line-height:1.75">Go like you mean it.<br><br><strong style="color:#fff;font-size:1.1em">Absolute. Unapologetic.</strong><br><br>Like a rocket with no reverse gear<br>and nothing left to lose.<br><br><span style="color:rgba(255,255,255,.38)">Your vision. Your pace. Your terms.<br>Block out every voice that isn&rsquo;t yours.</span></div>`,
 
-  /* 13 — stop waiting */
+  /* 16 — not like other people */
+  `<div class="tr-main" style="margin-bottom:18px;color:rgba(255,255,255,.55)">Other people follow a script<br>they never wrote.</div>
+   <div class="tr-sub" style="font-size:clamp(14px,4vw,19px);color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:22px">They run code they never questioned.<br>They call that living.<br><br><strong style="color:rgba(255,255,255,.95);font-size:1.1em">You are not them.</strong></div>
+   <div class="tr-sub" style="font-size:clamp(13px,3.6vw,17px);color:rgba(255,255,255,.52);line-height:1.78">You follow codes of your own choice.<br>Your own pride. Your own relentless ambition.<br><br>You go to the gym because <strong style="color:#fff">that&rsquo;s you.</strong><br>You build the business because <strong style="color:#fff">that&rsquo;s you.</strong><br><br><span style="color:rgba(255,255,255,.38)">This is not obligation.<br>This is your identity.</span></div>`,
+
+  /* 17 — stop waiting */
   `<div class="tr-main" style="line-height:1.85;font-size:clamp(16px,5vw,28px)">
      Stop waiting for the right time.<br>
      Stop asking for permission.<br>
@@ -3192,43 +3251,86 @@ const _TR_SCENES = [
      <span style="color:rgba(255,255,255,.38)">Stop pretending you&rsquo;re not that guy.</span>
    </div>`,
 
-  /* 14 — YOU ARE THAT GUY */
+  /* 18 — YOU ARE THAT GUY */
   `<div class="tr-big" style="font-size:clamp(34px,10vw,86px);letter-spacing:1px;
      text-shadow:0 0 80px rgba(167,139,250,.95),0 0 200px rgba(100,50,220,.7)">
      YOU ARE<br>THAT GUY.
    </div>`,
 
-  /* 15 — Now. Go. */
+  /* 19 — Now. Go. */
   `<div class="tr-main" style="font-size:clamp(18px,5vw,30px);margin-bottom:6px;color:rgba(255,255,255,.55)">Now.</div>
    <div class="tr-big" style="font-size:clamp(62px,16vw,120px);text-shadow:0 0 70px rgba(167,139,250,.8)">Go.</div>
-   <button class="tr-go-btn" onclick="event.stopPropagation();document.getElementById('transcend-modal')?.remove()">I&rsquo;M READY</button>`,
+   <button class="tr-go-btn" onclick="event.stopPropagation();_trClose()">I&rsquo;M READY</button>`,
 ];
 
 let _trIdx = 0;
 let _trSpeed = 1;
 
-function showTranscendence() {
+function _trClose() {
   document.getElementById('transcend-modal')?.remove();
-  const m = document.createElement('div');
-  m.id = 'transcend-modal';
-  m.onclick = _trNext;
-  m.innerHTML = `
-    <canvas id="tr-canvas"></canvas>
-    <div class="tr-nebula" style="width:500px;height:500px;
-      background:radial-gradient(circle,rgba(100,50,220,.16),transparent 68%);
-      top:-10%;left:10%;"></div>
-    <div class="tr-nebula" style="width:360px;height:360px;
-      background:radial-gradient(circle,rgba(40,80,220,.1),transparent 70%);
-      bottom:5%;right:5%;animation-delay:-6s;"></div>
-    <div class="tr-content" id="tr-scene-wrap"></div>
-    <div class="tr-dots" id="tr-dots"></div>
-    <div class="tr-hint" id="tr-hint">tap anywhere to continue</div>
-    <button class="tr-close-btn" onclick="event.stopPropagation();document.getElementById('transcend-modal')?.remove()">✕</button>
-  `;
-  document.body.appendChild(m);
-  _trInitCanvas();
-  _trIdx = 0;
-  _trShowScene(0);
+  document.querySelector('.tr-flash')?.remove();
+  document.querySelector('.room-cat')?.classList.remove('cat-awake');
+}
+
+function showTranscendence() {
+  _trClose();
+
+  // 1. Wake the cat — eyes open + glow
+  const cat = document.querySelector('.room-cat');
+  if (cat) cat.classList.add('cat-awake');
+
+  // 2. After 480ms — flash-bang originates from cat's screen position
+  setTimeout(() => {
+    const catEl = document.querySelector('.room-cat');
+    const rect = catEl?.getBoundingClientRect();
+    const cx = rect ? Math.round((rect.left + rect.width / 2) / window.innerWidth * 100) : 50;
+    const cy = rect ? Math.round((rect.top + rect.height / 2) / window.innerHeight * 100) : 72;
+
+    const flash = document.createElement('div');
+    flash.className = 'tr-flash';
+    flash.style.background = `radial-gradient(circle at ${cx}% ${cy}%,
+      rgba(255,255,255,.98) 0%,
+      rgba(210,180,255,.88) 12%,
+      rgba(130,60,230,.65) 32%,
+      rgba(50,10,100,.35) 58%,
+      transparent 78%)`;
+    document.body.appendChild(flash);
+
+    requestAnimationFrame(() => requestAnimationFrame(() => flash.classList.add('tr-expand')));
+
+    // 3. At peak (500ms into flash) — build the modal underneath
+    setTimeout(() => {
+      const m = document.createElement('div');
+      m.id = 'transcend-modal';
+      m.style.cssText = 'opacity:0;transition:opacity .9s ease';
+      m.onclick = _trNext;
+      m.innerHTML = `
+        <canvas id="tr-canvas"></canvas>
+        <div class="tr-nebula" style="width:500px;height:500px;
+          background:radial-gradient(circle,rgba(100,50,220,.16),transparent 68%);
+          top:-10%;left:10%;"></div>
+        <div class="tr-nebula" style="width:360px;height:360px;
+          background:radial-gradient(circle,rgba(40,80,220,.1),transparent 70%);
+          bottom:5%;right:5%;animation-delay:-6s;"></div>
+        <div class="tr-content" id="tr-scene-wrap"></div>
+        <div class="tr-dots" id="tr-dots"></div>
+        <div class="tr-hint" id="tr-hint">tap anywhere to continue</div>
+        <button class="tr-close-btn" onclick="event.stopPropagation();_trClose()">✕</button>
+      `;
+      document.body.appendChild(m);
+      _trInitCanvas();
+      _trIdx = 0;
+      _trShowScene(0);
+
+      // 4. Fade flash out, reveal modal
+      setTimeout(() => {
+        flash.classList.remove('tr-expand');
+        flash.classList.add('tr-fade');
+        requestAnimationFrame(() => requestAnimationFrame(() => { m.style.opacity = '1'; }));
+        setTimeout(() => flash.remove(), 750);
+      }, 180);
+    }, 460);
+  }, 480);
 }
 
 function _trNext(e) {
@@ -3252,8 +3354,8 @@ function _trShowScene(idx) {
   }
 
   // Speed up canvas on final scenes
-  if (idx >= 14 && window._trSetSpeed) window._trSetSpeed(5);
-  else if (idx >= 10 && window._trSetSpeed) window._trSetSpeed(2.5);
+  if (idx >= 18 && window._trSetSpeed) window._trSetSpeed(5);
+  else if (idx >= 14 && window._trSetSpeed) window._trSetSpeed(2.5);
   else if (window._trSetSpeed) window._trSetSpeed(1);
 
   // Hide hint on last scene
