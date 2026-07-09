@@ -442,8 +442,10 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .room-cat{
   position:absolute;top:389px;left:186px;
   width:38px;height:22px;
-  z-index:5;pointer-events:none;
+  z-index:5;pointer-events:auto;cursor:pointer;
+  transition:filter .2s;
 }
+.room-cat:hover{filter:brightness(1.5) drop-shadow(0 0 6px rgba(167,139,250,.7));}
 .cat-body{
   position:relative;width:30px;height:14px;
   background:#2f2f2f;border-radius:50%;
@@ -1013,38 +1015,6 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   .p-nav{width:34px;height:34px;font-size:20px;}
   .poster-body{padding:22px 16px 12px;}
   .p-quote{font-size:14px;}
-}
-
-/* ── FLOOR CAP ── */
-.floor-cap{
-  position:absolute;top:308px;left:148px;
-  width:28px;height:13px;
-  cursor:pointer;z-index:8;
-  transform:rotate(-16deg);
-  transition:transform .22s,filter .22s;
-  filter:drop-shadow(0 3px 5px rgba(0,0,0,.7));
-}
-.floor-cap:hover{
-  transform:rotate(-8deg) scale(1.22) translateY(-2px);
-  filter:drop-shadow(0 4px 10px rgba(130,100,255,.8)) brightness(1.35);
-}
-.floor-cap-crown{
-  position:absolute;bottom:4px;left:3px;right:3px;
-  height:9px;border-radius:7px 7px 1px 1px;
-  background:linear-gradient(160deg,#2e2170,#1a1048);
-  border:1px solid rgba(140,110,220,.35);
-}
-.floor-cap-brim{
-  position:absolute;bottom:0;left:0;right:0;
-  height:4px;border-radius:2px;
-  background:linear-gradient(to bottom,#201860,#100c3a);
-  border:1px solid rgba(100,80,180,.25);
-}
-.floor-cap-logo{
-  position:absolute;top:1px;left:50%;transform:translateX(-50%);
-  width:6px;height:6px;border-radius:50%;
-  background:radial-gradient(circle at 35% 35%,#9d7fff,#5530cc);
-  box-shadow:0 0 4px rgba(160,130,255,.6);
 }
 
 /* ── TRANSCENDENCE MODAL ── */
@@ -1817,7 +1787,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <!-- Futon -->
       <div class="futon" onclick="showFutonMenu(event)" title="Rest on futon"></div>
       <div class="pillow"></div>
-      <div class="room-cat"><div class="cat-body"></div></div>
+      <div class="room-cat" onclick="event.stopPropagation();showTranscendence()" title="..."><div class="cat-body"></div></div>
 
       <!-- Dumbbell — between door and fan -->
       <div class="dumbbell" onclick="showDumbbellMenu(event)" title="Train">
@@ -1832,14 +1802,6 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
         <div class="door-icon">🚪</div>
         <div class="door-txt">Out</div>
         <div class="door-knob"></div>
-      </div>
-
-      <!-- Cap dropped on floor — click to open transcendence -->
-      <div class="floor-cap" onclick="event.stopPropagation();showTranscendence()" title="...">
-        <div class="floor-cap-crown">
-          <div class="floor-cap-logo"></div>
-        </div>
-        <div class="floor-cap-brim"></div>
       </div>
 
       <!-- Character -->
