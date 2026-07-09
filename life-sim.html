@@ -1015,6 +1015,119 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   .p-quote{font-size:14px;}
 }
 
+/* ── FLOOR CAP ── */
+.floor-cap{
+  position:absolute;top:308px;left:148px;
+  width:28px;height:13px;
+  cursor:pointer;z-index:8;
+  transform:rotate(-16deg);
+  transition:transform .22s,filter .22s;
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,.7));
+}
+.floor-cap:hover{
+  transform:rotate(-8deg) scale(1.22) translateY(-2px);
+  filter:drop-shadow(0 4px 10px rgba(130,100,255,.8)) brightness(1.35);
+}
+.floor-cap-crown{
+  position:absolute;bottom:4px;left:3px;right:3px;
+  height:9px;border-radius:7px 7px 1px 1px;
+  background:linear-gradient(160deg,#2e2170,#1a1048);
+  border:1px solid rgba(140,110,220,.35);
+}
+.floor-cap-brim{
+  position:absolute;bottom:0;left:0;right:0;
+  height:4px;border-radius:2px;
+  background:linear-gradient(to bottom,#201860,#100c3a);
+  border:1px solid rgba(100,80,180,.25);
+}
+.floor-cap-logo{
+  position:absolute;top:1px;left:50%;transform:translateX(-50%);
+  width:6px;height:6px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#9d7fff,#5530cc);
+  box-shadow:0 0 4px rgba(160,130,255,.6);
+}
+
+/* ── TRANSCENDENCE MODAL ── */
+#transcend-modal{
+  position:fixed;inset:0;z-index:9999;background:#01010a;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;overflow:hidden;
+}
+#tr-canvas{position:absolute;inset:0;width:100%;height:100%;}
+.tr-nebula{
+  position:absolute;border-radius:50%;
+  filter:blur(90px);pointer-events:none;z-index:1;
+  animation:tr-nebula-drift 14s ease-in-out infinite alternate;
+}
+@keyframes tr-nebula-drift{
+  0%{transform:translate(0,0) scale(1);}
+  100%{transform:translate(40px,30px) scale(1.12);}
+}
+.tr-content{
+  position:relative;z-index:2;
+  text-align:center;padding:32px 28px;
+  max-width:640px;pointer-events:none;
+  user-select:none;
+}
+.tr-scene{opacity:0;transition:opacity 1.4s ease;}
+.tr-scene.visible{opacity:1;}
+.tr-big{
+  font-size:clamp(30px,8.5vw,66px);font-weight:900;
+  color:#fff;line-height:1.12;letter-spacing:-.5px;
+  text-shadow:0 0 50px rgba(140,90,255,.55);
+  margin-bottom:14px;
+}
+.tr-main{
+  font-size:clamp(17px,5vw,30px);font-weight:700;
+  color:rgba(255,255,255,.9);line-height:1.45;
+  letter-spacing:.15px;margin-bottom:14px;
+  text-shadow:0 0 24px rgba(140,90,255,.3);
+}
+.tr-sub{
+  font-size:clamp(13px,3.6vw,17px);font-weight:400;
+  color:rgba(255,255,255,.55);line-height:1.78;
+  letter-spacing:.3px;max-width:500px;margin:0 auto;
+}
+.tr-accent{color:#a78bfa;}
+.tr-dots{
+  position:absolute;bottom:52px;left:50%;transform:translateX(-50%);
+  display:flex;gap:7px;z-index:3;pointer-events:none;
+}
+.tr-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:rgba(255,255,255,.15);transition:background .45s,transform .3s;
+}
+.tr-dot.active{background:rgba(167,139,250,.9);transform:scale(1.3);}
+.tr-hint{
+  position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
+  font-size:10px;letter-spacing:3.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.2);z-index:3;pointer-events:none;
+  animation:tr-hint-pulse 2.6s ease-in-out infinite;
+}
+@keyframes tr-hint-pulse{0%,100%{opacity:.35}50%{opacity:.85}}
+.tr-close-btn{
+  position:absolute;top:16px;right:18px;z-index:10;
+  background:transparent;border:none;
+  color:rgba(255,255,255,.2);font-size:22px;
+  cursor:pointer;padding:8px;line-height:1;
+  transition:color .2s;pointer-events:all;
+}
+.tr-close-btn:hover{color:rgba(255,255,255,.7);}
+.tr-go-btn{
+  display:inline-block;margin-top:34px;
+  padding:15px 52px;border-radius:40px;
+  background:linear-gradient(135deg,#7c3aed,#4f46e5);
+  color:#fff;font-weight:900;font-size:16px;
+  letter-spacing:2px;text-transform:uppercase;
+  border:none;cursor:pointer;pointer-events:all;
+  box-shadow:0 0 45px rgba(124,58,237,.65);
+  transition:transform .22s,box-shadow .22s;
+}
+.tr-go-btn:hover{
+  transform:scale(1.07);
+  box-shadow:0 0 70px rgba(124,58,237,.95);
+}
+
 /* ── MOBILE — scale the whole room as one unit ── */
 @media(max-width:700px){
   .stats-panel { display:none; }
@@ -1719,6 +1832,14 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
         <div class="door-icon">🚪</div>
         <div class="door-txt">Out</div>
         <div class="door-knob"></div>
+      </div>
+
+      <!-- Cap dropped on floor — click to open transcendence -->
+      <div class="floor-cap" onclick="event.stopPropagation();showTranscendence()" title="...">
+        <div class="floor-cap-crown">
+          <div class="floor-cap-logo"></div>
+        </div>
+        <div class="floor-cap-brim"></div>
       </div>
 
       <!-- Character -->
@@ -3041,6 +3162,206 @@ function _navPoster(dir) {
   localStorage.setItem('life_sim_poster', _posterIdx);
   updateRoomPoster();
   _renderPosterModal();
+}
+
+// ─────────────────────────────────────────────
+//  TRANSCENDENCE
+// ─────────────────────────────────────────────
+
+const _TR_SCENES = [
+  /* 0 — scale of existence */
+  `<div style="letter-spacing:7px;font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:20px;font-weight:600">The universe is</div>
+   <div class="tr-big" style="font-size:clamp(38px,11vw,88px)">13.8 billion<br>years old.</div>`,
+
+  /* 1 — you were born */
+  `<div class="tr-main">And in all that time —<br>all that space,<br>all those trillion, trillion stars —</div>
+   <div class="tr-big" style="color:#a78bfa;margin-top:6px;font-size:clamp(28px,8vw,62px)">you were born.</div>
+   <div class="tr-sub" style="margin-top:22px;color:rgba(255,255,255,.38)">That is not an accident.</div>`,
+
+  /* 2 — your lineage */
+  `<div class="tr-main">Your ancestors survived<br>ice ages, plagues, famines, and wars —</div>
+   <div class="tr-sub" style="margin-top:18px;font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.72);font-weight:500;line-height:1.62">every single day for <strong style="color:#fff">300,000 years straight.</strong><br><br>Not one of them gave up.<br><br>You are the end result of the most unbroken chain of survivors in history.</div>`,
+
+  /* 3 — ocean in a drop */
+  `<div class="tr-big" style="font-size:clamp(26px,7vw,54px);margin-bottom:20px;color:rgba(255,255,255,.72)">You are not a drop<br>in the ocean.</div>
+   <div class="tr-big" style="color:#a78bfa;font-size:clamp(28px,8vw,62px)">You are the ocean<br>in a drop.</div>`,
+
+  /* 4 — kings and conquerors */
+  `<div class="tr-main">Every king. Every conqueror.<br>Every person who ever changed the world.</div>
+   <div class="tr-sub" style="margin-top:22px;font-size:clamp(14px,4vw,19px);color:rgba(255,255,255,.65);line-height:1.72">They woke up with the same doubt you feel.<br>They had no idea if it would work.<br><br><strong style="color:rgba(255,255,255,.92);font-size:1.08em">And they went anyway.</strong></div>`,
+
+  /* 5 — 37 trillion cells */
+  `<div class="tr-main" style="margin-bottom:20px">Right now — this exact second —</div>
+   <div class="tr-sub" style="font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.78);font-weight:500;line-height:1.68"><strong style="color:#fff;font-size:1.15em">37 trillion cells</strong> in your body<br>are running chemical reactions<br>just to keep you alive.<br><br>Your own body is fighting for you.<br><br>The only question is: <strong style="color:#a78bfa">are you?</strong></div>`,
+
+  /* 6 — limits are not walls */
+  `<div class="tr-big" style="font-size:clamp(28px,8vw,60px);margin-bottom:20px">The limits you feel<br>are not walls.</div>
+   <div class="tr-sub" style="font-size:clamp(14px,4vw,20px);color:rgba(255,255,255,.62);line-height:1.75">They are directions.<br><br>Every ceiling you believe in was invented by a person — usually someone with far less potential <strong style="color:rgba(255,255,255,.9)">than you.</strong></div>`,
+
+  /* 7 — no ceiling */
+  `<div class="tr-big" style="font-size:clamp(44px,13vw,102px);color:#a78bfa;text-shadow:0 0 80px rgba(167,139,250,.9),0 0 160px rgba(100,60,220,.5);line-height:1.05">There is<br>no ceiling.</div>`,
+
+  /* 8 — you will die */
+  `<div class="tr-big" style="font-size:clamp(34px,10vw,80px);margin-bottom:22px">You will die.</div>
+   <div class="tr-sub" style="font-size:clamp(13px,3.6vw,17px);color:rgba(255,255,255,.52);line-height:1.8">Not today. But eventually.<br><br>And when that moment comes, the only question that will matter is:<br><br><strong style="color:rgba(255,255,255,.88);font-size:1.08em">did you become what you were capable of?</strong></div>`,
+
+  /* 9 — stop waiting */
+  `<div class="tr-main" style="line-height:1.82;font-size:clamp(16px,5vw,29px)">
+     Stop waiting for the right time.<br>
+     Stop asking for permission.<br>
+     <span style="color:rgba(255,255,255,.45)">Stop pretending you're not that guy.</span>
+   </div>`,
+
+  /* 10 — YOU ARE THAT GUY */
+  `<div class="tr-big" style="font-size:clamp(34px,10vw,86px);letter-spacing:1px;
+     text-shadow:0 0 80px rgba(167,139,250,.95),0 0 200px rgba(100,50,220,.7)">
+     YOU ARE<br>THAT GUY.
+   </div>`,
+
+  /* 11 — Now. Go. */
+  `<div class="tr-main" style="font-size:clamp(18px,5vw,30px);margin-bottom:6px;color:rgba(255,255,255,.62)">Now.</div>
+   <div class="tr-big" style="font-size:clamp(62px,16vw,120px);text-shadow:0 0 70px rgba(167,139,250,.8)">Go.</div>
+   <button class="tr-go-btn" onclick="event.stopPropagation();document.getElementById('transcend-modal')?.remove()">I&rsquo;M READY</button>`,
+];
+
+let _trIdx = 0;
+let _trSpeed = 1;
+
+function showTranscendence() {
+  document.getElementById('transcend-modal')?.remove();
+  const m = document.createElement('div');
+  m.id = 'transcend-modal';
+  m.onclick = _trNext;
+  m.innerHTML = `
+    <canvas id="tr-canvas"></canvas>
+    <div class="tr-nebula" style="width:500px;height:500px;
+      background:radial-gradient(circle,rgba(100,50,220,.16),transparent 68%);
+      top:-10%;left:10%;"></div>
+    <div class="tr-nebula" style="width:360px;height:360px;
+      background:radial-gradient(circle,rgba(40,80,220,.1),transparent 70%);
+      bottom:5%;right:5%;animation-delay:-6s;"></div>
+    <div class="tr-content" id="tr-scene-wrap"></div>
+    <div class="tr-dots" id="tr-dots"></div>
+    <div class="tr-hint" id="tr-hint">tap anywhere to continue</div>
+    <button class="tr-close-btn" onclick="event.stopPropagation();document.getElementById('transcend-modal')?.remove()">✕</button>
+  `;
+  document.body.appendChild(m);
+  _trInitCanvas();
+  _trIdx = 0;
+  _trShowScene(0);
+}
+
+function _trNext(e) {
+  if (e.target.closest('.tr-go-btn,.tr-close-btn')) return;
+  if (_trIdx < _TR_SCENES.length - 1) {
+    _trIdx++;
+    _trShowScene(_trIdx);
+  }
+}
+
+function _trShowScene(idx) {
+  const wrap = document.getElementById('tr-scene-wrap');
+  const dotsEl = document.getElementById('tr-dots');
+  const hintEl = document.getElementById('tr-hint');
+  if (!wrap) return;
+
+  // Dots
+  if (dotsEl) {
+    dotsEl.innerHTML = _TR_SCENES.map((_,i) =>
+      `<div class="tr-dot${i===idx?' active':''}"></div>`).join('');
+  }
+
+  // Speed up canvas on final scenes
+  if (idx >= 10 && window._trSetSpeed) window._trSetSpeed(5);
+  else if (idx >= 7 && window._trSetSpeed) window._trSetSpeed(2.5);
+  else if (window._trSetSpeed) window._trSetSpeed(1);
+
+  // Hide hint on last scene
+  if (hintEl) hintEl.style.display = idx === _TR_SCENES.length - 1 ? 'none' : 'block';
+
+  const old = wrap.querySelector('.tr-scene');
+  if (old) {
+    old.style.transition = 'opacity .55s';
+    old.style.opacity = '0';
+    setTimeout(() => { old.remove(); _trRenderScene(wrap, idx); }, 560);
+  } else {
+    _trRenderScene(wrap, idx);
+  }
+}
+
+function _trRenderScene(wrap, idx) {
+  const div = document.createElement('div');
+  div.className = 'tr-scene';
+  div.innerHTML = _TR_SCENES[idx];
+  wrap.appendChild(div);
+  requestAnimationFrame(() => requestAnimationFrame(() => div.classList.add('visible')));
+}
+
+function _trInitCanvas() {
+  const canvas = document.getElementById('tr-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W = canvas.width = window.innerWidth;
+  let H = canvas.height = window.innerHeight;
+  const CX = W / 2, CY = H / 2;
+  let speed = 1, targetSpeed = 1;
+
+  function makeStar(scatter) {
+    const a = Math.random() * Math.PI * 2;
+    return {
+      angle: a,
+      dist: scatter ? (5 + Math.random() * Math.sqrt(W*W+H*H) * 0.45) : (3 + Math.random() * 8),
+      speed: 0.25 + Math.random() * 0.65,
+      size: 0.2 + Math.random() * 1.3,
+      opacity: scatter ? (Math.random() * 0.65 + 0.1) : 0,
+      twinkle: Math.random() * Math.PI * 2,
+      twinkleRate: 0.008 + Math.random() * 0.018,
+    };
+  }
+
+  const stars = Array.from({length: 240}, () => makeStar(true));
+  ctx.fillStyle = '#01010a';
+  ctx.fillRect(0, 0, W, H);
+
+  function draw() {
+    ctx.fillStyle = `rgba(1,1,10,${speed > 3 ? 0.35 : 0.22})`;
+    ctx.fillRect(0, 0, W, H);
+    speed += (targetSpeed - speed) * 0.018;
+
+    const maxD = Math.sqrt(W * W + H * H) * 0.58;
+    stars.forEach((s, i) => {
+      s.dist += s.speed * speed;
+      s.opacity = Math.min(0.88, s.opacity + 0.005 * speed);
+      s.twinkle += s.twinkleRate;
+
+      const x = CX + Math.cos(s.angle) * s.dist;
+      const y = CY + Math.sin(s.angle) * s.dist;
+      const tw = 0.88 + Math.sin(s.twinkle) * 0.12;
+      const a = s.opacity * tw;
+
+      if (speed > 2.5 && s.dist > 15) {
+        const sl = s.speed * speed * (speed > 4 ? 10 : 5);
+        const px = CX + Math.cos(s.angle) * (s.dist - sl);
+        const py = CY + Math.sin(s.angle) * (s.dist - sl);
+        const g = ctx.createLinearGradient(px, py, x, y);
+        g.addColorStop(0, 'rgba(255,255,255,0)');
+        g.addColorStop(1, `rgba(255,255,255,${a * .75})`);
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(x, y);
+        ctx.strokeStyle = g; ctx.lineWidth = s.size * .65; ctx.stroke();
+      }
+
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(.2, s.size * (1 + Math.min(speed-1,1.5)*.1)), 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fill();
+
+      if (s.dist > maxD) stars[i] = { ...makeStar(false) };
+    });
+
+    if (document.getElementById('transcend-modal')) requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+  window._trSetSpeed = v => { targetSpeed = v; };
 }
 
 // ─────────────────────────────────────────────
