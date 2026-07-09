@@ -1917,7 +1917,7 @@ function calc() {
   const sleepLog = W.sleep?.log || {};
   const hydLog   = W.hydration?.log || {};
   const dietLog  = W.diet?.log  || {};
-  const hydGoal  = W.hydration?.goal || 8;
+  const hydGoal  = 6; // 6 glasses = 3L (hardcoded to match "3L a day" goal)
 
   const sleepGoal = W.sleep?.goal || 8;
   let gymSess7=0, hydDays=0, sleepGoodDays=0, sleepTotal=0, sleepDays=0;
@@ -4234,8 +4234,8 @@ function _chAutoCheck(habitId, dateStr) {
       return hrs !== null && hrs >= 8;
     }
     if (habitId === 'gym') {
-      const g = wd.gym?.log?.[dateStr];
-      return !!(g && g.exercises && g.exercises.length > 0);
+      // Any saved gym entry counts (user may not log individual exercises)
+      return !!(wd.gym?.log?.[dateStr]);
     }
     if (habitId === 'water_3l') {
       const w = wd.hydration?.log?.[dateStr];
@@ -4245,7 +4245,9 @@ function _chAutoCheck(habitId, dateStr) {
       const f = wd.facialExercises?.log?.[dateStr];
       const exList = wd.facialExercises?.exercises || [];
       if (!exList.length) return false;
-      return !!(f && (f.completed||[]).length >= exList.length);
+      // wellness looksmax tab saves under 'done'; facial page saves under 'completed' — check both
+      const ticked = (f?.completed || f?.done || []).length;
+      return ticked >= exList.length;
     }
   } catch(e) {}
   return false;
