@@ -1134,6 +1134,374 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   box-shadow:0 0 70px rgba(124,58,237,.95);
 }
 
+/* ══════════════════════════════════════════════
+   DUNGEON BASEMENT
+   ══════════════════════════════════════════════ */
+
+/* ── TRAPDOOR (bedroom floor) ── */
+.trapdoor{
+  position:absolute;top:456px;left:185px;
+  width:54px;height:36px;z-index:7;cursor:pointer;
+  border:1.5px dashed rgba(110,55,180,.2);
+  border-radius:3px;
+  transition:border-color .3s,box-shadow .3s;
+}
+.trapdoor::before{ /* cross-bar handle */
+  content:'';position:absolute;
+  bottom:9px;left:50%;transform:translateX(-50%);
+  width:20px;height:2px;
+  background:rgba(110,55,180,.18);border-radius:2px;
+  box-shadow:0 -5px 0 rgba(110,55,180,.12);
+}
+.trapdoor:hover{
+  border-color:rgba(160,100,255,.7);
+  box-shadow:0 0 16px rgba(120,55,220,.4),inset 0 0 8px rgba(100,45,180,.1);
+}
+
+/* ── DUNGEON CONFIRM MODAL ── */
+.dng-confirm{
+  position:absolute;inset:0;z-index:70;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(4,2,12,.9);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;
+  transition:opacity .3s;
+}
+.dng-confirm.show{opacity:1;pointer-events:auto;}
+.dng-confirm-card{
+  background:rgba(18,8,32,.96);
+  border:1px solid rgba(130,75,220,.3);
+  border-radius:18px;padding:30px 26px 24px;
+  text-align:center;width:min(275px,80vw);
+}
+.dng-confirm-icon{
+  font-size:28px;margin-bottom:12px;
+  animation:dng-conf-bob 1.9s ease-in-out infinite;
+}
+@keyframes dng-conf-bob{
+  0%,100%{transform:translateY(0);}50%{transform:translateY(5px);}
+}
+.dng-confirm-title{
+  font-size:15px;font-weight:800;color:#fff;
+  margin-bottom:7px;letter-spacing:.3px;
+}
+.dng-confirm-sub{
+  font-size:12px;color:rgba(255,255,255,.4);
+  margin-bottom:22px;line-height:1.55;
+}
+.dng-confirm-btns{display:flex;gap:10px;}
+.dng-confirm-btns button{
+  flex:1;padding:10px 0;border-radius:20px;
+  font-size:11px;font-weight:800;letter-spacing:1.2px;
+  text-transform:uppercase;cursor:pointer;transition:all .2s;border:none;
+}
+.dng-btn-yes{
+  background:linear-gradient(135deg,#6d28d9,#4c1d95);
+  border:1px solid rgba(167,139,250,.35) !important;
+  color:#e9d5ff;
+}
+.dng-btn-yes:hover{background:linear-gradient(135deg,#7c3aed,#5b21b6);}
+.dng-btn-no{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1) !important;
+  color:rgba(255,255,255,.4);
+}
+.dng-btn-no:hover{color:rgba(255,255,255,.7);}
+
+/* ── DUNGEON WRAP (full-room overlay) ── */
+.dungeon-wrap{
+  position:absolute;inset:0;z-index:55;overflow:hidden;
+  display:none;
+  background:#07040f;
+  opacity:0;transform:translateY(16px) scale(.97);
+  transition:opacity .55s ease,transform .55s cubic-bezier(.22,.68,0,1.2);
+}
+.dungeon-wrap.visible{display:block;}
+.dungeon-wrap.show{opacity:1;transform:translateY(0) scale(1);}
+
+/* stone block texture (shared) */
+.dng-stone{
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 26px,rgba(0,0,0,.22) 26px,rgba(0,0,0,.22) 28px),
+    repeating-linear-gradient(90deg,transparent,transparent 34px,rgba(0,0,0,.14) 34px,rgba(0,0,0,.14) 36px);
+  background-size:36px 28px;
+}
+
+/* ── Perspective room surfaces ── */
+/* back wall inner rectangle: 25.6%–74.4% x, 12.7%–48% y
+   = pixel equiv: 110–320 x, 65–245 y on a 430×510 canvas */
+.dng-ceiling{
+  position:absolute;inset:0;
+  clip-path:polygon(0% 0%,100% 0%,74.4% 12.7%,25.6% 12.7%);
+  background-color:#120a20;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 26px,rgba(0,0,0,.28) 26px,rgba(0,0,0,.28) 28px),
+    repeating-linear-gradient(90deg,transparent,transparent 34px,rgba(0,0,0,.18) 34px,rgba(0,0,0,.18) 36px);
+  background-size:36px 28px;
+}
+.dng-wall-l{
+  position:absolute;inset:0;
+  clip-path:polygon(0% 0%,25.6% 12.7%,25.6% 48%,0% 100%);
+  background-color:#0d0618;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 26px,rgba(0,0,0,.32) 26px,rgba(0,0,0,.32) 28px),
+    repeating-linear-gradient(90deg,transparent,transparent 34px,rgba(0,0,0,.2) 34px,rgba(0,0,0,.2) 36px);
+  background-size:36px 28px;
+}
+.dng-wall-r{
+  position:absolute;inset:0;
+  clip-path:polygon(74.4% 12.7%,100% 0%,100% 100%,74.4% 48%);
+  background-color:#0d0618;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 26px,rgba(0,0,0,.32) 26px,rgba(0,0,0,.32) 28px),
+    repeating-linear-gradient(90deg,transparent,transparent 34px,rgba(0,0,0,.2) 34px,rgba(0,0,0,.2) 36px);
+  background-size:36px 28px;
+}
+.dng-floor{
+  position:absolute;inset:0;
+  clip-path:polygon(25.6% 48%,74.4% 48%,100% 100%,0% 100%);
+  background:linear-gradient(to bottom,#1c1030 0%,#0b0620 100%);
+  background-image:
+    repeating-linear-gradient(90deg,transparent,transparent 44px,rgba(255,255,255,.025) 44px,rgba(255,255,255,.025) 46px);
+}
+.dng-back{
+  position:absolute;
+  top:12.7%;left:25.6%;right:25.6%;
+  height:35.3%; /* 48%-12.7% */
+  background-color:#160c26;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 24px,rgba(0,0,0,.2) 24px,rgba(0,0,0,.2) 26px),
+    repeating-linear-gradient(90deg,transparent,transparent 32px,rgba(0,0,0,.12) 32px,rgba(0,0,0,.12) 34px);
+  background-size:34px 26px;
+  border:1px solid rgba(90,40,150,.25);
+  box-shadow:
+    inset 0 0 50px rgba(100,40,180,.1),
+    0 0 30px rgba(100,40,180,.08);
+}
+
+/* ── TORCHES ── */
+.dng-torch{
+  position:absolute;z-index:6;
+  display:flex;flex-direction:column;align-items:center;
+  pointer-events:none;
+}
+/* torch glow on wall */
+.dng-torch::before{
+  content:'';position:absolute;
+  top:-22px;left:50%;transform:translateX(-50%);
+  width:90px;height:90px;
+  background:radial-gradient(circle,rgba(140,0,255,.22),rgba(100,0,200,.08) 50%,transparent 70%);
+  border-radius:50%;
+  animation:dng-glow-pulse 2s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes dng-glow-pulse{
+  0%,100%{opacity:.65;transform:translateX(-50%) scale(1);}
+  50%{opacity:1;transform:translateX(-50%) scale(1.2);}
+}
+.dng-torch-stick{
+  width:5px;height:22px;
+  background:linear-gradient(to top,#4a2008,#8b5a2a);
+  border-radius:1px 1px 3px 3px;
+  border:1px solid rgba(0,0,0,.5);
+  position:relative;z-index:1;
+}
+.dng-torch-stick::before{ /* torch head bracket */
+  content:'';position:absolute;
+  top:-5px;left:-3px;right:-3px;
+  height:7px;
+  background:linear-gradient(to bottom,#7a4a20,#4a2008);
+  border-radius:2px;
+  border:1px solid rgba(0,0,0,.4);
+}
+.dng-flames{
+  position:absolute;bottom:calc(100% - 2px);
+  display:flex;align-items:flex-end;justify-content:center;
+  width:26px;height:36px;
+  filter:drop-shadow(0 0 6px rgba(160,0,255,.8));
+}
+.dng-flame{
+  position:absolute;border-radius:50% 50% 28% 28%;
+  bottom:0;
+}
+.dng-f-out{
+  width:20px;height:28px;
+  background:radial-gradient(ellipse at bottom,rgba(130,0,240,.9),rgba(70,0,160,.5) 55%,transparent 100%);
+  animation:dng-flk-a .15s ease-in-out infinite alternate;
+}
+.dng-f-mid{
+  width:13px;height:21px;
+  background:radial-gradient(ellipse at bottom,rgba(200,80,255,.95),rgba(140,20,220,.7) 50%,transparent 100%);
+  animation:dng-flk-b .11s ease-in-out infinite alternate;
+}
+.dng-f-core{
+  width:6px;height:13px;
+  background:radial-gradient(ellipse at bottom,rgba(255,245,255,1),rgba(230,180,255,.9) 45%,transparent 100%);
+  animation:dng-flk-c .09s ease-in-out infinite alternate;
+}
+@keyframes dng-flk-a{
+  0%{transform:scaleX(1) scaleY(1) rotate(-3deg);opacity:.85;}
+  100%{transform:scaleX(.87) scaleY(1.1) rotate(5deg);opacity:1;}
+}
+@keyframes dng-flk-b{
+  0%{transform:scaleX(1.05) scaleY(.94) rotate(3deg);opacity:.9;}
+  100%{transform:scaleX(.9) scaleY(1.12) rotate(-4deg);opacity:1;}
+}
+@keyframes dng-flk-c{
+  0%{transform:scaleX(1) scaleY(1);opacity:1;}
+  100%{transform:scaleX(1.12) scaleY(.88);opacity:.88;}
+}
+
+/* ── PHOTO GRID (on back wall) ── */
+.dng-photo-grid{
+  position:absolute;
+  top:calc(12.7% + 10px);
+  left:calc(25.6% + 14px);
+  right:calc(25.6% + 14px);
+  height:calc(35.3% - 20px);
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(2,1fr);
+  gap:6px;z-index:4;
+}
+.dng-photo-slot{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(120,70,200,.22);
+  border-radius:4px;cursor:pointer;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .2s,background .2s;
+  position:relative;
+}
+.dng-photo-slot:hover{
+  border-color:rgba(180,130,255,.55);
+  background:rgba(150,90,220,.1);
+}
+.dng-photo-slot img{width:100%;height:100%;object-fit:cover;}
+.dng-slot-plus{
+  font-size:16px;color:rgba(130,80,200,.4);line-height:1;
+}
+
+/* ── MEDITATION SIGIL ── */
+.dng-sigil{
+  position:absolute;top:360px;left:50%;
+  transform:translateX(-50%);
+  width:66px;height:66px;border-radius:50%;
+  border:1.5px solid rgba(160,100,255,.3);
+  background:radial-gradient(circle,rgba(100,40,200,.14),transparent 70%);
+  cursor:pointer;z-index:4;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  animation:dng-sigil-glow 3s ease-in-out infinite;
+  transition:all .4s;
+}
+.dng-sigil.active{
+  border-color:rgba(220,180,255,.8);
+  background:radial-gradient(circle,rgba(150,70,255,.3),transparent 70%);
+  box-shadow:0 0 40px rgba(170,70,255,.75),0 0 80px rgba(130,30,220,.45);
+}
+@keyframes dng-sigil-glow{
+  0%,100%{box-shadow:0 0 12px rgba(130,50,220,.35),0 0 26px rgba(100,30,180,.18);border-color:rgba(160,100,255,.28);}
+  50%{box-shadow:0 0 22px rgba(150,70,255,.65),0 0 50px rgba(120,40,220,.35);border-color:rgba(200,155,255,.6);}
+}
+.dng-sigil-icon{font-size:22px;line-height:1;margin-bottom:2px;}
+.dng-sigil-txt{
+  font-size:7.5px;letter-spacing:2.2px;text-transform:uppercase;
+  color:rgba(160,110,255,.55);font-weight:800;
+}
+
+/* ── FLOATING MEDITATION CHARACTER ── */
+.dng-med-char{
+  position:absolute;top:285px;left:50%;
+  transform:translateX(-50%);
+  display:none;flex-direction:column;align-items:center;gap:0;
+  z-index:5;
+}
+.dng-med-char.show{display:flex;}
+.dng-med-char.floating{animation:dng-med-float 3.2s ease-in-out infinite;}
+@keyframes dng-med-float{
+  0%,100%{top:285px;}
+  50%{top:263px;}
+}
+.dng-med-char::before{ /* aura glow */
+  content:'';position:absolute;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  width:88px;height:88px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,150,255,.28),rgba(140,60,255,.08) 55%,transparent 75%);
+  animation:dng-aura-pulse 2.4s ease-in-out infinite;z-index:-1;
+}
+@keyframes dng-aura-pulse{
+  0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(1);}
+  50%{opacity:1;transform:translate(-50%,-50%) scale(1.35);}
+}
+.dng-med-head{
+  width:16px;height:16px;border-radius:50%;
+  background:#9B6240;border:1.5px solid #7A4A28;position:relative;
+}
+.dng-med-head::before,.dng-med-head::after{
+  content:'';position:absolute;
+  top:4px;width:3.5px;height:3.5px;
+  border-radius:50%;background:rgba(255,255,255,.0);
+  transition:background .6s,box-shadow .6s;
+}
+.dng-med-head::before{left:2.5px;}
+.dng-med-head::after{right:2.5px;}
+.dng-med-char.meditating .dng-med-head::before,
+.dng-med-char.meditating .dng-med-head::after{
+  background:#fff;
+  box-shadow:0 0 7px rgba(255,255,255,.9),0 0 14px rgba(210,170,255,.9);
+}
+.dng-med-neck{width:5px;height:2px;background:#9B6240;}
+.dng-med-body{
+  width:22px;height:18px;
+  clip-path:polygon(0% 0%,100% 0%,82% 52%,82% 100%,18% 100%,18% 52%);
+  background:linear-gradient(to bottom,#1a1a30 0%,#1a1a30 52%,#252538 52%,#252538 100%);
+}
+
+/* meditation dims the room */
+.dungeon-wrap.meditating .dng-ceiling,
+.dungeon-wrap.meditating .dng-wall-l,
+.dungeon-wrap.meditating .dng-wall-r,
+.dungeon-wrap.meditating .dng-floor,
+.dungeon-wrap.meditating .dng-back{
+  filter:brightness(.55);transition:filter 1.4s ease;
+}
+/* meditation aura on floor */
+.dungeon-wrap.meditating::before{
+  content:'';position:absolute;
+  width:220px;height:220px;border-radius:50%;
+  top:250px;left:50%;transform:translateX(-50%);
+  background:radial-gradient(circle,rgba(180,100,255,.16),transparent 70%);
+  animation:dng-med-radiate 3s ease-in-out infinite;z-index:3;pointer-events:none;
+}
+@keyframes dng-med-radiate{
+  0%,100%{opacity:.6;transform:translateX(-50%) scale(1);}
+  50%{opacity:1;transform:translateX(-50%) scale(1.5);}
+}
+
+/* ── DUNGEON NAV BAR ── */
+.dng-nav{
+  position:absolute;bottom:0;left:0;right:0;z-index:10;
+  height:50px;
+  background:linear-gradient(to top,rgba(6,2,14,.97),rgba(6,2,14,.82));
+  border-top:1px solid rgba(110,60,190,.2);
+  display:flex;align-items:center;justify-content:space-between;padding:0 16px;
+}
+.dng-nav-btn{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(120,70,200,.25);
+  color:rgba(190,145,255,.7);
+  padding:7px 13px;border-radius:14px;
+  font-size:11px;font-weight:800;letter-spacing:.9px;
+  text-transform:uppercase;cursor:pointer;
+  display:flex;align-items:center;gap:5px;transition:all .2s;
+}
+.dng-nav-btn:hover{
+  border-color:rgba(167,139,250,.6);color:rgba(220,190,255,.92);
+  background:rgba(120,70,200,.12);
+}
+.dng-nav-title{
+  font-size:9px;letter-spacing:4.5px;text-transform:uppercase;
+  color:rgba(120,70,180,.45);font-weight:800;
+}
+
 /* ── MOBILE — scale the whole room as one unit ── */
 @media(max-width:700px){
   .stats-panel { display:none; }
@@ -1845,6 +2213,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
         <div class="door-knob"></div>
       </div>
 
+      <!-- Trapdoor — faint outline, click to descend -->
+      <div class="trapdoor" onclick="event.stopPropagation();showDungeonConfirm()" title=""></div>
+
       <!-- Character -->
       <div class="char" id="char" style="top:270px;left:175px">
         <div class="char-bubble" id="char-bubble">😮‍💨 Loading…</div>
@@ -1852,6 +2223,86 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
           <div class="char-head" id="char-head"></div>
           <div class="char-neck"></div>
           <div class="char-body" id="char-body"></div>
+        </div>
+      </div>
+
+      <!-- Dungeon confirm -->
+      <div class="dng-confirm" id="dng-confirm">
+        <div class="dng-confirm-card">
+          <div class="dng-confirm-icon">⬇</div>
+          <div class="dng-confirm-title">There&rsquo;s something beneath the floor.</div>
+          <div class="dng-confirm-sub">Do you really want to go down there?</div>
+          <div class="dng-confirm-btns">
+            <button class="dng-btn-yes" onclick="enterDungeon()">Descend</button>
+            <button class="dng-btn-no" onclick="hideDungeonConfirm()">Stay here</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DUNGEON BASEMENT -->
+      <div class="dungeon-wrap" id="dungeon-wrap">
+        <!-- perspective surfaces -->
+        <div class="dng-ceiling"></div>
+        <div class="dng-wall-l"></div>
+        <div class="dng-wall-r"></div>
+        <div class="dng-floor"></div>
+        <div class="dng-back"></div>
+
+        <!-- torches: left wall, right wall, back-wall flanks -->
+        <div class="dng-torch" style="top:110px;left:22px">
+          <div class="dng-torch-stick"></div>
+          <div class="dng-flames">
+            <div class="dng-flame dng-f-out"></div>
+            <div class="dng-flame dng-f-mid"></div>
+            <div class="dng-flame dng-f-core"></div>
+          </div>
+        </div>
+        <div class="dng-torch" style="top:110px;right:22px">
+          <div class="dng-torch-stick"></div>
+          <div class="dng-flames">
+            <div class="dng-flame dng-f-out"></div>
+            <div class="dng-flame dng-f-mid"></div>
+            <div class="dng-flame dng-f-core"></div>
+          </div>
+        </div>
+        <div class="dng-torch" style="top:106px;left:108px">
+          <div class="dng-torch-stick"></div>
+          <div class="dng-flames">
+            <div class="dng-flame dng-f-out"></div>
+            <div class="dng-flame dng-f-mid"></div>
+            <div class="dng-flame dng-f-core"></div>
+          </div>
+        </div>
+        <div class="dng-torch" style="top:106px;right:108px">
+          <div class="dng-torch-stick"></div>
+          <div class="dng-flames">
+            <div class="dng-flame dng-f-out"></div>
+            <div class="dng-flame dng-f-mid"></div>
+            <div class="dng-flame dng-f-core"></div>
+          </div>
+        </div>
+
+        <!-- photo grid on back wall -->
+        <div class="dng-photo-grid" id="dng-photos"></div>
+
+        <!-- meditation sigil on floor -->
+        <div class="dng-sigil" id="dng-sigil" onclick="toggleDungeonMeditate()">
+          <div class="dng-sigil-icon">🧘</div>
+          <div class="dng-sigil-txt">Meditate</div>
+        </div>
+
+        <!-- floating meditating character (hidden until meditation starts) -->
+        <div class="dng-med-char" id="dng-med-char">
+          <div class="dng-med-head" id="dng-med-head"></div>
+          <div class="dng-med-neck"></div>
+          <div class="dng-med-body"></div>
+        </div>
+
+        <!-- nav bar -->
+        <div class="dng-nav">
+          <button class="dng-nav-btn" onclick="exitDungeon()">⬆ Ascend</button>
+          <div class="dng-nav-title">The Dungeon</div>
+          <button class="dng-nav-btn" onclick="dngPromptAddPhoto()">📷 Add</button>
         </div>
       </div>
 
@@ -3444,6 +3895,168 @@ function _trInitCanvas() {
   }
   requestAnimationFrame(draw);
   window._trSetSpeed = v => { targetSpeed = v; };
+}
+
+// ─────────────────────────────────────────────
+//  DUNGEON BASEMENT
+// ─────────────────────────────────────────────
+
+function showDungeonConfirm() {
+  document.getElementById('dng-confirm')?.classList.add('show');
+}
+function hideDungeonConfirm() {
+  document.getElementById('dng-confirm')?.classList.remove('show');
+}
+
+function enterDungeon() {
+  hideDungeonConfirm();
+  const dng = document.getElementById('dungeon-wrap');
+  if (!dng) return;
+  // Sync character skin to dungeon char
+  const rHead = document.getElementById('char-head');
+  const dHead = document.getElementById('dng-med-head');
+  if (rHead && dHead) dHead.style.background = rHead.style.background || '#9B6240';
+  renderDungeonPhotos();
+  dng.classList.add('visible');
+  requestAnimationFrame(() => requestAnimationFrame(() => dng.classList.add('show')));
+}
+
+function exitDungeon() {
+  if (_dngMeditating) toggleDungeonMeditate(true);
+  const dng = document.getElementById('dungeon-wrap');
+  if (!dng) return;
+  dng.classList.remove('show');
+  setTimeout(() => { dng.classList.remove('visible'); }, 560);
+}
+
+// ── Meditation ──
+let _dngMeditating = false;
+let _dngMedTimer = null;
+
+function toggleDungeonMeditate(forceStop) {
+  _dngMeditating = forceStop ? false : !_dngMeditating;
+  const charEl = document.getElementById('dng-med-char');
+  const sigilEl = document.getElementById('dng-sigil');
+  const wrap = document.getElementById('dungeon-wrap');
+
+  if (_dngMeditating) {
+    charEl?.classList.add('show');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      charEl?.classList.add('floating','meditating');
+    }));
+    sigilEl?.classList.add('active');
+    wrap?.classList.add('meditating');
+    // update bubble in bedroom
+    const bubble = document.getElementById('char-bubble');
+    if (bubble) bubble.textContent = '🧘 Transcending…';
+  } else {
+    charEl?.classList.remove('floating','meditating');
+    setTimeout(() => { if (!_dngMeditating) charEl?.classList.remove('show'); }, 900);
+    sigilEl?.classList.remove('active');
+    wrap?.classList.remove('meditating');
+    const bubble = document.getElementById('char-bubble');
+    if (bubble) bubble.textContent = '';
+  }
+}
+
+// ── Photos ──
+let _dngPhotos = {};
+const _DNG_SLOTS = 6;
+
+function _dngLoadPhotos() {
+  try { _dngPhotos = JSON.parse(localStorage.getItem('dungeon_photos') || '{}'); }
+  catch(e) { _dngPhotos = {}; }
+}
+
+function renderDungeonPhotos() {
+  _dngLoadPhotos();
+  const grid = document.getElementById('dng-photos');
+  if (!grid) return;
+  grid.innerHTML = '';
+  for (let i = 0; i < _DNG_SLOTS; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'dng-photo-slot';
+    if (_dngPhotos[i]) {
+      const img = document.createElement('img');
+      img.src = _dngPhotos[i];
+      slot.appendChild(img);
+      // Long-press to remove
+      let pressT;
+      const startPress = () => { pressT = setTimeout(() => removeDungeonPhoto(i), 700); };
+      const endPress = () => clearTimeout(pressT);
+      slot.addEventListener('touchstart', startPress);
+      slot.addEventListener('touchend', endPress);
+      slot.addEventListener('mousedown', startPress);
+      slot.addEventListener('mouseup', endPress);
+    } else {
+      slot.innerHTML = '<span class="dng-slot-plus">+</span>';
+      slot.onclick = () => dngAddPhoto(i);
+    }
+    grid.appendChild(slot);
+  }
+}
+
+let _dngPhotoInput = null;
+let _dngTargetSlot = 0;
+
+function dngPromptAddPhoto() {
+  // Pick first empty slot, or slot 0
+  _dngLoadPhotos();
+  _dngTargetSlot = 0;
+  for (let i = 0; i < _DNG_SLOTS; i++) {
+    if (!_dngPhotos[i]) { _dngTargetSlot = i; break; }
+  }
+  _dngOpenPicker();
+}
+
+function dngAddPhoto(slotIdx) {
+  _dngTargetSlot = slotIdx;
+  _dngOpenPicker();
+}
+
+function _dngOpenPicker() {
+  if (!_dngPhotoInput || !document.body.contains(_dngPhotoInput)) {
+    _dngPhotoInput = document.createElement('input');
+    _dngPhotoInput.type = 'file';
+    _dngPhotoInput.accept = 'image/*';
+    _dngPhotoInput.style.cssText = 'position:fixed;opacity:0;width:1px;height:1px;top:-9999px;left:-9999px;';
+    _dngPhotoInput.addEventListener('change', _dngPhotoSelected);
+    document.body.appendChild(_dngPhotoInput);
+  }
+  _dngPhotoInput.value = '';
+  _dngPhotoInput.click();
+}
+
+function _dngPhotoSelected() {
+  const file = _dngPhotoInput?.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const max = 600;
+      let w = img.width, h = img.height;
+      if (w > max || h > max) {
+        const r = Math.min(max/w, max/h);
+        w = Math.round(w*r); h = Math.round(h*r);
+      }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      _dngPhotos[_dngTargetSlot] = canvas.toDataURL('image/jpeg', .82);
+      try { localStorage.setItem('dungeon_photos', JSON.stringify(_dngPhotos)); } catch(err) {}
+      renderDungeonPhotos();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeDungeonPhoto(slotIdx) {
+  _dngLoadPhotos();
+  delete _dngPhotos[slotIdx];
+  try { localStorage.setItem('dungeon_photos', JSON.stringify(_dngPhotos)); } catch(e) {}
+  renderDungeonPhotos();
 }
 
 // ─────────────────────────────────────────────
