@@ -351,14 +351,46 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   animation:screenFlicker 4s ease-in-out infinite;border-radius:1px;
 }
 @keyframes screenFlicker{0%,100%{opacity:.5;}50%{opacity:1;}}
-/* corner speakers */
+/* corner speakers — clickable to upload transcendence music */
 .d-spkr{
   position:absolute;top:12px;width:18px;height:20px;
   background:linear-gradient(180deg,#1e1e1e,#141414);
   border:1px solid #333;border-radius:2px;
+  cursor:pointer;pointer-events:auto;
+  transition:border-color .3s,box-shadow .3s;
+  z-index:2;
+}
+.d-spkr:hover{border-color:rgba(160,110,255,.5);box-shadow:0 0 8px rgba(140,80,255,.3);}
+.d-spkr.has-music{
+  border-color:rgba(160,110,255,.55);
+  box-shadow:0 0 10px rgba(140,80,255,.45),0 0 4px rgba(180,130,255,.35);
+}
+/* speaker grille dots */
+.d-spkr::before{
+  content:'';position:absolute;
+  inset:3px 2px;
+  background:radial-gradient(circle,#2a2a2a 1.5px,transparent 1.5px);
+  background-size:4px 4px;
+  border-radius:1px;
+  opacity:.7;
 }
 .d-spkr-l{left:4px;}
 .d-spkr-r{right:4px;}
+/* toast confirmation */
+.tr-music-toast{
+  position:absolute;bottom:22px;left:50%;
+  transform:translateX(-50%);
+  background:rgba(14,6,28,.93);
+  border:1px solid rgba(140,80,220,.45);
+  border-radius:20px;padding:6px 14px;
+  font-size:10px;color:rgba(210,180,255,.95);
+  white-space:nowrap;z-index:200;pointer-events:none;
+  animation:tr-toast-in .35s ease;
+}
+@keyframes tr-toast-in{
+  from{opacity:0;transform:translateX(-50%) translateY(8px);}
+  to{opacity:1;transform:translateX(-50%) translateY(0);}
+}
 /* mac mini — clickable independently */
 .d-mini{
   position:absolute;top:34px;right:4px;width:14px;height:14px;
@@ -2154,9 +2186,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <!-- Desk -->
       <div class="desk" onclick="showDeskMenu(event)" title="Click — what are you doing?">
         <div class="d-strip"></div>
-        <div class="d-spkr d-spkr-l"></div>
+        <div class="d-spkr d-spkr-l" id="spkr-l" onclick="showTranscendenceMusicPicker(event)" title="Upload transcendence music"></div>
         <div class="d-monitor" id="monitor"></div>
-        <div class="d-spkr d-spkr-r"></div>
+        <div class="d-spkr d-spkr-r" id="spkr-r" onclick="showTranscendenceMusicPicker(event)" title="Upload transcendence music"></div>
         <div class="d-mini" id="d-mini" onclick="toggleMini(event)" title="Mac Mini — click to turn on/off"></div>
         <div class="d-kbd"></div>
         <div class="d-kbd d-kbd2"></div>
@@ -3810,10 +3842,92 @@ const _TR_SCENES = [
 let _trIdx = 0;
 let _trSpeed = 1;
 
+// ── TRANSCENDENCE MUSIC ─────────────────────────────────────────────────────
+window._trAudio    = null;   // current Audio object
+window._trAudioUrl = null;   // blob URL for the loaded MP3
+
+function _trOpenDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('life-os-music', 1);
+    req.onupgradeneeded = e => {
+      e.target.result.createObjectStore('music', {keyPath: 'id'});
+    };
+    req.onsuccess  = e => resolve(e.target.result);
+    req.onerror    = e => reject(e.target.error);
+  });
+}
+
+async function _trLoadStoredAudio() {
+  try {
+    const db   = await _trOpenDB();
+    const tx   = db.transaction('music', 'readonly');
+    const req  = tx.objectStore('music').get('transcendence');
+    req.onsuccess = () => {
+      if (!req.result) return;
+      const blob = new Blob([req.result.data], {type: req.result.mime || 'audio/mpeg'});
+      window._trAudioUrl = URL.createObjectURL(blob);
+      document.querySelectorAll('.d-spkr').forEach(el => el.classList.add('has-music'));
+    };
+  } catch(e) { /* IndexedDB unavailable — silent fail */ }
+}
+
+async function _trSaveAudio(arrayBuffer, filename, mime) {
+  try {
+    const db  = await _trOpenDB();
+    const tx  = db.transaction('music', 'readwrite');
+    tx.objectStore('music').put({id: 'transcendence', data: arrayBuffer, filename, mime});
+  } catch(e) { /* silent fail */ }
+}
+
+function showTranscendenceMusicPicker(e) {
+  e.stopPropagation();
+  // reuse a persistent hidden input (iOS-safe pattern)
+  let inp = document.getElementById('_tr-music-inp');
+  if (!inp) {
+    inp = document.createElement('input');
+    inp.type = 'file';
+    inp.id   = '_tr-music-inp';
+    inp.accept = 'audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/*';
+    inp.style.cssText = 'position:fixed;top:-999px;left:-999px;opacity:0;pointer-events:none;';
+    document.body.appendChild(inp);
+  }
+  inp.onchange = async () => {
+    const file = inp.files[0];
+    if (!file) return;
+    const buf = await file.arrayBuffer();
+    // revoke old blob URL to free memory
+    if (window._trAudioUrl) URL.revokeObjectURL(window._trAudioUrl);
+    const blob = new Blob([buf], {type: file.type || 'audio/mpeg'});
+    window._trAudioUrl = URL.createObjectURL(blob);
+    _trSaveAudio(buf, file.name, file.type || 'audio/mpeg');
+    document.querySelectorAll('.d-spkr').forEach(el => el.classList.add('has-music'));
+    // show confirmation toast in the room
+    const room = document.querySelector('.room-wrap') || document.querySelector('.room') || document.body;
+    const toast = document.createElement('div');
+    toast.className = 'tr-music-toast';
+    toast.textContent = '🎵 ' + file.name;
+    room.style.position = room.style.position || 'relative';
+    room.appendChild(toast);
+    setTimeout(() => toast.remove(), 3200);
+    inp.value = '';
+  };
+  inp.click();
+}
+
+// load any previously stored audio on startup
+_trLoadStoredAudio();
+// ────────────────────────────────────────────────────────────────────────────
+
 function _trClose() {
   document.getElementById('transcend-modal')?.remove();
   document.querySelector('.tr-flash')?.remove();
   document.querySelector('.room-cat')?.classList.remove('cat-awake');
+  // stop transcendence music
+  if (window._trAudio) {
+    window._trAudio.pause();
+    window._trAudio.currentTime = 0;
+    window._trAudio = null;
+  }
 }
 
 function showTranscendence() {
@@ -3865,6 +3979,13 @@ function showTranscendence() {
       _trInitCanvas();
       _trIdx = 0;
       _trShowScene(0);
+      // play transcendence music (once, no loop)
+      if (window._trAudioUrl) {
+        window._trAudio = new Audio(window._trAudioUrl);
+        window._trAudio.loop = false;
+        window._trAudio.volume = 0.82;
+        window._trAudio.play().catch(() => {});
+      }
 
       // 4. Fade flash out, reveal modal
       setTimeout(() => {
