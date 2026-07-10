@@ -1138,25 +1138,39 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
    DUNGEON BASEMENT
    ══════════════════════════════════════════════ */
 
-/* ── TRAPDOOR (bedroom floor) ── */
+/* ── TRAPDOOR — footprint marks (left side of floor) ── */
 .trapdoor{
-  position:absolute;top:456px;left:185px;
-  width:54px;height:36px;z-index:7;cursor:pointer;
-  border:1.5px dashed rgba(110,55,180,.2);
-  border-radius:3px;
-  transition:border-color .3s,box-shadow .3s;
-}
-.trapdoor::before{ /* cross-bar handle */
-  content:'';position:absolute;
-  bottom:9px;left:50%;transform:translateX(-50%);
-  width:20px;height:2px;
-  background:rgba(110,55,180,.18);border-radius:2px;
-  box-shadow:0 -5px 0 rgba(110,55,180,.12);
+  position:absolute;top:418px;left:24px;
+  width:34px;height:52px;z-index:7;cursor:pointer;
+  border:none;background:none;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  transition:filter .3s;
 }
 .trapdoor:hover{
-  border-color:rgba(160,100,255,.7);
-  box-shadow:0 0 16px rgba(120,55,220,.4),inset 0 0 8px rgba(100,45,180,.1);
+  filter:drop-shadow(0 0 7px rgba(160,100,255,.75)) brightness(1.6);
 }
+.td-pair{
+  display:flex;align-items:flex-end;gap:6px;
+}
+.td-pair-2{
+  transform:translateX(4px); /* slight stagger = walking feel */
+}
+.td-foot{
+  width:10px;height:17px;
+  border:1.5px solid rgba(110,55,180,.28);
+  border-radius:4px 4px 2px 2px;
+  position:relative;
+}
+/* toe bump */
+.td-foot::before{
+  content:'';position:absolute;
+  top:-2px;left:1px;right:1px;height:5px;
+  border:1.5px solid rgba(110,55,180,.2);
+  border-radius:50% 50% 0 0;
+  border-bottom:none;
+}
+.td-foot-l{transform:rotate(-7deg);}
+.td-foot-r{transform:rotate(7deg);}
 
 /* ── DUNGEON CONFIRM MODAL ── */
 .dng-confirm{
@@ -1218,64 +1232,40 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .dungeon-wrap.visible{display:block;}
 .dungeon-wrap.show{opacity:1;transform:translateY(0) scale(1);}
 
-/* stone block texture (shared) */
-.dng-stone{
-  background-image:
-    repeating-linear-gradient(0deg,transparent,transparent 26px,rgba(0,0,0,.22) 26px,rgba(0,0,0,.22) 28px),
-    repeating-linear-gradient(90deg,transparent,transparent 34px,rgba(0,0,0,.14) 34px,rgba(0,0,0,.14) 36px);
-  background-size:36px 28px;
-}
-
-/* ── Perspective room surfaces ── */
+/* ── Perspective room surfaces — solid fills only, lines drawn by SVG overlay ── */
 /* back wall inner rectangle: 25.6%–74.4% x, 12.7%–48% y
    = pixel equiv: 110–320 x, 65–245 y on a 430×510 canvas */
 .dng-ceiling{
   position:absolute;inset:0;
   clip-path:polygon(0% 0%,100% 0%,74.4% 12.7%,25.6% 12.7%);
-  background-color:#120a20;
-  background-image:
-    repeating-linear-gradient(0deg,transparent,transparent 26px,rgba(0,0,0,.28) 26px,rgba(0,0,0,.28) 28px),
-    repeating-linear-gradient(90deg,transparent,transparent 34px,rgba(0,0,0,.18) 34px,rgba(0,0,0,.18) 36px);
-  background-size:36px 28px;
+  background:#0e0820;
 }
 .dng-wall-l{
   position:absolute;inset:0;
   clip-path:polygon(0% 0%,25.6% 12.7%,25.6% 48%,0% 100%);
-  background-color:#0d0618;
-  background-image:
-    repeating-linear-gradient(0deg,transparent,transparent 26px,rgba(0,0,0,.32) 26px,rgba(0,0,0,.32) 28px),
-    repeating-linear-gradient(90deg,transparent,transparent 34px,rgba(0,0,0,.2) 34px,rgba(0,0,0,.2) 36px);
-  background-size:36px 28px;
+  background:linear-gradient(to right,#080414,#100820);
 }
 .dng-wall-r{
   position:absolute;inset:0;
   clip-path:polygon(74.4% 12.7%,100% 0%,100% 100%,74.4% 48%);
-  background-color:#0d0618;
-  background-image:
-    repeating-linear-gradient(0deg,transparent,transparent 26px,rgba(0,0,0,.32) 26px,rgba(0,0,0,.32) 28px),
-    repeating-linear-gradient(90deg,transparent,transparent 34px,rgba(0,0,0,.2) 34px,rgba(0,0,0,.2) 36px);
-  background-size:36px 28px;
+  background:linear-gradient(to left,#080414,#100820);
 }
 .dng-floor{
   position:absolute;inset:0;
   clip-path:polygon(25.6% 48%,74.4% 48%,100% 100%,0% 100%);
-  background:linear-gradient(to bottom,#1c1030 0%,#0b0620 100%);
-  background-image:
-    repeating-linear-gradient(90deg,transparent,transparent 44px,rgba(255,255,255,.025) 44px,rgba(255,255,255,.025) 46px);
+  background:linear-gradient(to top,#0b0620 0%,#1a1030 100%);
 }
 .dng-back{
   position:absolute;
   top:12.7%;left:25.6%;right:25.6%;
-  height:35.3%; /* 48%-12.7% */
-  background-color:#160c26;
-  background-image:
-    repeating-linear-gradient(0deg,transparent,transparent 24px,rgba(0,0,0,.2) 24px,rgba(0,0,0,.2) 26px),
-    repeating-linear-gradient(90deg,transparent,transparent 32px,rgba(0,0,0,.12) 32px,rgba(0,0,0,.12) 34px);
-  background-size:34px 26px;
-  border:1px solid rgba(90,40,150,.25);
-  box-shadow:
-    inset 0 0 50px rgba(100,40,180,.1),
-    0 0 30px rgba(100,40,180,.08);
+  height:35.3%;
+  background:#160c26;
+  box-shadow:inset 0 0 50px rgba(100,40,180,.1),0 0 30px rgba(100,40,180,.08);
+}
+/* SVG perspective-line overlay */
+.dng-lines{
+  position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none;z-index:4;overflow:visible;
 }
 
 /* ── TORCHES ── */
@@ -2214,7 +2204,16 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       </div>
 
       <!-- Trapdoor — faint outline, click to descend -->
-      <div class="trapdoor" onclick="event.stopPropagation();showDungeonConfirm()" title=""></div>
+      <div class="trapdoor" onclick="event.stopPropagation();showDungeonConfirm()" title="">
+        <div class="td-pair">
+          <div class="td-foot td-foot-l"></div>
+          <div class="td-foot td-foot-r"></div>
+        </div>
+        <div class="td-pair td-pair-2">
+          <div class="td-foot td-foot-l"></div>
+          <div class="td-foot td-foot-r"></div>
+        </div>
+      </div>
 
       <!-- Character -->
       <div class="char" id="char" style="top:270px;left:175px">
@@ -2247,6 +2246,103 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
         <div class="dng-wall-r"></div>
         <div class="dng-floor"></div>
         <div class="dng-back"></div>
+        <!-- Perspective lines SVG overlay — correct orientation per surface -->
+        <svg class="dng-lines" viewBox="0 0 430 510" xmlns="http://www.w3.org/2000/svg">
+          <!-- ═══ BOLD CORNER EDGES (most visible) ═══ -->
+          <g stroke="#a870e0" stroke-linecap="round">
+            <!-- 4 diagonal room edges converging to back wall corners -->
+            <line x1="0"   y1="0"   x2="110" y2="65"  stroke-width="2.2" opacity=".75"/>
+            <line x1="430" y1="0"   x2="320" y2="65"  stroke-width="2.2" opacity=".75"/>
+            <line x1="0"   y1="510" x2="110" y2="245" stroke-width="2.2" opacity=".75"/>
+            <line x1="430" y1="510" x2="320" y2="245" stroke-width="2.2" opacity=".75"/>
+            <!-- Back wall frame (most prominent) -->
+            <rect x="110" y="65" width="210" height="180" fill="none"
+                  stroke="#b888ee" stroke-width="2.5" opacity=".72"/>
+            <!-- Screen top/bottom outer edges -->
+            <line x1="0" y1="0"   x2="430" y2="0"   stroke-width="1.5" opacity=".38"/>
+            <line x1="0" y1="510" x2="430" y2="510" stroke-width="1.5" opacity=".38"/>
+          </g>
+
+          <!-- ═══ LEFT WALL — horizontal stone lines converging right ═══ -->
+          <!-- Formula: left=(0, H×510) → right=(110, 65+H×180) -->
+          <g stroke="#6830a8" stroke-width="1" opacity=".32">
+            <line x1="0" y1="51"  x2="110" y2="83"/>
+            <line x1="0" y1="102" x2="110" y2="101"/>
+            <line x1="0" y1="153" x2="110" y2="119"/>
+            <line x1="0" y1="204" x2="110" y2="137"/>
+            <line x1="0" y1="255" x2="110" y2="155"/>
+            <line x1="0" y1="306" x2="110" y2="173"/>
+            <line x1="0" y1="357" x2="110" y2="191"/>
+            <line x1="0" y1="408" x2="110" y2="209"/>
+            <line x1="0" y1="459" x2="110" y2="227"/>
+          </g>
+
+          <!-- ═══ RIGHT WALL — horizontal stone lines converging left ═══ -->
+          <!-- Formula: right=(430, H×510) → left=(320, 65+H×180) -->
+          <g stroke="#6830a8" stroke-width="1" opacity=".32">
+            <line x1="430" y1="51"  x2="320" y2="83"/>
+            <line x1="430" y1="102" x2="320" y2="101"/>
+            <line x1="430" y1="153" x2="320" y2="119"/>
+            <line x1="430" y1="204" x2="320" y2="137"/>
+            <line x1="430" y1="255" x2="320" y2="155"/>
+            <line x1="430" y1="306" x2="320" y2="173"/>
+            <line x1="430" y1="357" x2="320" y2="191"/>
+            <line x1="430" y1="408" x2="320" y2="209"/>
+            <line x1="430" y1="459" x2="320" y2="227"/>
+          </g>
+
+          <!-- ═══ CEILING — lines converge toward back edge (y=65) ═══ -->
+          <!-- Cross-section lines (closer together near back = smaller spacing) -->
+          <g stroke="#6830a8" stroke-width=".8" opacity=".22">
+            <line x1="28"  y1="16" x2="403" y2="16"/>
+            <line x1="55"  y1="33" x2="375" y2="33"/>
+            <line x1="83"  y1="49" x2="348" y2="49"/>
+            <!-- Radial convergence lines front→back -->
+            <line x1="50"  y1="0" x2="131" y2="65"/>
+            <line x1="100" y1="0" x2="152" y2="65"/>
+            <line x1="150" y1="0" x2="173" y2="65"/>
+            <line x1="215" y1="0" x2="215" y2="65"/>
+            <line x1="280" y1="0" x2="257" y2="65"/>
+            <line x1="330" y1="0" x2="278" y2="65"/>
+            <line x1="380" y1="0" x2="299" y2="65"/>
+          </g>
+
+          <!-- ═══ FLOOR — lines radiate from vanishing pt (215,245) ═══ -->
+          <g stroke="#6830a8" stroke-width="1" opacity=".3">
+            <!-- Radial depth lines converging to vanishing point -->
+            <line x1="215" y1="245" x2="0"   y2="510"/>
+            <line x1="215" y1="245" x2="55"  y2="510"/>
+            <line x1="215" y1="245" x2="110" y2="510"/>
+            <line x1="215" y1="245" x2="160" y2="510"/>
+            <line x1="215" y1="245" x2="215" y2="510"/>
+            <line x1="215" y1="245" x2="270" y2="510"/>
+            <line x1="215" y1="245" x2="320" y2="510"/>
+            <line x1="215" y1="245" x2="375" y2="510"/>
+            <line x1="215" y1="245" x2="430" y2="510"/>
+            <!-- Cross-section lines (wider as depth increases toward viewer) -->
+            <!-- D=0.2: y=298, D=0.4: y=351, D=0.6: y=404, D=0.8: y=457 -->
+            <line x1="88"  y1="298" x2="342" y2="298"/>
+            <line x1="66"  y1="351" x2="364" y2="351"/>
+            <line x1="44"  y1="404" x2="386" y2="404"/>
+            <line x1="22"  y1="457" x2="408" y2="457"/>
+          </g>
+
+          <!-- ═══ BACK WALL — face-on stone grid (no perspective needed) ═══ -->
+          <g stroke="#6830a8" stroke-width=".85" opacity=".22">
+            <!-- Horizontal courses -->
+            <line x1="110" y1="95"  x2="320" y2="95"/>
+            <line x1="110" y1="125" x2="320" y2="125"/>
+            <line x1="110" y1="155" x2="320" y2="155"/>
+            <line x1="110" y1="185" x2="320" y2="185"/>
+            <line x1="110" y1="215" x2="320" y2="215"/>
+            <!-- Vertical joints -->
+            <line x1="145" y1="65" x2="145" y2="245"/>
+            <line x1="180" y1="65" x2="180" y2="245"/>
+            <line x1="215" y1="65" x2="215" y2="245"/>
+            <line x1="250" y1="65" x2="250" y2="245"/>
+            <line x1="285" y1="65" x2="285" y2="245"/>
+          </g>
+        </svg>
 
         <!-- torches: left wall, right wall, back-wall flanks -->
         <div class="dng-torch" style="top:110px;left:22px">
