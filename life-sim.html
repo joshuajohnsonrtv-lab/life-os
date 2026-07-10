@@ -1138,22 +1138,16 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
    DUNGEON BASEMENT
    ══════════════════════════════════════════════ */
 
-/* ── TRAPDOOR — footprint marks (left side of floor) ── */
+/* ── TRAPDOOR — two shoe outlines (mid left wall of bedroom) ── */
 .trapdoor{
-  position:absolute;top:418px;left:24px;
-  width:34px;height:52px;z-index:7;cursor:pointer;
+  position:absolute;top:238px;left:10px;
+  width:30px;height:22px;z-index:7;cursor:pointer;
   border:none;background:none;
-  display:flex;flex-direction:column;align-items:center;gap:5px;
+  display:flex;align-items:flex-end;justify-content:center;gap:6px;
   transition:filter .3s;
 }
 .trapdoor:hover{
   filter:drop-shadow(0 0 7px rgba(160,100,255,.75)) brightness(1.6);
-}
-.td-pair{
-  display:flex;align-items:flex-end;gap:6px;
-}
-.td-pair-2{
-  transform:translateX(4px); /* slight stagger = walking feel */
 }
 .td-foot{
   width:10px;height:17px;
@@ -1273,7 +1267,12 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   position:absolute;z-index:6;
   display:flex;flex-direction:column;align-items:center;
   pointer-events:none;
+  transform-origin:bottom center;
 }
+/* near torches (outer walls, closer to camera) = bigger */
+.dng-torch-near{transform:scale(1.5);z-index:7;}
+/* far torches (near back wall, further away) = smaller */
+.dng-torch-far{transform:scale(0.65);}
 /* torch glow on wall */
 .dng-torch::before{
   content:'';position:absolute;
@@ -2205,14 +2204,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
       <!-- Trapdoor — faint outline, click to descend -->
       <div class="trapdoor" onclick="event.stopPropagation();showDungeonConfirm()" title="">
-        <div class="td-pair">
-          <div class="td-foot td-foot-l"></div>
-          <div class="td-foot td-foot-r"></div>
-        </div>
-        <div class="td-pair td-pair-2">
-          <div class="td-foot td-foot-l"></div>
-          <div class="td-foot td-foot-r"></div>
-        </div>
+        <div class="td-foot td-foot-l"></div>
+        <div class="td-foot td-foot-r"></div>
       </div>
 
       <!-- Character -->
@@ -2344,8 +2337,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
           </g>
         </svg>
 
-        <!-- torches: left wall, right wall, back-wall flanks -->
-        <div class="dng-torch" style="top:110px;left:22px">
+        <!-- torches: near (outer walls, bigger) + far (back-wall flanks, smaller) -->
+        <!-- near-left: on the left wall ~25% down, close to camera = largest -->
+        <div class="dng-torch dng-torch-near" style="top:118px;left:22px">
           <div class="dng-torch-stick"></div>
           <div class="dng-flames">
             <div class="dng-flame dng-f-out"></div>
@@ -2353,7 +2347,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
             <div class="dng-flame dng-f-core"></div>
           </div>
         </div>
-        <div class="dng-torch" style="top:110px;right:22px">
+        <!-- near-right: mirror on right wall -->
+        <div class="dng-torch dng-torch-near" style="top:118px;right:22px">
           <div class="dng-torch-stick"></div>
           <div class="dng-flames">
             <div class="dng-flame dng-f-out"></div>
@@ -2361,7 +2356,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
             <div class="dng-flame dng-f-core"></div>
           </div>
         </div>
-        <div class="dng-torch" style="top:106px;left:108px">
+        <!-- far-left: at back-wall left corner, further away = smallest -->
+        <div class="dng-torch dng-torch-far" style="top:74px;left:114px">
           <div class="dng-torch-stick"></div>
           <div class="dng-flames">
             <div class="dng-flame dng-f-out"></div>
@@ -2369,7 +2365,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
             <div class="dng-flame dng-f-core"></div>
           </div>
         </div>
-        <div class="dng-torch" style="top:106px;right:108px">
+        <!-- far-right: at back-wall right corner -->
+        <div class="dng-torch dng-torch-far" style="top:74px;right:114px">
           <div class="dng-torch-stick"></div>
           <div class="dng-flames">
             <div class="dng-flame dng-f-out"></div>
