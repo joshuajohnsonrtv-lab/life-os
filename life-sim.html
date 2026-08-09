@@ -5078,6 +5078,28 @@ function manualSave() {
 // Call scaleRoom multiple times to survive iframe
 // layout timing — first call is immediate, then
 // retries after paint/layout settle.
+// ── ONE-TIME FULL DATA RESET (schema v3) ─────────────────────────────────
+// Runs ONCE on the first open after this version is deployed, then never again.
+(function _schemaReset() {
+  const SCHEMA = '3';
+  if (localStorage.getItem('_life_os_schema') === SCHEMA) return;
+  // Wipe every known localStorage key
+  const KEYS = [
+    'dungeon_photos','life_os_firebase_config','life_os_firebase_key',
+    'life_sim_activity_log','life_sim_food','life_sim_month_target',
+    'life_sim_poster','life_sim_runtime','life_sim_todo_tmpls',
+    'life_sim_todos','life_sim_walks','money_os_data',
+    'sim_firebase_config','sim_firebase_key','sim_saved_at',
+    'wellness_data','life_sim_challenge','life_sim_challenge_log'
+  ];
+  KEYS.forEach(k => localStorage.removeItem(k));
+  // Wipe IndexedDB music store
+  try { indexedDB.deleteDatabase('life-os-music'); } catch(e) {}
+  // Lock so this never runs again
+  localStorage.setItem('_life_os_schema', SCHEMA);
+})();
+// ─────────────────────────────────────────────────────────────────────────────
+
 scaleRoom();
 setTimeout(scaleRoom, 60);
 setTimeout(scaleRoom, 250);
