@@ -4326,214 +4326,108 @@ _trLoadStoredAudio();
 //  TOPOGRAPHIC TEXTURE — marching squares on a multi-octave sine heightfield
 //  Generates proper organic contour lines matching the reference aesthetic.
 // ══════════════════════════════════════════════════════════════════════════════
-(function _initTopoTexture() {
-  // Retina-crisp: render at physical pixel resolution, display at CSS_SIZE px
-  const DPR = Math.min(Math.ceil(window.devicePixelRatio || 2), 3);
-  const CSS_SIZE = 600;                        // CSS display size (px)
-  const W = CSS_SIZE * Math.max(DPR, 2);       // min 2× (1200), max 3× (1800)
-  const H = W;
-  const CELL = 2;                              // canvas px per grid cell
-  // Frequency multiplier: keeps same visual hill scale regardless of resolution.
-  // old was 0.30 with CELL=3 and background-size=640px (≈1 CSS px per cell).
-  // New: 1 cell = CELL*(CSS_SIZE/W) CSS px. Scale mult so CSS freq stays constant.
-  const FMUL = 0.10 * (3 / CELL) * (W / (CSS_SIZE * 2));
-  const canvas = document.createElement('canvas');
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
+(function _initGradientTheme() {
+  // Smooth diagonal gradient — same black/grey/white palette, no lines or texture.
+  // Starts and ends at the same dark value so it tiles seamlessly with background-repeat.
+  const grad = 'linear-gradient(135deg,#050505 0%,#0c0c0c 25%,#181818 50%,#0c0c0c 75%,#050505 100%)';
+  document.documentElement.style.setProperty('--topo-img', grad);
 
-  // ── 1. Pure black base ──
-  ctx.fillStyle = '#020202';
-  ctx.fillRect(0, 0, W, H);
-
-  // ── 2. Build height field with stacked sine waves (approximates Perlin noise) ──
-  const cols = Math.floor(W / CELL) + 2;
-  const rows = Math.floor(H / CELL) + 2;
-  const field = new Float32Array(cols * rows);
-  let fmin = Infinity, fmax = -Infinity;
-
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const x = c * FMUL, y = r * FMUL;
-      const v =
-        Math.sin(x * 0.17 + 0.52) * Math.cos(y * 0.22 + 1.35)         // broad hills
-      + Math.sin(x * 0.08 - y * 0.11 + 2.74) * 0.70                   // large ridges
-      + Math.sin(x * 0.33 + y * 0.25 - 0.83) * 0.42                   // medium detail
-      + Math.sin(x * 0.54 - y * 0.40 + 4.12) * 0.24                   // fine ridges
-      + Math.sin(x * 0.81 + y * 0.67 + 0.88) * 0.13                   // finer detail
-      + Math.sin(x * 1.26 - y * 1.00 + 2.40) * 0.07                   // high freq
-      + Math.sin(x * 1.95 + y * 1.54 + 3.77) * 0.035;                 // finest
-      field[r * cols + c] = v;
-      if (v < fmin) fmin = v;
-      if (v > fmax) fmax = v;
-    }
-  }
-
-  const range = (fmax - fmin) || 1;
-  const nrm = i => (field[i] - fmin) / range;
-
-  // ── 3. Marching squares — draw contour lines at each level ──
-  function lerp01(a, b, t) {
-    const d = b - a;
-    return Math.abs(d) < 1e-9 ? 0.5 : Math.max(0, Math.min(1, (t - a) / d));
-  }
-
-  function marchLevel(t, strokeColor, lw) {
-    ctx.beginPath();
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = lw;
-    for (let r = 0; r < rows - 1; r++) {
-      for (let c = 0; c < cols - 1; c++) {
-        const a = nrm(r * cols + c);
-        const b = nrm(r * cols + c + 1);
-        const cc = nrm((r + 1) * cols + c + 1);
-        const d = nrm((r + 1) * cols + c);
-        const mask = (a >= t ? 8 : 0) | (b >= t ? 4 : 0) | (cc >= t ? 2 : 0) | (d >= t ? 1 : 0);
-        if (!mask || mask === 15) continue;
-
-        const px = c * CELL, py = r * CELL;
-        const ps = px + CELL, pq = py + CELL;
-        const eT = px + lerp01(a, b, t) * CELL;
-        const eR = py + lerp01(b, cc, t) * CELL;
-        const eB = px + lerp01(d, cc, t) * CELL;
-        const eL = py + lerp01(a, d, t) * CELL;
-
-        const mv = (ax, ay, bx, by) => { ctx.moveTo(ax, ay); ctx.lineTo(bx, by); };
-        switch (mask) {
-          case 1:  case 14: mv(px, eL, eB, pq); break;
-          case 2:  case 13: mv(eB, pq, ps, eR); break;
-          case 3:  case 12: mv(px, eL, ps, eR); break;
-          case 4:  case 11: mv(eT, py, ps, eR); break;
-          case 5:           mv(eT, py, px, eL); mv(eB, pq, ps, eR); break;
-          case 6:  case 9:  mv(eT, py, eB, pq); break;
-          case 7:  case 8:  mv(eT, py, px, eL); break;
-          case 10:          mv(eT, py, ps, eR); mv(px, eL, eB, pq); break;
-        }
-      }
-    }
-    ctx.stroke();
-  }
-
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-
-  // White contour lines — 28 levels, alpha ramps up toward peaks
-  const N = 28;
-  for (let li = 0; li < N; li++) {
-    const t = (li + 0.5) / N;
-    const a = (0.09 + Math.pow(t, 0.55) * 0.58).toFixed(3);
-    const lw = 0.5 + t * 0.6;
-    marchLevel(t, `rgba(222,222,230,${a})`, lw);
-  }
-
-  // Subtle blue-grey shimmer on mid-range levels (matches the reference)
-  for (let li = 8; li < 20; li++) {
-    const t = (li + 0.5) / N;
-    marchLevel(t, `rgba(140,165,220,0.11)`, 0.9);
-  }
-
-  // ── 4. Push to CSS variable so all rules can reference it once ──
-  const dataUrl = canvas.toDataURL('image/png');
-  document.documentElement.style.setProperty('--topo-img', `url("${dataUrl}")`);
-
-  // ── 5. Inject style rules — topo applied everywhere ──
-  // CSS_SIZE = display size in CSS px (canvas is 2-3× larger for crisp Retina rendering)
-  const S  = CSS_SIZE + 'px ' + CSS_SIZE + 'px';       // e.g. "600px 600px"
-  const Sh = (CSS_SIZE / 2) + 'px ' + (CSS_SIZE / 2) + 'px'; // e.g. "300px 300px"
+  // ── Inject style rules — gradient applied everywhere ──
   const st = document.createElement('style');
   st.id = '__topo-style';
   st.textContent = `
-    /* body — pure topo, no overlay */
-    body{background-image:var(--topo-img);background-size:${S};background-repeat:repeat;}
+    /* body */
+    body{background-image:var(--topo-img);background-size:600px 600px;background-repeat:repeat;}
 
-    /* primary chrome — dark glass over topo */
+    /* primary chrome */
     .hdr,.loc-bar{
-      background-image:var(--topo-img);background-size:${S};
+      background-image:var(--topo-img);background-size:600px 600px;
       background-color:rgba(2,2,2,.87);background-blend-mode:multiply;}
     .stats-panel{
-      background-image:var(--topo-img);background-size:${S};
+      background-image:var(--topo-img);background-size:600px 600px;
       background-color:rgba(2,2,2,.89);}
 
     /* cards */
     .sblock{
-      background-image:var(--topo-img);background-size:${Sh};
+      background-image:var(--topo-img);background-size:300px 300px;
       background-color:rgba(6,6,6,.87);}
 
     /* modals */
     .journal-inner,.prog-sheet,.setup-modal-card{
-      background-image:var(--topo-img);background-size:${S};
+      background-image:var(--topo-img);background-size:600px 600px;
       background-color:rgba(2,2,2,.91);}
 
     /* small panels */
     .dng-confirm-card,.gwarn-box{
-      background-image:var(--topo-img);background-size:${Sh};
+      background-image:var(--topo-img);background-size:300px 300px;
       background-color:rgba(4,4,4,.91);}
 
-    /* interactive elements — topo + coloured overlay */
+    /* interactive elements — coloured overlay over gradient */
     .zone-btn,.j-foot button{
       background-image:var(--tbtn-gold),var(--topo-img);
-      background-size:auto,${Sh};background-color:rgba(8,8,8,.9);}
+      background-size:auto,300px 300px;background-color:rgba(8,8,8,.9);}
     .zone-btn:hover,.zone-btn.zb-gold{
       background-image:var(--tbtn-gold),var(--topo-img);
       background-color:rgba(12,12,8,.88);}
 
     .act-bubble{
-      background-image:var(--topo-img);background-size:${Sh};
+      background-image:var(--topo-img);background-size:300px 300px;
       background-color:rgba(6,6,6,.93);}
     .act-bubble:hover{
       background-image:var(--tbtn-gold),var(--topo-img);
-      background-size:auto,${Sh};}
+      background-size:auto,300px 300px;}
 
     .loc-btn{
-      background-image:var(--topo-img);background-size:${Sh};
+      background-image:var(--topo-img);background-size:300px 300px;
       background-color:rgba(8,8,8,.9);}
     .loc-btn.active{
       background-image:var(--tbtn-gold),var(--topo-img);
-      background-size:auto,${Sh};background-color:rgba(10,8,2,.88);}
+      background-size:auto,300px 300px;background-color:rgba(10,8,2,.88);}
 
     .j-add-btn{
       background-image:var(--tbtn-purple),var(--topo-img);
-      background-size:auto,${Sh};}
+      background-size:auto,300px 300px;}
     .j-foot button{
       background-image:var(--tbtn-purple),var(--topo-img);
-      background-size:auto,${Sh};background-color:rgba(8,6,10,.9);}
+      background-size:auto,300px 300px;background-color:rgba(8,6,10,.9);}
 
     .tmpl-load{
       background-image:var(--tbtn-purple),var(--topo-img);
-      background-size:auto,${Sh};}
+      background-size:auto,300px 300px;}
 
     .face-start-btn{
       background-image:var(--tbtn-gold),var(--topo-img);
-      background-size:auto,${Sh};}
+      background-size:auto,300px 300px;}
 
     .dng-btn-yes{
       background-image:var(--tbtn-purple),var(--topo-img);
-      background-size:auto,${Sh};}
+      background-size:auto,300px 300px;}
     .dng-btn-no{
-      background-image:var(--topo-img);background-size:${Sh};
+      background-image:var(--topo-img);background-size:300px 300px;
       background-color:rgba(8,8,8,.9);}
 
     .dng-nav{
-      background-image:var(--topo-img);background-size:${S};
+      background-image:var(--topo-img);background-size:600px 600px;
       background-color:rgba(2,2,2,.88);}
     .dng-nav-btn{
-      background-image:var(--topo-img);background-size:${Sh};
+      background-image:var(--topo-img);background-size:300px 300px;
       background-color:rgba(8,8,8,.9);}
     .dng-nav-btn:hover,.dng-nav-btn.active{
       background-image:var(--tbtn-purple),var(--topo-img);
-      background-size:auto,${Sh};}
+      background-size:auto,300px 300px;}
 
     .save-btn{
       background-image:var(--tbtn-green),var(--topo-img);
-      background-size:auto,${Sh};}
+      background-size:auto,300px 300px;}
 
     /* journal entries */
     .j-journal-entry,.tmpl-row{
-      background-image:var(--topo-img);background-size:${Sh};
+      background-image:var(--topo-img);background-size:300px 300px;
       background-color:rgba(8,8,8,.9);}
 
     /* kitchen & wilderness panel */
     .kitchen-wrap .kitch{
-      background-image:var(--topo-img);background-size:${S};
+      background-image:var(--topo-img);background-size:600px 600px;
       background-color:rgba(5,5,8,.94);}
   `;
   document.head.appendChild(st);
