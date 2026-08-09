@@ -4327,7 +4327,16 @@ _trLoadStoredAudio();
 //  Generates proper organic contour lines matching the reference aesthetic.
 // ══════════════════════════════════════════════════════════════════════════════
 (function _initTopoTexture() {
-  const W = 640, H = 640, CELL = 3;          // canvas size + grid cell size
+  // Retina-crisp: render at physical pixel resolution, display at CSS_SIZE px
+  const DPR = Math.min(Math.ceil(window.devicePixelRatio || 2), 3);
+  const CSS_SIZE = 600;                        // CSS display size (px)
+  const W = CSS_SIZE * Math.max(DPR, 2);       // min 2× (1200), max 3× (1800)
+  const H = W;
+  const CELL = 2;                              // canvas px per grid cell
+  // Frequency multiplier: keeps same visual hill scale regardless of resolution.
+  // old was 0.30 with CELL=3 and background-size=640px (≈1 CSS px per cell).
+  // New: 1 cell = CELL*(CSS_SIZE/W) CSS px. Scale mult so CSS freq stays constant.
+  const FMUL = 0.10 * (3 / CELL) * (W / (CSS_SIZE * 2));
   const canvas = document.createElement('canvas');
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
@@ -4344,7 +4353,7 @@ _trLoadStoredAudio();
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      const x = c * 0.30, y = r * 0.30;
+      const x = c * FMUL, y = r * FMUL;
       const v =
         Math.sin(x * 0.17 + 0.52) * Math.cos(y * 0.22 + 1.35)         // broad hills
       + Math.sin(x * 0.08 - y * 0.11 + 2.74) * 0.70                   // large ridges
@@ -4427,101 +4436,104 @@ _trLoadStoredAudio();
   document.documentElement.style.setProperty('--topo-img', `url("${dataUrl}")`);
 
   // ── 5. Inject style rules — topo applied everywhere ──
+  // CSS_SIZE = display size in CSS px (canvas is 2-3× larger for crisp Retina rendering)
+  const S  = CSS_SIZE + 'px ' + CSS_SIZE + 'px';       // e.g. "600px 600px"
+  const Sh = (CSS_SIZE / 2) + 'px ' + (CSS_SIZE / 2) + 'px'; // e.g. "300px 300px"
   const st = document.createElement('style');
   st.id = '__topo-style';
   st.textContent = `
     /* body — pure topo, no overlay */
-    body{background-image:var(--topo-img);background-size:640px 640px;background-repeat:repeat;}
+    body{background-image:var(--topo-img);background-size:${S};background-repeat:repeat;}
 
     /* primary chrome — dark glass over topo */
     .hdr,.loc-bar{
-      background-image:var(--topo-img);background-size:640px 640px;
+      background-image:var(--topo-img);background-size:${S};
       background-color:rgba(2,2,2,.87);background-blend-mode:multiply;}
     .stats-panel{
-      background-image:var(--topo-img);background-size:640px 640px;
+      background-image:var(--topo-img);background-size:${S};
       background-color:rgba(2,2,2,.89);}
 
     /* cards */
     .sblock{
-      background-image:var(--topo-img);background-size:320px 320px;
+      background-image:var(--topo-img);background-size:${Sh};
       background-color:rgba(6,6,6,.87);}
 
     /* modals */
     .journal-inner,.prog-sheet,.setup-modal-card{
-      background-image:var(--topo-img);background-size:640px 640px;
+      background-image:var(--topo-img);background-size:${S};
       background-color:rgba(2,2,2,.91);}
 
     /* small panels */
     .dng-confirm-card,.gwarn-box{
-      background-image:var(--topo-img);background-size:320px 320px;
+      background-image:var(--topo-img);background-size:${Sh};
       background-color:rgba(4,4,4,.91);}
 
     /* interactive elements — topo + coloured overlay */
     .zone-btn,.j-foot button{
       background-image:var(--tbtn-gold),var(--topo-img);
-      background-size:auto,320px 320px;background-color:rgba(8,8,8,.9);}
+      background-size:auto,${Sh};background-color:rgba(8,8,8,.9);}
     .zone-btn:hover,.zone-btn.zb-gold{
       background-image:var(--tbtn-gold),var(--topo-img);
       background-color:rgba(12,12,8,.88);}
 
     .act-bubble{
-      background-image:var(--topo-img);background-size:320px 320px;
+      background-image:var(--topo-img);background-size:${Sh};
       background-color:rgba(6,6,6,.93);}
     .act-bubble:hover{
       background-image:var(--tbtn-gold),var(--topo-img);
-      background-size:auto,320px 320px;}
+      background-size:auto,${Sh};}
 
     .loc-btn{
-      background-image:var(--topo-img);background-size:320px 320px;
+      background-image:var(--topo-img);background-size:${Sh};
       background-color:rgba(8,8,8,.9);}
     .loc-btn.active{
       background-image:var(--tbtn-gold),var(--topo-img);
-      background-size:auto,320px 320px;background-color:rgba(10,8,2,.88);}
+      background-size:auto,${Sh};background-color:rgba(10,8,2,.88);}
 
     .j-add-btn{
       background-image:var(--tbtn-purple),var(--topo-img);
-      background-size:auto,320px 320px;}
+      background-size:auto,${Sh};}
     .j-foot button{
       background-image:var(--tbtn-purple),var(--topo-img);
-      background-size:auto,320px 320px;background-color:rgba(8,6,10,.9);}
+      background-size:auto,${Sh};background-color:rgba(8,6,10,.9);}
 
     .tmpl-load{
       background-image:var(--tbtn-purple),var(--topo-img);
-      background-size:auto,320px 320px;}
+      background-size:auto,${Sh};}
 
     .face-start-btn{
       background-image:var(--tbtn-gold),var(--topo-img);
-      background-size:auto,320px 320px;}
+      background-size:auto,${Sh};}
 
     .dng-btn-yes{
       background-image:var(--tbtn-purple),var(--topo-img);
-      background-size:auto,320px 320px;}
+      background-size:auto,${Sh};}
     .dng-btn-no{
-      background-image:var(--topo-img);background-size:320px 320px;
+      background-image:var(--topo-img);background-size:${Sh};
       background-color:rgba(8,8,8,.9);}
 
     .dng-nav{
-      background-image:var(--topo-img);background-size:640px 640px;
+      background-image:var(--topo-img);background-size:${S};
       background-color:rgba(2,2,2,.88);}
     .dng-nav-btn{
-      background-image:var(--topo-img);background-size:320px 320px;
+      background-image:var(--topo-img);background-size:${Sh};
       background-color:rgba(8,8,8,.9);}
     .dng-nav-btn:hover,.dng-nav-btn.active{
       background-image:var(--tbtn-purple),var(--topo-img);
-      background-size:auto,320px 320px;}
+      background-size:auto,${Sh};}
 
     .save-btn{
       background-image:var(--tbtn-green),var(--topo-img);
-      background-size:auto,320px 320px;}
+      background-size:auto,${Sh};}
 
     /* journal entries */
     .j-journal-entry,.tmpl-row{
-      background-image:var(--topo-img);background-size:320px 320px;
+      background-image:var(--topo-img);background-size:${Sh};
       background-color:rgba(8,8,8,.9);}
 
     /* kitchen & wilderness panel */
     .kitchen-wrap .kitch{
-      background-image:var(--topo-img);background-size:640px 640px;
+      background-image:var(--topo-img);background-size:${S};
       background-color:rgba(5,5,8,.94);}
   `;
   document.head.appendChild(st);
