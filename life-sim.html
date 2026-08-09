@@ -4534,7 +4534,8 @@ function enterDungeon() {
   const rHead = document.getElementById('char-head');
   const dHead = document.getElementById('dng-med-head');
   if (rHead && dHead) dHead.style.background = rHead.style.background || '#9B6240';
-  renderDungeonPhotos();
+  _dngLoadPhotos();     // read from localStorage into memory first
+  renderDungeonPhotos(); // then render from memory (no further LS reads)
   dng.classList.add('visible');
   requestAnimationFrame(() => requestAnimationFrame(() => dng.classList.add('show')));
 }
@@ -4577,105 +4578,144 @@ function toggleDungeonMeditate(forceStop) {
   }
 }
 
-// ── Photos ──
-let _dngPhotos = {};
+// ── Dungeon Photos ──────────────────────────────────────────────────
+let _dngPhotos = {};      // in-memory store (source of truth after init)
 const _DNG_SLOTS = 6;
+let _dngTargetSlot = 0;
 
 function _dngLoadPhotos() {
   try { _dngPhotos = JSON.parse(localStorage.getItem('dungeon_photos') || '{}'); }
   catch(e) { _dngPhotos = {}; }
 }
 
+function _dngSavePhotos() {
+  try { localStorage.setItem('dungeon_photos', JSON.stringify(_dngPhotos)); }
+  catch(e) { /* localStorage full — photos still live in memory this session */ }
+}
+
 function renderDungeonPhotos() {
-  _dngLoadPhotos();
+  // NOTE: does NOT re-read localStorage — always renders from in-memory _dngPhotos
+  // (call _dngLoadPhotos() explicitly when initialising)
   const grid = document.getElementById('dng-photos');
   if (!grid) return;
   grid.innerHTML = '';
+
   for (let i = 0; i < _DNG_SLOTS; i++) {
     const slot = document.createElement('div');
     slot.className = 'dng-photo-slot';
-    if (_dngPhotos[i]) {
+    const idx = i; // capture for closures
+
+    if (_dngPhotos[idx]) {
+      // ── filled slot ──
       const img = document.createElement('img');
-      img.src = _dngPhotos[i];
+      img.src = _dngPhotos[idx];
       slot.appendChild(img);
-      // Long-press to remove
-      let pressT;
-      const startPress = () => { pressT = setTimeout(() => removeDungeonPhoto(i), 700); };
-      const endPress = () => clearTimeout(pressT);
-      slot.addEventListener('touchstart', startPress);
-      slot.addEventListener('touchend', endPress);
-      slot.addEventListener('mousedown', startPress);
-      slot.addEventListener('mouseup', endPress);
+
+      // short tap → replace; long press → remove
+      let pressTimer = null;
+      let didLongPress = false;
+
+      const onStart = () => {
+        didLongPress = false;
+        pressTimer = setTimeout(() => {
+          didLongPress = true;
+          if (confirm('Remove this photo?')) {
+            delete _dngPhotos[idx];
+            _dngSavePhotos();
+            renderDungeonPhotos();
+          }
+        }, 650);
+      };
+      const onEnd = () => {
+        clearTimeout(pressTimer);
+      };
+      const onTap = () => {
+        if (!didLongPress) {
+          // short tap = replace
+          _dngPickPhoto(idx);
+        }
+      };
+
+      slot.addEventListener('touchstart', onStart, {passive:true});
+      slot.addEventListener('touchend', onEnd);
+      slot.addEventListener('touchcancel', onEnd);
+      slot.addEventListener('mousedown', onStart);
+      slot.addEventListener('mouseup', onEnd);
+      slot.addEventListener('click', onTap);
+
+      // hint label
+      const hint = document.createElement('div');
+      hint.style.cssText = 'position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:8px;color:rgba(255,255,255,.28);pointer-events:none;';
+      hint.textContent = 'tap · hold to remove';
+      slot.appendChild(hint);
     } else {
+      // ── empty slot ──
       slot.innerHTML = '<span class="dng-slot-plus">+</span>';
-      slot.onclick = () => dngAddPhoto(i);
+      slot.addEventListener('click', () => _dngPickPhoto(idx));
     }
+
     grid.appendChild(slot);
   }
 }
 
-let _dngPhotoInput = null;
-let _dngTargetSlot = 0;
-
-function dngPromptAddPhoto() {
-  // Pick first empty slot, or slot 0
-  _dngLoadPhotos();
-  _dngTargetSlot = 0;
-  for (let i = 0; i < _DNG_SLOTS; i++) {
-    if (!_dngPhotos[i]) { _dngTargetSlot = i; break; }
-  }
-  _dngOpenPicker();
-}
-
-function dngAddPhoto(slotIdx) {
+function _dngPickPhoto(slotIdx) {
   _dngTargetSlot = slotIdx;
-  _dngOpenPicker();
-}
+  // Always create a fresh input — most reliable across all browsers / iOS Safari
+  const old = document.getElementById('_dng-file-inp');
+  if (old) old.remove();
 
-function _dngOpenPicker() {
-  if (!_dngPhotoInput || !document.body.contains(_dngPhotoInput)) {
-    _dngPhotoInput = document.createElement('input');
-    _dngPhotoInput.type = 'file';
-    _dngPhotoInput.accept = 'image/*';
-    _dngPhotoInput.style.cssText = 'position:fixed;opacity:0;width:1px;height:1px;top:-9999px;left:-9999px;';
-    _dngPhotoInput.addEventListener('change', _dngPhotoSelected);
-    document.body.appendChild(_dngPhotoInput);
-  }
-  _dngPhotoInput.value = '';
-  _dngPhotoInput.click();
-}
+  const inp = document.createElement('input');
+  inp.id   = '_dng-file-inp';
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  // Must be in visible DOM region for iOS Safari to open picker
+  inp.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;opacity:0;pointer-events:none;';
+  document.body.appendChild(inp);
 
-function _dngPhotoSelected() {
-  const file = _dngPhotoInput?.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const max = 600;
-      let w = img.width, h = img.height;
-      if (w > max || h > max) {
-        const r = Math.min(max/w, max/h);
-        w = Math.round(w*r); h = Math.round(h*r);
-      }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      _dngPhotos[_dngTargetSlot] = canvas.toDataURL('image/jpeg', .82);
-      try { localStorage.setItem('dungeon_photos', JSON.stringify(_dngPhotos)); } catch(err) {}
-      renderDungeonPhotos();
+  inp.addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const tmpImg = new Image();
+      tmpImg.onload = () => {
+        const MAX = 700;
+        const scale = Math.min(1, MAX / tmpImg.width, MAX / tmpImg.height);
+        const canvas = document.createElement('canvas');
+        canvas.width  = Math.round(tmpImg.width  * scale);
+        canvas.height = Math.round(tmpImg.height * scale);
+        canvas.getContext('2d').drawImage(tmpImg, 0, 0, canvas.width, canvas.height);
+        _dngPhotos[_dngTargetSlot] = canvas.toDataURL('image/jpeg', 0.82);
+        _dngSavePhotos();
+        renderDungeonPhotos();
+      };
+      tmpImg.src = ev.target.result;
     };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+    reader.readAsDataURL(file);
+    // remove input after use
+    setTimeout(() => inp.remove(), 1000);
+  });
+
+  inp.click();
+}
+
+// keep dngAddPhoto and dngPromptAddPhoto as aliases for the nav button
+function dngAddPhoto(slotIdx) { _dngPickPhoto(slotIdx); }
+function dngPromptAddPhoto() {
+  // find first empty slot, fallback to 0
+  let target = 0;
+  for (let i = 0; i < _DNG_SLOTS; i++) {
+    if (!_dngPhotos[i]) { target = i; break; }
+  }
+  _dngPickPhoto(target);
 }
 
 function removeDungeonPhoto(slotIdx) {
-  _dngLoadPhotos();
   delete _dngPhotos[slotIdx];
-  try { localStorage.setItem('dungeon_photos', JSON.stringify(_dngPhotos)); } catch(e) {}
+  _dngSavePhotos();
   renderDungeonPhotos();
 }
+// ────────────────────────────────────────────────────────────────────
 
 // ─────────────────────────────────────────────
 //  DUMBBELL MENU
